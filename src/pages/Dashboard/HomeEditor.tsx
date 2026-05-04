@@ -47,8 +47,12 @@ export const HomeEditor = () => {
   };
 
   const handleAddSlide = () => {
-    if (slides.length >= 5) return;
-    setSlides([...slides, { id: Date.now(), title: "", description: "", image: "" }]);
+    console.log("handleAddSlide clicked.");
+    setSlides(prevSlides => {
+      console.log("Current slides:", prevSlides);
+      if (prevSlides.length >= 5) return prevSlides;
+      return [...prevSlides, { id: Date.now(), title: "", description: "", image: "" }];
+    });
   };
 
   const handleRemoveSlide = (id: number) => {
