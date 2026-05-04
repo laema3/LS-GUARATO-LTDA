@@ -50,7 +50,9 @@ export default function App() {
   useEffect(() => {
     const checkMaintenance = async () => {
       try {
+        console.log("Checking maintenance mode...");
         const { data, error } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1);
+        console.log("Maintenance check result:", data, error);
         
         // Se houver erro ou não encontrar, assumimos false para não travar
         if (error || !data || data.length === 0) {
@@ -83,7 +85,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      {maintenanceMode === null ? null : (
+      {true && (
         <Routes>
           {/* Rotas administrativas movem para cima para prioridade */}
           <Route path="/admin" element={<DashboardLayout />}>
