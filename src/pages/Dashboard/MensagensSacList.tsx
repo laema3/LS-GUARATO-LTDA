@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
-import { MessageSquare, Search, User, Mail, Phone, Calendar } from "lucide-react";
+import { MessageSquare, Search, User, Mail, Phone, Calendar, Trash2, Reply } from "lucide-react";
 
 export const MensagensSacList = () => {
   const [mensagens, setMensagens] = useState<any[]>([]);
@@ -29,6 +29,21 @@ export const MensagensSacList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    setLoading(true);
+    const { error } = await supabase.from('mensagens_contato').delete().eq('id', id);
+
+    if (error) {
+      console.error("Erro ao excluir mensagem:", error.message);
+    } else {
+      setMensagens(prev => prev.filter(m => m.id !== id));
+    }
+    setDeletingId(null);
+    setLoading(false);
   };
 
   const filteredMensagens = mensagens.filter(m => 
@@ -94,10 +109,47 @@ export const MensagensSacList = () => {
                       </div>
                     </div>
                     
-                    <div className="md:w-2/3 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                      <p className="text-gray-800 whitespace-pre-wrap text-sm leading-relaxed">
-                        {msg.mensagem}
-                      </p>
+                    <div className="md:w-2/3 flex flex-col gap-4">
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 flex-grow">
+                        <p className="text-gray-800 whitespace-pre-wrap text-sm leading-relaxed">
+                          {msg.mensagem}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3 self-end">
+                        <a 
+                          href={`mailto:${msg.email}?subject=Resposta LS Guarato - Contato Direto&body=Olá ${msg.nome},%0D%0A%0D%0AEm resposta à sua mensagem:%0D%0A"${msg.mensagem}"%0D%0A%0D%0A`}
+                          className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold bg-[#0B3C8C] text-white rounded-lg hover:bg-[#082a63] transition-colors"
+                        >
+                          <Reply className="h-3.5 w-3.5" />
+                          Responder
+                        </a>
+                        {deletingId === msg.id ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-red-600 uppercase">Confirmar?</span>
+                            <button 
+                              onClick={() => handleDelete(msg.id)}
+                              className="px-2 py-1 bg-red-600 text-white rounded text-[10px] font-bold hover:bg-red-700"
+                            >
+                              SIM
+                            </button>
+                            <button 
+                              onClick={() => setDeletingId(null)}
+                              className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-[10px] font-bold hover:bg-gray-300"
+                            >
+                              NÃO
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => setDeletingId(msg.id)}
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold bg-white text-[#D62828] border border-[#D62828] rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Excluir
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

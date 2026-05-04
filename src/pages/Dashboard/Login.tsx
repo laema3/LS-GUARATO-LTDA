@@ -27,13 +27,19 @@ export const Login = () => {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error: loginError } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
       password,
     });
 
-    if (error) {
-      setError(error.message);
+    if (loginError) {
+      if (loginError.message.includes("Email not confirmed")) {
+        setError("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada ou as configurações de Autenticação no Supabase (desative 'Confirm Email' se quiser entrar direto).");
+      } else if (loginError.message.includes("Invalid login credentials")) {
+        setError("E-mail ou senha incorretos.");
+      } else {
+        setError(loginError.message);
+      }
       setLoading(false);
     } else {
       navigate("/admin");

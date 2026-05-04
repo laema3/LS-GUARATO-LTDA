@@ -15,6 +15,7 @@ export const UsuariosEditor = () => {
   const [loading, setLoading] = useState(true);
   const [usuarios, setUsuarios] = useState<SystemUser[]>([]);
   const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState<'admin' | 'operator'>('operator');
   const [enviando, setEnviando] = useState(false);
 
   const [tableExists, setTableExists] = useState(true);
@@ -48,8 +49,8 @@ export const UsuariosEditor = () => {
 
     setEnviando(true);
     const { error } = await supabase.from('profiles').insert([{
-      email: newEmail,
-      role: 'admin'
+      email: newEmail.toLowerCase().trim(),
+      role: newRole
     }]);
 
     if (!error) {
@@ -57,21 +58,40 @@ export const UsuariosEditor = () => {
       setNewEmail("");
       loadUsers();
     } else {
-      alert("Erro ao adicionar usuário: " + error.message);
+      console.error("Erro ao autorizar usuário:", error.message);
     }
     setEnviando(false);
   };
 
-  const handleDeleteUser = async (id: string) => {
-    if (!confirm("Tem certeza que deseja remover o acesso deste usuário?")) return;
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const handleDeleteUser = async (id: string) => {
+    setEnviando(true);
     const { error } = await supabase.from('profiles').delete().eq('id', id);
 
-    if (!error) {
-      loadUsers();
+    if (error) {
+      console.error("Erro ao remover usuário:", error.message);
     } else {
-      alert("Erro ao remover usuário: " + error.message);
+      loadUsers();
     }
+    setDeletingId(null);
+    setEnviando(false);
+  };
+
+  const handleUpdateRole = async (id: string, newRole: string) => {
+    setEnviando(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', id);
+
+    if (error) {
+      console.error("Erro ao atualizar cargo:", error.message);
+    } else {
+      loadUsers();
+      setShowToast(true);
+    }
+    setEnviando(false);
   };
 
   return (
@@ -123,21 +143,46 @@ FOR ALL TO authenticated USING (true);`}
         </div>
       )}
 
+      {/* Dica para o usuário atual caso ele não seja Admin no profiles */}
+      <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg mb-6">
+        <h3 className="text-amber-800 font-bold text-sm mb-1">Dica de Acesso</h3>
+        <p className="text-amber-700 text-xs">
+          Se você criou seu usuário direto no Painel do Supabase, você precisa autorizá-lo como <strong>admin</strong> na tabela <strong>profiles</strong> para ver todas as opções.
+          Execute este comando se necessário:
+        </p>
+        <code className="block bg-amber-900/10 p-2 mt-2 rounded text-[10px] font-mono text-amber-900">
+          INSERT INTO public.profiles (email, role) VALUES ('rh@lsguarato.com.br', 'admin') ON CONFLICT (email) DO UPDATE SET role = 'admin';
+        </code>
+      </div>
+
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-bold font-sans text-gray-900 mb-4 flex items-center gap-2">
           <UserPlus className="h-5 w-5 text-[#D62828]" /> Autorizar Novo Administrador
         </h2>
         <form onSubmit={handleAddUser} className="flex flex-col gap-4">
-          <div className="flex-grow relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input 
-              type="email" 
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              placeholder="Digite o e-mail do novo administrador"
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none"
-              required
-            />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-grow relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input 
+                type="email" 
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="E-mail do administrador ou operador"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                required
+              />
+            </div>
+            <div className="w-full md:w-48 relative">
+              <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <select
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value as any)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none appearance-none bg-white"
+              >
+                <option value="operator">Operador</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
           </div>
           <button 
             type="submit" 
@@ -173,24 +218,54 @@ FOR ALL TO authenticated USING (true);`}
                 <div key={user.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors group">
                   <div className="flex items-center gap-4">
                     <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-[#0B3C8C] font-bold text-lg">
-                      {user.email.charAt(0).toUpperCase()}
+                      {user.email?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900">{user.email}</p>
                       <p className="text-xs text-gray-500">Adicionado em: {new Date(user.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-green-100 text-green-700 rounded-full uppercase tracking-wider">
-                      {user.role || 'Admin'}
-                    </span>
-                    <button 
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                      title="Remover Acesso"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <select
+                        value={user.role || 'operator'}
+                        onChange={(e) => handleUpdateRole(user.id, e.target.value)}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border-none outline-none cursor-pointer appearance-none ${
+                          user.role === 'admin' 
+                            ? 'bg-red-100 text-red-700' 
+                            : 'bg-green-100 text-green-700'
+                        }`}
+                        style={{ paddingRight: '0.5rem' }}
+                        disabled={enviando}
+                      >
+                        <option value="admin">Administrador</option>
+                        <option value="operator">Operador</option>
+                      </select>
+                    </div>
+                    {deletingId === user.id ? (
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="px-2 py-1 bg-red-600 text-white rounded text-[10px] font-bold hover:bg-red-700"
+                        >
+                          CONFIRMAR
+                        </button>
+                        <button 
+                          onClick={() => setDeletingId(null)}
+                          className="px-2 py-1 bg-gray-200 text-gray-700 rounded text-[10px] font-bold hover:bg-gray-300"
+                        >
+                          X
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => setDeletingId(user.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                        title="Remover Acesso"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
