@@ -15,7 +15,8 @@ export const ConfiguracoesEditor = () => {
     email: "",
     link_loja: "",
     link_google_play: "",
-    link_app_store: ""
+    link_app_store: "",
+    manutencao_ativa: false
   });
 
   useEffect(() => {
@@ -32,39 +33,57 @@ export const ConfiguracoesEditor = () => {
         email: data.email || "",
         link_loja: data.link_loja || "",
         link_google_play: data.link_google_play || "",
-        link_app_store: data.link_app_store || ""
+        link_app_store: data.link_app_store || "",
+        manutencao_ativa: data.manutencao_ativa || false
       });
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setEmpresa({ ...empresa, [e.target.name]: e.target.value });
+    const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
+    setEmpresa({ ...empresa, [e.target.name]: value });
   };
 
   const handleSave = async () => {
-    const { error } = await supabase.from('footer_settings').update({
-      descricao: empresa.descricao,
-      endereco: empresa.endereco,
-      telefone: empresa.telefone,
-      email: empresa.email,
-      link_loja: empresa.link_loja,
-      link_google_play: empresa.link_google_play,
-      link_app_store: empresa.link_app_store
-    }).eq('id', 1);
+    try {
+      const { error } = await supabase.from('footer_settings').update({
+        descricao: empresa.descricao,
+        endereco: empresa.endereco,
+        telefone: empresa.telefone,
+        email: empresa.email,
+        link_loja: empresa.link_loja,
+        link_google_play: empresa.link_google_play,
+        link_app_store: empresa.link_app_store,
+        manutencao_ativa: empresa.manutencao_ativa
+      }).eq('id', 1);
 
-    // Se estiver vazio/não houver registro ainda
-    if (error && error.code !== 'PGRST116') {
-       // tenta insert
-       const { error: errInsert } = await supabase.from('footer_settings').insert([{
-         id: 1, ...empresa
-       }]);
-       if (!errInsert) {
-          setShowToast(true);
-       } else {
-          alert("Erro ao salvar dados da empresa: " + errInsert.message);
-       }
-    } else if (!error) {
-       setShowToast(true);
+      if (error) {
+        if (error.message.includes('column "manutencao_ativa" does not exist')) {
+          alert("ERRO: A coluna 'manutencao_ativa' não existe no seu banco de dados Supabase. Por favor, adicione-a na tabela 'footer_settings' como tipo 'boolean' para que esta função funcione.");
+        } else if (error.code === 'PGRST116') {
+           // tenta insert se não houver ID 1
+           const { error: errInsert } = await supabase.from('footer_settings').insert([{
+             id: 1, 
+             descricao: empresa.descricao,
+             endereco: empresa.endereco,
+             telefone: empresa.telefone,
+             email: empresa.email,
+             link_loja: empresa.link_loja,
+             link_google_play: empresa.link_google_play,
+             link_app_store: empresa.link_app_store,
+             manutencao_ativa: empresa.manutencao_ativa
+           }]);
+           
+           if (errInsert) throw errInsert;
+           setShowToast(true);
+        } else {
+          throw error;
+        }
+      } else {
+        setShowToast(true);
+      }
+    } catch (err: any) {
+      alert("Erro ao salvar: " + err.message);
     }
   };
 
@@ -131,6 +150,25 @@ export const ConfiguracoesEditor = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none resize-none" 
               />
             </div>
+         </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+         <div className="flex items-center justify-between">
+           <div>
+             <h2 className="text-xl font-bold font-sans text-gray-900 leading-tight">Modo Manutenção</h2>
+             <p className="text-sm text-gray-500 mt-1">Ao ativar, o site público exibirá apenas a página de manutenção.</p>
+           </div>
+           <label className="relative inline-flex items-center cursor-pointer">
+             <input 
+               type="checkbox" 
+               name="manutencao_ativa"
+               checked={empresa.manutencao_ativa}
+               onChange={handleChange}
+               className="sr-only peer" 
+             />
+             <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#0B3C8C]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-600"></div>
+           </label>
          </div>
       </div>
 

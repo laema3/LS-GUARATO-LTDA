@@ -1,8 +1,28 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { Home, Info, LayoutDashboard, FileText, LogOut, Briefcase, Settings2, Settings, MessageSquare } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Home, Info, LayoutDashboard, FileText, LogOut, Briefcase, Settings2, Settings, MessageSquare, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 
 export const DashboardLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin/login");
+  };
 
   const menu = [
     { name: "Ajustes da Empresa", path: "/admin/ajustes", icon: Settings },
@@ -16,6 +36,7 @@ export const DashboardLayout = () => {
     { name: "Serviços (PDFs)", path: "/admin/servicos", icon: FileText },
     { name: "Vagas: Cadastrar", path: "/admin/vagas/cadastrar", icon: Briefcase },
     { name: "Vagas: Parâmetros", path: "/admin/vagas/parametros", icon: Settings2 },
+    { name: "Usuários do Sistema", path: "/admin/usuarios", icon: Users },
   ].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
@@ -43,15 +64,24 @@ export const DashboardLayout = () => {
           })}
         </nav>
         <div className="p-4 border-t border-white/20">
-          <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+          >
             <LogOut className="h-5 w-5 text-[#D62828] shrink-0" />
-            Voltar ao Site
-          </Link>
+            Sair do Painel
+          </button>
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto p-8 relative">
-        <Outlet />
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0B3C8C]"></div>
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
-    </div>
+</div>
   );
 };
