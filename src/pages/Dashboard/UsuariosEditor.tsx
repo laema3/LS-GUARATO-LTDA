@@ -105,8 +105,16 @@ export const UsuariosEditor = () => {
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Habilitar Segurança de Nível de Linha
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Acesso Total" ON public.profiles FOR ALL TO authenticated USING (true);`}
+
+-- Política para permitir verificação de e-mail (Seguro: apenas leitura)
+CREATE POLICY "Permitir verificação" ON public.profiles 
+FOR SELECT USING (true);
+
+-- Política para administradores autenticados alterarem dados
+CREATE POLICY "Acesso administrativp" ON public.profiles 
+FOR ALL TO authenticated USING (true);`}
             </pre>
           </div>
           <p className="text-xs text-red-600 mt-3 font-medium">

@@ -28,7 +28,7 @@ export const Login = () => {
     setError(null);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.toLowerCase().trim(),
       password,
     });
 
@@ -46,20 +46,30 @@ export const Login = () => {
     setError(null);
 
     // Primeiro verificamos se o e-mail está na lista de autorizados (tabela profiles)
+    const lowerEmail = email.toLowerCase().trim();
+    
+    // Tentamos buscar o e-mail autorizado
     const { data: allowed, error: checkError } = await supabase
       .from('profiles')
       .select('email')
-      .eq('email', email)
-      .single();
+      .ilike('email', lowerEmail)
+      .maybeSingle();
 
-    if (checkError || !allowed) {
-      setError("Este e-mail não está autorizado como administrador. Peça ao administrador principal para autorizar seu acesso.");
+    if (checkError) {
+      console.error("Erro ao verificar autorização:", checkError);
+      setError("Erro ao verificar autorização. Verifique se você executou o SQL de criação das tabelas no Supabase.");
+      setLoading(false);
+      return;
+    }
+
+    if (!allowed) {
+      setError("Este e-mail não está autorizado como administrador. Se você acabou de criar o usuário no Supabase, certifique-se de adicioná-lo também na tabela 'profiles' via SQL.");
       setLoading(false);
       return;
     }
 
     const { error } = await supabase.auth.signUp({
-      email,
+      email: lowerEmail,
       password,
     });
 
