@@ -104,10 +104,10 @@ export default function App() {
           </Route>
 
           <Route path="/admin/login" element={<Login />} />
-          <Route path="/area-restrita" element={<AreaRestrita />} />
 
           <Route path="/" element={maintenanceMode ? <Maintenance /> : <Layout />}>
             <Route index element={<Home />} />
+            <Route path="area-restrita" element={<AreaRestrita />} />
             <Route path="sobre" element={<Sobre />} />
             <Route path="contato" element={<Contato />} />
             

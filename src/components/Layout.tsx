@@ -64,8 +64,8 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={cn(
-                  "flex items-center gap-2 hover:text-white transition-colors text-[#D62828]",
-                  location.pathname === link.path && "text-white underline underline-offset-4 decoration-2"
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
+                  location.pathname === link.path && "text-[#D62828] underline underline-offset-4 decoration-2"
                 )}
               >
                 <link.icon className="h-5 w-5 text-[#D62828]" />
@@ -77,8 +77,8 @@ const Header = () => {
             <div className="relative group">
               <button 
                 className={cn(
-                  "flex items-center gap-2 hover:text-white transition-colors text-[#D62828]",
-                  location.pathname.startsWith('/servicos') && "text-white"
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
+                  location.pathname.startsWith('/servicos') && "text-[#D62828]"
                 )}
               >
                 <Store className="h-5 w-5 text-[#D62828]" />
@@ -103,8 +103,8 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={cn(
-                  "flex items-center gap-2 hover:text-white transition-colors text-[#D62828]",
-                  location.pathname === link.path && "text-white underline underline-offset-4 decoration-2"
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
+                  location.pathname === link.path && "text-[#D62828] underline underline-offset-4 decoration-2"
                 )}
               >
                 <link.icon className="h-5 w-5 text-[#D62828]" />

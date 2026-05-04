@@ -116,7 +116,7 @@ export const DashboardLayout = () => {
               <Link 
                 key={item.path} 
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-white/20 font-bold' : 'hover:bg-white/10'}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-white/20 font-bold text-[#D62828]' : 'text-white hover:bg-white/10 hover:text-[#D62828]'}`}
               >
                 <item.icon className="h-5 w-5 text-[#D62828] shrink-0" />
                 {item.name}
