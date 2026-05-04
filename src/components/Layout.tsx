@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp } from "lucide-react";
+import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
@@ -258,10 +258,12 @@ const Footer = () => {
                 Acessar Loja Virtual
               </a>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <a href={linkGoogle} target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-700 text-white rounded p-2 flex items-center justify-center transition-colors">
+                <a href={linkGoogle} target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-700 text-white rounded p-2 flex items-center justify-center gap-2 transition-colors">
+                  <Play className="h-4 w-4 text-[#D62828]" />
                   <span className="text-xs font-semibold">Google Play</span>
                 </a>
-                <a href={linkApple} target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-700 text-white rounded p-2 flex items-center justify-center transition-colors">
+                <a href={linkApple} target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-700 text-white rounded p-2 flex items-center justify-center gap-2 transition-colors">
+                  <Apple className="h-4 w-4 text-[#D62828]" />
                   <span className="text-xs font-semibold">App Store</span>
                 </a>
               </div>

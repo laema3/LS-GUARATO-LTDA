@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeft, ChevronRight, ShoppingBag, Truck, CreditCard, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingBag, Truck, CreditCard, Clock, Apple, Play } from "lucide-react";
 import { mockFAQs, mockSlides } from "../data/mockData";
 import { Accordion } from "../components/ui/Accordion";
 import { supabase } from "../lib/supabase";
@@ -204,9 +204,11 @@ export const Home = () => {
           <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">Baixe agora e tenha acesso a ofertas exclusivas, clube de benefícios e faça suas compras sem sair de casa.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
+              <Apple className="h-5 w-5 text-[#D62828]" />
               Baixar na App Store
             </button>
             <button className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
+              <Play className="h-5 w-5 text-[#D62828]" />
               Baixar no Google Play
             </button>
           </div>
