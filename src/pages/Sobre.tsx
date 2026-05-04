@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabase";
 export const Sobre = () => {
   const [historiaTitle, setHistoriaTitle] = useState("Histórico de Confiança");
   const [historiaDescription, setHistoriaDescription] = useState("O LS Guarato nasceu com uma missão simples:\nofererecer produtos de qualidade com preços justos para todas as famílias da nossa região.\nO que começou como uma pequena mercearia, fruto do trabalho árduo e da dedicação inabalável, transformou-se ao longo dos anos em uma rede consolidada, sendo hoje uma referência no setor supermercadista de Uberaba.\nNosso foco sempre foi o cliente. Entendemos que ir ao supermercado não é apenas fazer compras, é abastecer o seu lar, é preparar a festa de aniversário, é garantir a saúde da sua família através de alimentos frescos. Por isso, exigimos rigor no controle de qualidade dos nossos hortifrutis, carnes e padaria.");
+  const [bannerImage, setBannerImage] = useState("https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200");
   const [historiaImage, setHistoriaImage] = useState("");
   const [missao, setMissao] = useState("Oferecer produtos de alta qualidade, com variedade e preço justo, garantindo um atendimento de excelência e comodidade aos nossos clientes em um ambiente acolhedor.");
   const [visao, setVisao] = useState("Ser reconhecido como o supermercado referência em qualidade e relacionamento na região de Uberaba, inovando sempre e crescendo junto com a nossa comunidade.");
@@ -15,6 +16,7 @@ export const Sobre = () => {
     const loadSobre = async () => {
       const { data } = await supabase.from('sobre_settings').select('*').eq('id', 1).single();
       if (data) {
+        if (data.banner_image) setBannerImage(data.banner_image);
         if (data.historia_title) setHistoriaTitle(data.historia_title);
         if (data.historia_description) setHistoriaDescription(data.historia_description);
         if (data.historia_image) setHistoriaImage(data.historia_image);
@@ -32,7 +34,7 @@ export const Sobre = () => {
       <div className="relative h-[400px] w-full bg-gray-900 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
         <img 
-          src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200" 
+          src={bannerImage} 
           alt="Interior do supermercado"
           className="absolute inset-0 w-full h-full object-cover"
         />

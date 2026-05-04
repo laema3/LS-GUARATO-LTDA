@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings } from "lucide-react";
+import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
@@ -8,6 +8,7 @@ const Header = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [logo, setLogo] = useState("");
   const location = useLocation();
 
   useEffect(() => {
@@ -15,29 +16,45 @@ const Header = () => {
     setIsServicesOpen(false);
   }, [location]);
 
+  useEffect(() => {
+    const loadHeader = async () => {
+      const { data } = await supabase.from('header_settings').select('*').eq('id', 1).single();
+      if (data && data.logo) {
+        setLogo(data.logo);
+      }
+    };
+    loadHeader();
+  }, []);
+
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Sobre", path: "/sobre" },
+    { name: "Home", path: "/", icon: Store },
+    { name: "Sobre", path: "/sobre", icon: Store },
   ];
 
   const serviceLinks = [
-    { name: "Jornal de Ofertas", path: "/servicos/jornal-de-ofertas" },
-    { name: "Transparência Salarial", path: "/servicos/transparencia-salarial" },
-    { name: "Vagas de Empregos", path: "/servicos/vagas" },
+    { name: "Jornal de Ofertas", path: "/servicos/jornal-de-ofertas", icon: FileText },
+    { name: "Transparência Salarial", path: "/servicos/transparencia-salarial", icon: TrendingUp },
+    { name: "Vagas de Empregos", path: "/servicos/vagas", icon: Briefcase },
   ];
 
   const actionLinks = [
-    { name: "Área Restrita", path: "/area-restrita" },
-    { name: "Contato", path: "/contato" },
+    { name: "Área Restrita", path: "/area-restrita", icon: ShieldCheck },
+    { name: "Contato", path: "/contato", icon: Mail },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#0B3C8C] shadow-lg text-white">
       <div className="container mx-auto px-4">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex py-4 min-h-[5rem] items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Store className="h-8 w-8 text-[#D62828]" />
-            <span className="font-sans font-bold text-2xl tracking-tight">LS GUARATO</span>
+            {logo ? (
+              <img src={logo} alt="LS GUARATO" className="h-[78px] md:h-[84px] object-contain" />
+            ) : (
+              <>
+                <Store className="h-8 w-8 text-[#D62828]" />
+                <span className="font-sans font-bold text-2xl tracking-tight">LS GUARATO</span>
+              </>
+            )}
           </Link>
 
           {/* Desktop Nav */}
@@ -47,10 +64,11 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={cn(
-                  "hover:text-[#D62828] transition-colors",
-                  location.pathname === link.path && "text-[#D62828] underline underline-offset-4 decoration-2"
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-yellow-400",
+                  location.pathname === link.path && "text-yellow-400 underline underline-offset-4 decoration-2"
                 )}
               >
+                <link.icon className="h-5 w-5 text-yellow-400" />
                 {link.name}
               </Link>
             ))}
@@ -59,10 +77,11 @@ const Header = () => {
             <div className="relative group">
               <button 
                 className={cn(
-                  "flex items-center gap-1 hover:text-[#D62828] transition-colors",
-                  location.pathname.startsWith('/servicos') && "text-[#D62828]"
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-yellow-400",
+                  location.pathname.startsWith('/servicos') && "text-yellow-400"
                 )}
               >
+                <Store className="h-5 w-5" />
                 Serviços <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
               </button>
               <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden text-gray-800">
@@ -70,8 +89,9 @@ const Header = () => {
                   <Link 
                     key={link.path} 
                     to={link.path}
-                    className="block px-4 py-3 hover:bg-gray-100 hover:text-[#0B3C8C] transition-colors border-b border-gray-100 last:border-0"
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 hover:text-[#0B3C8C] transition-colors border-b border-gray-100 last:border-0"
                   >
+                    <link.icon className="h-4 w-4 text-yellow-500" />
                     {link.name}
                   </Link>
                 ))}
@@ -83,10 +103,11 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={cn(
-                  "hover:text-[#D62828] transition-colors",
-                  location.pathname === link.path && "text-[#D62828] underline underline-offset-4 decoration-2"
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-yellow-400",
+                  location.pathname === link.path && "text-yellow-400 underline underline-offset-4 decoration-2"
                 )}
               >
+                <link.icon className="h-5 w-5" />
                 {link.name}
               </Link>
             ))}
@@ -107,7 +128,8 @@ const Header = () => {
         <div className="md:hidden bg-[#082a63] border-t border-white/10">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="text-lg font-medium py-2">
+              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-yellow-400">
+                <link.icon className="h-5 w-5" />
                 {link.name}
               </Link>
             ))}
@@ -115,14 +137,18 @@ const Header = () => {
             <div className="flex flex-col gap-2">
               <button 
                 onClick={() => setIsServicesOpen(!isServicesOpen)}
-                className="flex items-center justify-between text-lg font-medium py-2"
+                className="flex items-center justify-between text-lg font-medium py-2 text-yellow-400"
               >
-                Serviços <ChevronDown className={cn("h-5 w-5 transition-transform", isServicesOpen && "rotate-180")} />
+                <span className="flex items-center gap-2">
+                  <Store className="h-5 w-5" /> Serviços
+                </span>
+                <ChevronDown className={cn("h-5 w-5 transition-transform", isServicesOpen && "rotate-180")} />
               </button>
               {isServicesOpen && (
                 <div className="pl-4 flex flex-col gap-3 py-2 border-l-2 border-[#D62828]">
                   {serviceLinks.map((link) => (
-                    <Link key={link.path} to={link.path} className="text-white/80">
+                    <Link key={link.path} to={link.path} className="flex items-center gap-2 text-white/80">
+                      <link.icon className="h-4 w-4 text-yellow-500" />
                       {link.name}
                     </Link>
                   ))}
@@ -131,7 +157,8 @@ const Header = () => {
             </div>
 
             {actionLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="text-lg font-medium py-2">
+              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-yellow-400">
+                <link.icon className="h-5 w-5" />
                 {link.name}
               </Link>
             ))}

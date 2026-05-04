@@ -58,7 +58,7 @@ export const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Banner / Slider Section */}
-      <section className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-gray-900">
+      <section className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-blue-900">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -88,7 +88,7 @@ export const Home = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-lg md:text-2xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md"
+                  className="text-lg md:text-2xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md bg-transparent"
                 >
                   {slides[currentSlide].description}
                 </motion.p>
@@ -124,19 +124,6 @@ export const Home = () => {
         >
           <ChevronRight className="h-8 w-8" />
         </button>
-
-        {/* Slider Indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-          {slides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                currentSlide === idx ? "bg-[#D62828] w-8" : "bg-white/60 hover:bg-white"
-              }`}
-            />
-          ))}
-        </div>
       </section>
 
       {/* Features bar */}
@@ -182,7 +169,6 @@ export const Home = () => {
             </div>
             <div className="lg:w-1/2">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#0B3C8C] to-[#D62828] rounded-2xl transform translate-x-4 translate-y-4 opacity-20"></div>
                 <img 
                   src={sobreImage} 
                   alt="Fachada Supermercado" 

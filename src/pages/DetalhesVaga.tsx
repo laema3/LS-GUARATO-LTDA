@@ -8,8 +8,15 @@ export const DetalhesVaga = () => {
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [enviadoComSucesso, setEnviadoComSucesso] = useState(false);
+  const [formData, setFormData] = useState({
+    nome: "",
+    email: "",
+    telefone: "",
+    mensagem: "",
+  });
 
   useEffect(() => {
     loadJob();
@@ -50,17 +57,42 @@ export const DetalhesVaga = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFileName(e.target.files[0].name);
+      setFile(e.target.files[0]);
     }
   };
 
-  const handleApply = (e: React.FormEvent) => {
+  const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
     setEnviando(true);
-    // Simulate upload delay
-    setTimeout(() => {
-      setEnviando(false);
+    
+    try {
+      let fileUrl = "";
+      if (file) {
+        const fileExt = file.name.split('.').pop();
+        const uploadName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage.from('curriculos').upload(uploadName, file);
+        if (!uploadError) {
+          const { data } = supabase.storage.from('curriculos').getPublicUrl(uploadName);
+          fileUrl = data.publicUrl;
+        }
+      }
+
+      await supabase.from('candidatos').insert([{
+        nome: formData.nome,
+        email: formData.email,
+        telefone: formData.telefone,
+        mensagem: formData.mensagem,
+        curriculo_url: fileUrl,
+        vaga_nome: job.cargo
+      }]);
+
       setEnviadoComSucesso(true);
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao enviar candidatura. Tente novamente.");
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -108,22 +140,22 @@ export const DetalhesVaga = () => {
                   <form className="space-y-4" onSubmit={handleApply}>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo *</label>
-                      <input type="text" required className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="Digite seu nome completo" />
+                      <input type="text" required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="Digite seu nome completo" />
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
-                      <input type="email" required className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="exemplo@email.com" />
+                      <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="exemplo@email.com" />
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp *</label>
-                      <input type="tel" required className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="(00) 00000-0000" />
+                      <input type="tel" required value={formData.telefone} onChange={e => setFormData({...formData, telefone: e.target.value})} className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="(00) 00000-0000" />
                     </div>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mensagem (Opcional)</label>
-                      <textarea rows={3} className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="Fale um pouco sobre você e sua experiência..."></textarea>
+                      <textarea rows={3} value={formData.mensagem} onChange={e => setFormData({...formData, mensagem: e.target.value})} className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent transition-all" placeholder="Fale um pouco sobre você e sua experiência..."></textarea>
                     </div>
                     
                     {/* File Upload */}

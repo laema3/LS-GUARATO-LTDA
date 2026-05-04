@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 
 export const Contato = () => {
   const [formData, setFormData] = useState({
@@ -9,15 +10,55 @@ export const Contato = () => {
     mensagem: ""
   });
   const [submitted, setSubmitted] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  
+  const [empresa, setEmpresa] = useState({
+    endereco: "Rua João Pinheiro, 256\nCentro, Uberaba - MG\nCEP: 38010-040",
+    telefone: "(34) 3318-7000",
+    email: "contato@lsguarato.com.br"
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const loadEmpresa = async () => {
+      const { data } = await supabase.from('footer_settings').select('*').eq('id', 1).single();
+      if (data) {
+        setEmpresa({
+          endereco: data.endereco || empresa.endereco,
+          telefone: data.telefone || empresa.telefone,
+          email: data.email || empresa.email
+        });
+      }
+    };
+    loadEmpresa();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate required fields (already handled by HTML5 req)
-    // Simulate API call
-    setTimeout(() => {
-      setSubmitted(true);
-      setFormData({ nome: "", email: "", telefone: "", mensagem: "" });
-    }, 1000);
+    setEnviando(true);
+    try {
+      const { error } = await supabase.from('mensagens_contato').insert([{
+        nome: formData.nome,
+        email: formData.email,
+        telefone: formData.telefone,
+        mensagem: formData.mensagem
+      }]);
+      
+      if (error) {
+        console.error(error);
+        if (error.code === '42P01') {
+          alert("A tabela 'mensagens_contato' não existe. Por favor, crie no Supabase com as colunas: id, nome, email, telefone, mensagem, created_at.");
+        } else {
+          alert("Erro ao enviar mensagem.");
+        }
+      } else {
+        setSubmitted(true);
+        setFormData({ nome: "", email: "", telefone: "", mensagem: "" });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -51,7 +92,7 @@ export const Contato = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900">Endereço Principal</h3>
-                    <p className="text-gray-600 mt-1">Rua João Pinheiro, 256<br />Centro, Uberaba - MG<br />CEP: 38010-040</p>
+                    <p className="text-gray-600 mt-1 whitespace-pre-wrap">{empresa.endereco}</p>
                   </div>
                 </div>
                 
@@ -61,8 +102,7 @@ export const Contato = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900">Telefone / Televendas</h3>
-                    <p className="text-gray-600 mt-1">(34) 3318-7000</p>
-                    <p className="text-gray-600">(34) 99999-9999 (WhatsApp)</p>
+                    <p className="text-gray-600 mt-1 whitespace-pre-wrap">{empresa.telefone}</p>
                   </div>
                 </div>
 
@@ -72,7 +112,7 @@ export const Contato = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900">E-mail</h3>
-                    <p className="text-gray-600 mt-1">contato@lsguarato.com.br</p>
+                    <p className="text-gray-600 mt-1">{empresa.email}</p>
                   </div>
                 </div>
 
@@ -176,8 +216,8 @@ export const Contato = () => {
                     ></textarea>
                   </div>
                   
-                  <button type="submit" className="w-full bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    <Send className="h-5 w-5" /> Enviar Mensagem
+                  <button type="submit" disabled={enviando} className="w-full bg-[#0B3C8C] hover:bg-[#082a63] disabled:bg-gray-400 text-white font-bold py-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <Send className="h-5 w-5" /> {enviando ? "Enviando..." : "Enviar Mensagem"}
                   </button>
                 </form>
               )}

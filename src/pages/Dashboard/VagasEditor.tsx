@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Briefcase, PlusCircle, Trash2, Edit } from "lucide-react";
+import { Save, Briefcase, PlusCircle, Trash2, Edit, X, AlertTriangle } from "lucide-react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { supabase } from "../../lib/supabase";
 
@@ -51,6 +51,8 @@ export const VagasEditor = () => {
     criterios: [],
   });
 
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
   const resetForm = () => {
     setFormData({
       cargo: "",
@@ -91,10 +93,20 @@ export const VagasEditor = () => {
     });
   };
 
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+  const handleDeleteConfirmation = async () => {
+    if (deleteId) {
+      await supabase.from('vagas').delete().eq('id', deleteId);
+      loadVagas();
+      setDeleteId(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.cargo || !formData.empresa || !formData.remuneracao || !formData.cargaHoraria || !formData.observacoes) {
-      alert("Por favor, preencha todos os campos obrigatórios (incluindo observações).");
+      setAlertMessage("Por favor, preencha todos os campos obrigatórios (incluindo observações).");
       return;
     }
     
@@ -114,7 +126,7 @@ export const VagasEditor = () => {
         resetForm();
         setShowToast(true);
       } else {
-        alert("Erro ao atualizar vaga: " + error.message);
+        setAlertMessage("Erro ao atualizar vaga: " + error.message);
       }
     } else {
       const { error } = await supabase.from('vagas').insert([{
@@ -132,20 +144,73 @@ export const VagasEditor = () => {
         resetForm();
         setShowToast(true);
       } else {
-        alert("Erro ao salvar vaga: " + error.message);
+         setAlertMessage("Erro ao salvar vaga: " + error.message);
       }
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Tem certeza que deseja excluir esta vaga?")) {
-      await supabase.from('vagas').delete().eq('id', id);
-      loadVagas();
-    }
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+      {/* Delete Confirmation Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3 text-red-600">
+                <AlertTriangle className="h-6 w-6" />
+                <h3 className="text-lg font-bold text-gray-900">Excluir Vaga</h3>
+              </div>
+              <button type="button" onClick={() => setDeleteId(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button 
+                type="button"
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button"
+                onClick={handleDeleteConfirmation}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Alert Modal */}
+      {alertMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 animate-in zoom-in-95 duration-200 text-center">
+             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+               <AlertTriangle className="h-6 w-6 text-red-600" />
+             </div>
+             <h3 className="text-lg font-bold text-gray-900 mb-2">Atenção</h3>
+             <p className="text-gray-600 mb-6">{alertMessage}</p>
+             <button 
+               type="button"
+               onClick={() => setAlertMessage(null)}
+               className="w-full px-4 py-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white rounded-lg font-medium transition-colors"
+             >
+               Entendi
+             </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
         <h1 className="text-2xl font-bold font-sans text-gray-900">Cadastrar Vagas</h1>
         {!isFormOpen && (

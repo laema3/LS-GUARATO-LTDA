@@ -82,12 +82,24 @@ export const FooterEditor = () => {
                       value={logoRodape}
                       onChange={setLogoRodape}
                       title="Trocar Logotipo do Rodapé"
-                      accept="image/*"
+                      accept="*/*"
                       type="image"
+                      bucket="assets"
                       folder="rodape"
                       heightClass="h-28"
                     />
                   </div>
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ou cole o link (URL) da imagem:</label>
+                    <input 
+                      type="text" 
+                      value={logoRodape} 
+                      onChange={(e) => setLogoRodape(e.target.value)}
+                      placeholder="Ex: https://meusite.com/logo-branca.png"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Você pode enviar a imagem ou colocar o link direto acima.</p>
                </div>
                <div>
                   <div className="flex justify-between items-end mb-1">

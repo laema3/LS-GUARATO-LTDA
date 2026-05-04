@@ -18,12 +18,17 @@ import { PageLoader } from "./components/ui/Loader";
 
 // Import Admin Routes
 import { DashboardLayout } from "./pages/Dashboard/Layout";
+import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { HomeEditor } from "./pages/Dashboard/HomeEditor";
 import { SobreEditor } from "./pages/Dashboard/SobreEditor";
 import { FooterEditor } from "./pages/Dashboard/FooterEditor";
+import { CabecalhoEditor } from "./pages/Dashboard/CabecalhoEditor";
 import { ServicosEditor } from "./pages/Dashboard/ServicosEditor";
 import { VagasParametrosEditor } from "./pages/Dashboard/VagasParametrosEditor";
 import { VagasEditor } from "./pages/Dashboard/VagasEditor";
+import { CandidatosList } from "./pages/Dashboard/CandidatosList";
+import { ConfiguracoesEditor } from "./pages/Dashboard/ConfiguracoesEditor";
+import { MensagensSacList } from "./pages/Dashboard/MensagensSacList";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -58,10 +63,15 @@ export default function App() {
         </Route>
 
         <Route path="/admin" element={<DashboardLayout />}>
-          <Route index element={<HomeEditor />} />
+          <Route index element={<Dashboard />} />
+          <Route path="home" element={<HomeEditor />} />
+          <Route path="cabecalho" element={<CabecalhoEditor />} />
+          <Route path="ajustes" element={<ConfiguracoesEditor />} />
           <Route path="sobre" element={<SobreEditor />} />
           <Route path="rodape" element={<FooterEditor />} />
           <Route path="servicos" element={<ServicosEditor />} />
+          <Route path="candidatos" element={<CandidatosList />} />
+          <Route path="sac" element={<MensagensSacList />} />
           <Route path="vagas/cadastrar" element={<VagasEditor />} />
           <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
         </Route>

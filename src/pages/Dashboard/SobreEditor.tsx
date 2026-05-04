@@ -7,6 +7,7 @@ import { suggestText } from "../../services/geminiService";
 
 export const SobreEditor = () => {
   const [showToast, setShowToast] = useState(false);
+  const [bannerSobre, setBannerSobre] = useState("");
   const [imagemSobre, setImagemSobre] = useState("");
   const [historiaTitle, setHistoriaTitle] = useState("Histórico de Confiança");
   const [historiaDesc, setHistoriaDesc] = useState("O LS Guarato nasceu com uma missão simples...");
@@ -41,6 +42,7 @@ export const SobreEditor = () => {
   const loadData = async () => {
     const { data } = await supabase.from('sobre_settings').select('*').eq('id', 1).single();
     if (data) {
+      if (data.banner_image) setBannerSobre(data.banner_image);
       if (data.historia_title) setHistoriaTitle(data.historia_title);
       if (data.historia_description) setHistoriaDesc(data.historia_description);
       if (data.historia_image) setImagemSobre(data.historia_image);
@@ -53,6 +55,7 @@ export const SobreEditor = () => {
   const handleSave = async () => {
     const { error } = await supabase.from('sobre_settings').upsert({
       id: 1,
+      banner_image: bannerSobre,
       historia_title: historiaTitle,
       historia_description: historiaDesc,
       historia_image: imagemSobre,
@@ -75,6 +78,22 @@ export const SobreEditor = () => {
         <button onClick={handleSave} className="bg-[#0B3C8C] text-white px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-[#082a63] transition-colors">
           <Save className="h-5 w-5" /> Salvar Alterações
         </button>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+         <h2 className="text-xl font-bold font-sans text-gray-900 mb-6">Banner da Página</h2>
+         <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload da Imagem do Topo (Banner)</label>
+            <FileUpload
+              value={bannerSobre}
+              onChange={setBannerSobre}
+              title="Selecionar Banner"
+              accept="image/*"
+              type="image"
+              folder="sobre"
+              heightClass="h-48"
+            />
+         </div>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
