@@ -64,11 +64,11 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={cn(
-                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-yellow-400",
-                  location.pathname === link.path && "text-yellow-400 underline underline-offset-4 decoration-2"
+                  "flex items-center gap-2 hover:text-white transition-colors text-[#D62828]",
+                  location.pathname === link.path && "text-white underline underline-offset-4 decoration-2"
                 )}
               >
-                <link.icon className="h-5 w-5 text-yellow-400" />
+                <link.icon className="h-5 w-5 text-[#D62828]" />
                 {link.name}
               </Link>
             ))}
@@ -77,11 +77,11 @@ const Header = () => {
             <div className="relative group">
               <button 
                 className={cn(
-                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-yellow-400",
-                  location.pathname.startsWith('/servicos') && "text-yellow-400"
+                  "flex items-center gap-2 hover:text-white transition-colors text-[#D62828]",
+                  location.pathname.startsWith('/servicos') && "text-white"
                 )}
               >
-                <Store className="h-5 w-5" />
+                <Store className="h-5 w-5 text-[#D62828]" />
                 Serviços <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
               </button>
               <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden text-gray-800">
@@ -91,7 +91,7 @@ const Header = () => {
                     to={link.path}
                     className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 hover:text-[#0B3C8C] transition-colors border-b border-gray-100 last:border-0"
                   >
-                    <link.icon className="h-4 w-4 text-yellow-500" />
+                    <link.icon className="h-4 w-4 text-[#D62828]" />
                     {link.name}
                   </Link>
                 ))}
@@ -103,11 +103,11 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={cn(
-                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-yellow-400",
-                  location.pathname === link.path && "text-yellow-400 underline underline-offset-4 decoration-2"
+                  "flex items-center gap-2 hover:text-white transition-colors text-[#D62828]",
+                  location.pathname === link.path && "text-white underline underline-offset-4 decoration-2"
                 )}
               >
-                <link.icon className="h-5 w-5" />
+                <link.icon className="h-5 w-5 text-[#D62828]" />
                 {link.name}
               </Link>
             ))}
@@ -128,8 +128,8 @@ const Header = () => {
         <div className="md:hidden bg-[#082a63] border-t border-white/10">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-yellow-400">
-                <link.icon className="h-5 w-5" />
+              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-[#D62828]">
+                <link.icon className="h-5 w-5 text-[#D62828]" />
                 {link.name}
               </Link>
             ))}
@@ -137,10 +137,10 @@ const Header = () => {
             <div className="flex flex-col gap-2">
               <button 
                 onClick={() => setIsServicesOpen(!isServicesOpen)}
-                className="flex items-center justify-between text-lg font-medium py-2 text-yellow-400"
+                className="flex items-center justify-between text-lg font-medium py-2 text-[#D62828]"
               >
                 <span className="flex items-center gap-2">
-                  <Store className="h-5 w-5" /> Serviços
+                  <Store className="h-5 w-5 text-[#D62828]" /> Serviços
                 </span>
                 <ChevronDown className={cn("h-5 w-5 transition-transform", isServicesOpen && "rotate-180")} />
               </button>
@@ -148,7 +148,7 @@ const Header = () => {
                 <div className="pl-4 flex flex-col gap-3 py-2 border-l-2 border-[#D62828]">
                   {serviceLinks.map((link) => (
                     <Link key={link.path} to={link.path} className="flex items-center gap-2 text-white/80">
-                      <link.icon className="h-4 w-4 text-yellow-500" />
+                      <link.icon className="h-4 w-4 text-[#D62828]" />
                       {link.name}
                     </Link>
                   ))}
@@ -157,8 +157,8 @@ const Header = () => {
             </div>
 
             {actionLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-yellow-400">
-                <link.icon className="h-5 w-5" />
+              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-[#D62828]">
+                <link.icon className="h-5 w-5 text-[#D62828]" />
                 {link.name}
               </Link>
             ))}

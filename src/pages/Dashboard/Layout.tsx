@@ -36,7 +36,7 @@ export const DashboardLayout = () => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-white/20 font-bold' : 'hover:bg-white/10'}`}
               >
-                <item.icon className="h-5 w-5 text-yellow-400 shrink-0" />
+                <item.icon className="h-5 w-5 text-[#D62828] shrink-0" />
                 {item.name}
               </Link>
             )
@@ -44,7 +44,7 @@ export const DashboardLayout = () => {
         </nav>
         <div className="p-4 border-t border-white/20">
           <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-            <LogOut className="h-5 w-5 text-yellow-400 shrink-0" />
+            <LogOut className="h-5 w-5 text-[#D62828] shrink-0" />
             Voltar ao Site
           </Link>
         </div>
