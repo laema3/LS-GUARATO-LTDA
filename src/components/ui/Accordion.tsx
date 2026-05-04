@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -10,7 +10,7 @@ interface AccordionItemProps {
   onClick: () => void;
 }
 
-const AccordionItem = ({ question, answer, isOpen, onClick }: AccordionItemProps) => {
+const AccordionItem: React.FC<AccordionItemProps> = ({ question, answer, isOpen, onClick }) => {
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm mb-4">
       <button

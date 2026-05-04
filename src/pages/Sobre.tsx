@@ -53,7 +53,7 @@ export const Sobre = () => {
           <div className="lg:w-1/2">
             <h2 className="text-3xl md:text-4xl font-bold font-sans text-gray-900 mb-6 relative">
               <span className="relative z-10">{historiaTitle}</span>
-              <div className="absolute -bottom-2 left-0 w-20 h-1 bg-[#D62828] z-0"></div>
+              <div className="absolute -bottom-2 left-0 w-20 h-1 bg-[#0B3C8C] z-0"></div>
             </h2>
             <div className="space-y-4 text-gray-600 text-lg leading-relaxed">
               {historiaDescription.split('\n').map((paragraph, index) => (
@@ -97,8 +97,8 @@ export const Sobre = () => {
           </div>
 
           <div className="bg-gray-50 border border-gray-200 p-8 rounded-2xl text-center hover:shadow-lg transition-shadow">
-             <div className="bg-red-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-6">
-              <Heart className="h-8 w-8 text-[#D62828]" />
+             <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-6">
+              <Heart className="h-8 w-8 text-[#0B3C8C]" />
             </div>
             <h3 className="text-2xl font-bold font-sans text-gray-900 mb-4">Valores</h3>
             <ul className="text-gray-600 space-y-2">
@@ -119,7 +119,7 @@ export const Sobre = () => {
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
               O LS Guarato valoriza os seus colaboradores. Conheça nossas vagas e faça parte deste grande time!
             </p>
-            <Link to="/servicos/vagas" className="inline-block bg-[#D62828] hover:bg-[#b52020] text-white font-bold py-4 px-10 rounded-full text-lg transition-transform hover:scale-105 shadow-lg">
+            <Link to="/servicos/vagas" className="inline-block bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-4 px-10 rounded-full text-lg transition-transform hover:scale-105 shadow-lg">
               Trabalhe Conosco
             </Link>
           </div>

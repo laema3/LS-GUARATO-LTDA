@@ -1,7 +1,7 @@
 import { Briefcase, MapPin, Search, UploadCloud, X, Send, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
 export const VagasEmprego = () => {
@@ -104,7 +104,7 @@ export const VagasEmprego = () => {
             Vagas Abertas ({filteredJobs.length})
           </h2>
 
-          <div className="grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredJobs.length > 0 ? (
               filteredJobs.map((job, idx) => (
                 <motion.div 
@@ -115,30 +115,30 @@ export const VagasEmprego = () => {
                   whileHover={{ y: -4 }}
                   className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-200 overflow-hidden transition-all duration-300 group"
                 >
-                  <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="p-6 flex flex-col justify-between h-full gap-4">
                     <div className="flex-grow">
                       <div className="flex items-center gap-2 mb-2">
-                         <span className="text-xs font-semibold px-3 py-1 bg-blue-100 text-[#0B3C8C] rounded-full uppercase tracking-wide">
+                         <span className="text-[10px] font-semibold px-2 py-0.5 bg-blue-100 text-[#0B3C8C] rounded-full uppercase tracking-wide">
                            LS Guarato
                          </span>
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900 font-sans mb-2 group-hover:text-[#D62828] transition-colors">
+                      <h3 className="text-lg font-bold text-[#D62828] font-sans mb-1 transition-colors">
                         {job.cargo}
                       </h3>
-                      <p className="text-gray-600 mb-4 max-w-2xl line-clamp-2">
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                         {job.observacoes || "Venha fazer parte da nossa equipe!"}
                       </p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" /> {job.empresa}
+                          <MapPin className="h-3.5 w-3.5 text-[#D62828]" /> {job.empresa}
                         </div>
                       </div>
                     </div>
                     
-                    <div className="w-full md:w-auto shrink-0 flex items-center justify-end">
+                    <div className="pt-2">
                       <Link 
                         to={`/servicos/vagas/${job.id}`}
-                        className="w-full md:w-auto text-center bg-gray-900 hover:bg-[#D62828] text-white font-semibold py-3 px-8 rounded-lg transition-colors border border-transparent"
+                        className="block w-full text-center bg-[#0B3C8C] hover:bg-[#082a63] text-white text-sm font-semibold py-2.5 rounded-lg transition-colors border border-transparent"
                       >
                         Saiba mais
                       </Link>
@@ -160,7 +160,7 @@ export const VagasEmprego = () => {
             </p>
             <button 
               onClick={() => { setEnviadoSucesso(false); setShowModal(true); }}
-              className="inline-block bg-white text-[#0B3C8C] font-bold border border-[#0B3C8C] hover:bg-[#0B3C8C] hover:text-white py-3 px-8 rounded-lg transition-colors cursor-pointer"
+              className="inline-block bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-8 rounded-lg transition-colors cursor-pointer shadow-md"
             >
               Envie seu Currículo
             </button>
@@ -243,6 +243,17 @@ export const VagasEmprego = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* LGPD */}
+                  <div className="flex items-start gap-3 pt-4 border-t border-gray-100 mt-4">
+                    <input type="checkbox" id="lgpd-modal" required className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0B3C8C] focus:ring-[#0B3C8C] shrink-0 cursor-pointer" />
+                    <label htmlFor="lgpd-modal" className="text-[10px] leading-relaxed text-gray-500 cursor-pointer select-none">
+                      O LS GUARATO, compromete-se com a proteção de dados e informações pessoais compartilhadas pelos usuários. Esta política determina como os dados serão protegidos, os processos de coleta, registro, armazenamento, uso, compartilhamento e eliminação, nos termos da Lei Geral de Proteção de Dados (Lei n. 13.709/ 2018).
+                      <br /><br />
+                      Ao declarar que concorda com o presente termo, o Titular consente que LS GUARATO, doravante denominada Controladora, tome decisões referentes ao tratamento de seus dados pessoais, bem como realize o tratamento de seus dados pessoais, envolvendo operações como as que se referem a coleta, produção, recepção, classificação, utilização, acesso, reprodução, transmissão, distribuição, processamento, arquivamento, armazenamento, eliminação, avaliação ou controle da informação, modificação, comunicação, transferência, difusão ou extração.
+                    </label>
+                  </div>
+
                   <button type="submit" disabled={enviando} className="w-full bg-[#0B3C8C] hover:bg-[#082a63] disabled:bg-gray-400 text-white font-bold py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 mt-4">
                     <Send className="h-5 w-5" /> {enviando ? "Enviando..." : "Enviar para o Banco de Talentos"}
                   </button>

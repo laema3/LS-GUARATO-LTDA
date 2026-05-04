@@ -1,5 +1,5 @@
 import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
 export const Contato = () => {

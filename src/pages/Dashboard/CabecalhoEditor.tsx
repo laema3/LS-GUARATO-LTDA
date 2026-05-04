@@ -1,5 +1,5 @@
 import { Save } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { FileUpload } from "../../components/ui/FileUpload";
 import { supabase } from "../../lib/supabase";

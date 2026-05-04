@@ -110,9 +110,7 @@ export const MensagensSacList = () => {
                    </div>
                    <h3 className="text-lg font-bold text-gray-900 mb-1">Nenhuma mensagem encontrada</h3>
                    <p className="text-sm">As mensagens enviadas pelo formulário de contato aparecerão aqui.</p>
-                   <div className="mt-4 text-xs text-red-500 bg-red-50 p-3 rounded-md max-w-sm">
-                     Nota técnica: Se a tabela "mensagens_contato" não existir no seu Supabase, crie-a com as colunas: id, nome, email, telefone, mensagem e created_at.
-                   </div>
+
                  </div>
               </div>
             )}

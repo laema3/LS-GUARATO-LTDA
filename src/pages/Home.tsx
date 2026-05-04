@@ -100,7 +100,7 @@ export const Home = () => {
                   {slides[currentSlide].cta ? (
                     <Link 
                       to={slides[currentSlide].link || "/"}
-                      className="inline-block bg-[#D62828] hover:bg-[#b52020] text-white font-bold py-4 px-8 rounded-full text-lg transition-transform hover:scale-105 shadow-lg"
+                      className="inline-block bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-4 px-8 rounded-full text-lg transition-transform hover:scale-105 shadow-lg"
                     >
                       {slides[currentSlide].cta}
                     </Link>
@@ -150,7 +150,7 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2 space-y-6">
-              <div className="inline-block px-3 py-1 bg-[#D62828]/10 text-[#D62828] font-bold text-sm rounded-full mb-2 border border-[#D62828]/20">
+              <div className="inline-block px-3 py-1 bg-[#0B3C8C]/10 text-[#0B3C8C] font-bold text-sm rounded-full mb-2 border border-[#0B3C8C]/20">
                 Tradição e Qualidade
               </div>
               <h2 className="text-4xl font-bold font-sans text-gray-900 leading-tight">
@@ -187,7 +187,7 @@ export const Home = () => {
             <h2 className="text-3xl md:text-4xl font-bold font-sans text-gray-900 mb-4">
               TIRE SUAS DÚVIDAS
             </h2>
-            <div className="w-24 h-1 bg-[#D62828] mx-auto rounded-full"></div>
+            <div className="w-24 h-1 bg-[#0B3C8C] mx-auto rounded-full"></div>
             <p className="mt-4 text-gray-500 max-w-2xl mx-auto">
               Separamos as perguntas mais frequentes dos nossos clientes para facilitar o seu dia a dia.
             </p>
@@ -203,10 +203,10 @@ export const Home = () => {
           <h2 className="text-3xl font-bold font-sans mb-6">Ainda não tem o nosso aplicativo?</h2>
           <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">Baixe agora e tenha acesso a ofertas exclusivas, clube de benefícios e faça suas compras sem sair de casa.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-gray-900 hover:bg-black text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
+            <button className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
               Baixar na App Store
             </button>
-            <button className="bg-gray-900 hover:bg-black text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
+            <button className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
               Baixar no Google Play
             </button>
           </div>

@@ -1,5 +1,5 @@
 import { Save, Building } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { supabase } from "../../lib/supabase";
 

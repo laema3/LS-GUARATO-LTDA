@@ -56,10 +56,10 @@ export const TransparenciaSalarial = () => {
                     <h3 className="font-semibold text-gray-700">Relatório 1º Semestre</h3>
                     {firstPdf ? (
                        <div className="flex gap-2">
-                          <a href={firstPdf} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-2 bg-[#D62828] hover:bg-[#b52020] text-white py-2 px-4 rounded transition-colors text-sm font-medium">
+                          <a href={firstPdf} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white py-2 px-4 rounded transition-colors text-sm font-medium">
                             <FileText className="h-4 w-4" /> Visualizar
                           </a>
-                          <a href={firstPdf} target="_blank" rel="noopener noreferrer" download className="flex items-center justify-center bg-gray-800 hover:bg-black text-white p-2 rounded transition-colors">
+                          <a href={firstPdf} target="_blank" rel="noopener noreferrer" download className="flex items-center justify-center bg-[#0B3C8C] hover:bg-[#082a63] text-white p-2 rounded transition-colors">
                             <Download className="h-4 w-4" />
                           </a>
                        </div>
@@ -74,10 +74,10 @@ export const TransparenciaSalarial = () => {
                     <h3 className="font-semibold text-gray-700">Relatório 2º Semestre</h3>
                     {secondPdf ? (
                        <div className="flex gap-2">
-                          <a href={secondPdf} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-2 bg-[#D62828] hover:bg-[#b52020] text-white py-2 px-4 rounded transition-colors text-sm font-medium">
+                          <a href={secondPdf} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white py-2 px-4 rounded transition-colors text-sm font-medium">
                             <FileText className="h-4 w-4" /> Visualizar
                           </a>
-                          <a href={secondPdf} target="_blank" rel="noopener noreferrer" download className="flex items-center justify-center bg-gray-800 hover:bg-black text-white p-2 rounded transition-colors">
+                          <a href={secondPdf} target="_blank" rel="noopener noreferrer" download className="flex items-center justify-center bg-[#0B3C8C] hover:bg-[#082a63] text-white p-2 rounded transition-colors">
                             <Download className="h-4 w-4" />
                           </a>
                        </div>

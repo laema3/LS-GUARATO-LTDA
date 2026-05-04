@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Save, Briefcase, PlusCircle, Trash2, Edit, X, AlertTriangle } from "lucide-react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { supabase } from "../../lib/supabase";
@@ -182,7 +182,7 @@ export const VagasEditor = () => {
               <button 
                 type="button"
                 onClick={handleDeleteConfirmation}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                className="px-4 py-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white rounded-lg font-medium transition-colors"
               >
                 Sim, Excluir
               </button>
@@ -337,7 +337,7 @@ export const VagasEditor = () => {
                </button>
                <button 
                  type="submit"
-                 className="bg-[#D62828] hover:bg-[#b52020] text-white px-8 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
+                 className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
                >
                  <Save className="h-5 w-5" /> {editId ? "Atualizar Vaga" : "Salvar Vaga"}
                </button>

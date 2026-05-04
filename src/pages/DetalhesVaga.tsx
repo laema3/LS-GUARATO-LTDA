@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Clock, DollarSign, CheckCircle2, AlertCircle, UploadCloud, Send } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
 export const DetalhesVaga = () => {
@@ -111,7 +111,7 @@ export const DetalhesVaga = () => {
                     LS Guarato
                   </span>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 font-sans tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-bold text-[#D62828] font-sans tracking-tight">
                   {job.cargo}
                 </h1>
               </div>
@@ -178,14 +178,16 @@ export const DetalhesVaga = () => {
                     </div>
 
                     {/* LGPD */}
-                    <div className="flex items-start gap-2 pt-2">
-                      <input type="checkbox" id="lgpd" required className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0B3C8C] focus:ring-[#0B3C8C]" />
-                      <label htmlFor="lgpd" className="text-xs text-gray-600">
-                        Concordo com os Termos de Uso e entendo que meus dados serão processados de acordo com a <a href="#" className="underline text-[#0B3C8C]">Política de Privacidade (LGPD)</a> para fins de recrutamento.
+                    <div className="flex items-start gap-3 pt-4 border-t border-gray-100 mt-6">
+                      <input type="checkbox" id="lgpd" required className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0B3C8C] focus:ring-[#0B3C8C] shrink-0 cursor-pointer" />
+                      <label htmlFor="lgpd" className="text-[11px] leading-relaxed text-gray-600 cursor-pointer select-none">
+                        O LS GUARATO, compromete-se com a proteção de dados e informações pessoais compartilhadas pelos usuários. Esta política determina como os dados serão protegidos, os processos de coleta, registro, armazenamento, uso, compartilhamento e eliminação, nos termos da Lei Geral de Proteção de Dados (Lei n. 13.709/ 2018).
+                        <br /><br />
+                        Ao declarar que concorda com o presente termo, o Titular consente que LS GUARATO, doravante denominada Controladora, tome decisões referentes ao tratamento de seus dados pessoais, bem como realize o tratamento de seus dados pessoais, envolvendo operações como as que se referem a coleta, produção, recepção, classificação, utilização, acesso, reprodução, transmissão, distribuição, processamento, arquivamento, armazenamento, eliminação, avaliação ou controle da informação, modificação, comunicação, transferência, difusão ou extração.
                       </label>
                     </div>
                     
-                    <button type="submit" disabled={enviando} className="w-full bg-[#D62828] hover:bg-[#b52020] disabled:bg-gray-400 text-white font-bold py-4 rounded-md transition-colors flex items-center justify-center gap-2 text-lg shadow-md mt-6">
+                    <button type="submit" disabled={enviando} className="w-full bg-[#0B3C8C] hover:bg-[#082a63] disabled:bg-gray-400 text-white font-bold py-4 rounded-md transition-colors flex items-center justify-center gap-2 text-lg shadow-md mt-6">
                       <Send className="h-5 w-5" /> {enviando ? "Enviando..." : "Enviar Currículo"}
                     </button>
                   </form>
@@ -199,15 +201,15 @@ export const DetalhesVaga = () => {
               {/* Resumo */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="h-4 w-4" /> Localização</span>
+                  <span className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="h-4 w-4 text-[#D62828]" /> Localização</span>
                   <span className="font-semibold text-gray-900">{job.empresa || "Matriz"}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-500 flex items-center gap-1"><Clock className="h-4 w-4" /> Horário</span>
+                  <span className="text-sm text-gray-500 flex items-center gap-1"><Clock className="h-4 w-4 text-[#D62828]" /> Horário</span>
                   <span className="font-semibold text-gray-900">{job.carga_horaria || "Não especificado"}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-500 flex items-center gap-1"><DollarSign className="h-4 w-4" /> Remuneração</span>
+                  <span className="text-sm text-gray-500 flex items-center gap-1"><DollarSign className="h-4 w-4 text-[#D62828]" /> Remuneração</span>
                   <span className="font-semibold text-gray-900">{job.remuneracao || "Salário da Categoria"}</span>
                 </div>
               </div>
