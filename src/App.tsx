@@ -14,6 +14,7 @@ import { TransparenciaSalarial } from "./pages/TransparenciaSalarial";
 import { VagasEmprego } from "./pages/VagasEmprego";
 import { DetalhesVaga } from "./pages/DetalhesVaga";
 import { Contato } from "./pages/Contato";
+import { NotFound } from "./pages/NotFound";
 import { PageLoader } from "./components/ui/Loader";
 import Maintenance from "./pages/Maintenance";
 import { supabase } from "./lib/supabase";
@@ -119,7 +120,7 @@ export default function App() {
               <Route path="vagas/:id" element={<DetalhesVaga />} />
             </Route>
             
-            <Route path="*" element={<div className="min-h-[50vh] flex items-center justify-center text-3xl font-bold font-sans text-[#0B3C8C]">404 - Página não encontrada</div>} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       )}
