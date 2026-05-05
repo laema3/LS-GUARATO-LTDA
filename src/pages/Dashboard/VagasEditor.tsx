@@ -41,6 +41,7 @@ export const VagasEditor = () => {
     observacoes: string;
     beneficios: string[];
     criterios: string[];
+    ativa: boolean;
   }>({
     cargo: "",
     empresa: "",
@@ -49,6 +50,7 @@ export const VagasEditor = () => {
     observacoes: "",
     beneficios: [],
     criterios: [],
+    ativa: true,
   });
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -62,6 +64,7 @@ export const VagasEditor = () => {
       observacoes: "",
       beneficios: [],
       criterios: [],
+      ativa: true,
     });
     setEditId(null);
     setIsFormOpen(false);
@@ -77,6 +80,7 @@ export const VagasEditor = () => {
       observacoes: vaga.observacoes || "",
       beneficios: vaga.beneficios || [],
       criterios: vaga.criterios || [],
+      ativa: vaga.ativa !== undefined ? vaga.ativa : true,
     });
     setIsFormOpen(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -118,7 +122,8 @@ export const VagasEditor = () => {
         carga_horaria: formData.cargaHoraria,
         observacoes: formData.observacoes,
         beneficios: formData.beneficios,
-        criterios: formData.criterios
+        criterios: formData.criterios,
+        ativa: formData.ativa
       }).eq('id', editId);
       
       if (!error) {
@@ -136,7 +141,8 @@ export const VagasEditor = () => {
         carga_horaria: formData.cargaHoraria,
         observacoes: formData.observacoes,
         beneficios: formData.beneficios,
-        criterios: formData.criterios
+        criterios: formData.criterios,
+        ativa: formData.ativa
       }]);
 
       if (!error) {
@@ -151,6 +157,16 @@ export const VagasEditor = () => {
 
   const handleDelete = (id: string) => {
     setDeleteId(id);
+  };
+
+  const toggleVagaStatus = async (vaga: any) => {
+    const { error } = await supabase.from('vagas').update({
+      ativa: !vaga.ativa
+    }).eq('id', vaga.id);
+    
+    if (!error) {
+      loadVagas();
+    }
   };
 
   return (
@@ -327,6 +343,17 @@ export const VagasEditor = () => {
                />
             </div>
 
+            <div className="flex items-center gap-3 bg-blue-50 p-4 rounded-lg border border-blue-100">
+               <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors cursor-pointer" 
+                    onClick={() => setFormData({...formData, ativa: !formData.ativa})}
+                    style={{ backgroundColor: formData.ativa ? '#0B3C8C' : '#D1D5DB' }}>
+                 <span className={`${formData.ativa ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
+               </div>
+               <span className="text-sm font-bold text-[#0B3C8C]">
+                 {formData.ativa ? 'Vaga Habilitada (Ficará visível no site)' : 'Vaga Desabilitada (Ficará oculta no site)'}
+               </span>
+            </div>
+
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                <button 
                  type="button" 
@@ -364,16 +391,28 @@ export const VagasEditor = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-1">{vaga.cargo}</h3>
                 <p className="text-sm text-gray-500">
                   Remuneração: <span className="font-medium text-gray-700">{vaga.remuneracao}</span> • 
-                  Carga: <span className="font-medium text-gray-700">{vaga.cargaHoraria}</span>
+                  Carga: <span className="font-medium text-gray-700">{vaga.carga_horaria}</span>
                 </p>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => handleEdit(vaga)} className="text-gray-500 hover:text-[#0B3C8C] p-2 rounded-md hover:bg-blue-50 transition-colors">
-                  <Edit className="h-5 w-5" />
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => toggleVagaStatus(vaga)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
+                    vaga.ativa 
+                      ? 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200' 
+                      : 'bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200'
+                  }`}
+                >
+                  {vaga.ativa ? 'HABILITADA' : 'DESABILITADA'}
                 </button>
-                <button onClick={() => handleDelete(vaga.id)} className="text-gray-500 hover:text-red-500 p-2 rounded-md hover:bg-red-50 transition-colors">
-                  <Trash2 className="h-5 w-5" />
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={() => handleEdit(vaga)} className="text-gray-400 hover:text-[#0B3C8C] p-1.5 rounded-md hover:bg-blue-50 transition-colors">
+                    <Edit className="h-5 w-5" />
+                  </button>
+                  <button onClick={() => handleDelete(vaga.id)} className="text-gray-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition-colors">
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}

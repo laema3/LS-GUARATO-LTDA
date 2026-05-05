@@ -24,12 +24,20 @@ export const DetalhesVaga = () => {
 
   const loadJob = async () => {
     try {
-      const { data } = await supabase.from('vagas').select('*').eq('id', id).single();
+      const { data, error } = await supabase.from('vagas').select('*').eq('id', id).single();
       if (data) {
-        setJob(data);
+        // Se a vaga cadastrada existe mas não está ativa, marcamos como não encontrada para o público
+        if (data.ativa === false) {
+          setJob(null);
+        } else {
+          setJob(data);
+        }
+      } else if (error) {
+        setJob(null);
       }
     } catch (err) {
       console.error(err);
+      setJob(null);
     } finally {
       setLoading(false);
     }
@@ -46,8 +54,8 @@ export const DetalhesVaga = () => {
   if (!job) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <h2 className="text-2xl font-bold mb-4 font-sans text-gray-900">Vaga não encontrada</h2>
-        <Link to="/servicos/vagas" className="text-[#0B3C8C] hover:underline flex items-center gap-2">
+        <h2 className="text-2xl font-bold mb-4 font-sans text-gray-900 text-center">Vaga não encontrada ou processo encerrado</h2>
+        <Link to="/servicos/vagas" className="bg-[#0B3C8C] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#082a63] transition-colors flex items-center gap-2">
           <ArrowLeft className="h-4 w-4" /> Voltar para vagas
         </Link>
       </div>

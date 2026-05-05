@@ -24,7 +24,10 @@ export const VagasEmprego = () => {
   }, []);
 
   const loadJobs = async () => {
-    const { data } = await supabase.from('vagas').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase.from('vagas')
+      .select('*')
+      .eq('ativa', true)
+      .order('created_at', { ascending: false });
     if (data) {
       setJobs(data);
     }
