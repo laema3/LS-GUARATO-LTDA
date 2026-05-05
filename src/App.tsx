@@ -84,6 +84,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <PageLoader />
       <ScrollToTop />
       {true && (
         <Routes>

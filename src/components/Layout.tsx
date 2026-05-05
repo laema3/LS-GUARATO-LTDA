@@ -128,7 +128,7 @@ const Header = () => {
         <div className="md:hidden bg-[#082a63] border-t border-white/10">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-[#D62828]">
+              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-white hover:text-[#D62828]">
                 <link.icon className="h-5 w-5 text-[#D62828]" />
                 {link.name}
               </Link>
@@ -157,7 +157,7 @@ const Header = () => {
             </div>
 
             {actionLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-[#D62828]">
+              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-white hover:text-[#D62828]">
                 <link.icon className="h-5 w-5 text-[#D62828]" />
                 {link.name}
               </Link>
