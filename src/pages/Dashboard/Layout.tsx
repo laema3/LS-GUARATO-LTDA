@@ -125,6 +125,13 @@ export const DashboardLayout = () => {
           })}
         </nav>
         <div className="p-4 border-t border-white/20">
+          <Link 
+            to="/" 
+            className="w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors mb-2"
+          >
+            <Home className="h-5 w-5 text-[#D62828] shrink-0" />
+            Voltar para o Site
+          </Link>
           <button 
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"

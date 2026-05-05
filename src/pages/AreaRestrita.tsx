@@ -1,36 +1,59 @@
 import { User, CreditCard, Building2, Calculator, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { supabase } from "../lib/supabase";
 
 export const AreaRestrita = () => {
+  const [links, setLinks] = useState({
+    link_meu_rh: "#",
+    link_saldo_fora: "#",
+    link_saldo_dentro: "#",
+    link_cotacao: "#"
+  });
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const { data } = await supabase.from('footer_settings').select('link_meu_rh, link_saldo_fora, link_saldo_dentro, link_cotacao').eq('id', 1).single();
+      if (data) {
+        setLinks({
+          link_meu_rh: data.link_meu_rh || "#",
+          link_saldo_fora: data.link_saldo_fora || "#",
+          link_saldo_dentro: data.link_saldo_dentro || "#",
+          link_cotacao: data.link_cotacao || "#"
+        });
+      }
+    };
+    loadSettings();
+  }, []);
+
   const actions = [
     {
       title: "MEU RH",
       icon: User,
       desc: "Acesse seu contracheque, ponto e benefícios.",
       color: "from-blue-600 to-blue-800",
-      link: "#" // Would link to an external HR system or internal route
+      link: links.link_meu_rh
     },
     {
       title: "SALDO DE CONVÊNIO FORA DA EMPRESA",
       icon: CreditCard,
       desc: "Consulte seu saldo para uso na rede credenciada externa.",
       color: "from-emerald-500 to-emerald-700",
-      link: "#"
+      link: links.link_saldo_fora
     },
     {
       title: "SALDO DE CONVÊNIO DENTRO DA EMPRESA",
       icon: Building2,
       desc: "Consulte seu saldo para compras nas lojas LS Guarato.",
       color: "from-[#D62828] to-red-800",
-      link: "#"
+      link: links.link_saldo_dentro
     },
     {
       title: "PARTICIPAR DA COTAÇÃO",
       icon: Calculator,
       desc: "Área exclusiva para fornecedores e parceiros.",
       color: "from-purple-600 to-purple-800",
-      link: "#"
+      link: links.link_cotacao
     }
   ];
 
@@ -50,6 +73,8 @@ export const AreaRestrita = () => {
             <motion.a
               href={action.link}
               key={idx}
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ y: -8, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={`bg-gradient-to-br ${action.color} rounded-2xl p-8 text-white shadow-xl hover:shadow-2xl transition-all flex flex-col items-center justify-center text-center gap-4 relative overflow-hidden group min-h-[240px]`}

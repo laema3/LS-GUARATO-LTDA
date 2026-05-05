@@ -16,6 +16,10 @@ export const ConfiguracoesEditor = () => {
     link_loja: "",
     link_google_play: "",
     link_app_store: "",
+    link_meu_rh: "",
+    link_saldo_fora: "",
+    link_saldo_dentro: "",
+    link_cotacao: "",
     manutencao_ativa: false
   });
 
@@ -34,6 +38,10 @@ export const ConfiguracoesEditor = () => {
         link_loja: data.link_loja || "",
         link_google_play: data.link_google_play || "",
         link_app_store: data.link_app_store || "",
+        link_meu_rh: data.link_meu_rh || "",
+        link_saldo_fora: data.link_saldo_fora || "",
+        link_saldo_dentro: data.link_saldo_dentro || "",
+        link_cotacao: data.link_cotacao || "",
         manutencao_ativa: data.manutencao_ativa || false
       });
     }
@@ -54,12 +62,16 @@ export const ConfiguracoesEditor = () => {
         link_loja: empresa.link_loja,
         link_google_play: empresa.link_google_play,
         link_app_store: empresa.link_app_store,
+        link_meu_rh: empresa.link_meu_rh,
+        link_saldo_fora: empresa.link_saldo_fora,
+        link_saldo_dentro: empresa.link_saldo_dentro,
+        link_cotacao: empresa.link_cotacao,
         manutencao_ativa: empresa.manutencao_ativa
       }).eq('id', 1);
 
       if (error) {
-        if (error.message.includes('column "manutencao_ativa" does not exist')) {
-          alert("ERRO: A coluna 'manutencao_ativa' não existe no seu banco de dados Supabase. Por favor, adicione-a na tabela 'footer_settings' como tipo 'boolean' para que esta função funcione.");
+        if (error.message.includes('not found') || error.message.includes('does not exist')) {
+          alert("ERRO: Alguma das colunas necessárias para salvar os novos links não existe no banco de dados. Por favor, acesse o painel do Supabase e adicione as colunas: 'link_meu_rh', 'link_saldo_fora', 'link_saldo_dentro', 'link_cotacao' (tipo text) na tabela 'footer_settings'.");
         } else if (error.code === 'PGRST116') {
            // tenta insert se não houver ID 1
            const { error: errInsert } = await supabase.from('footer_settings').insert([{
@@ -71,6 +83,10 @@ export const ConfiguracoesEditor = () => {
              link_loja: empresa.link_loja,
              link_google_play: empresa.link_google_play,
              link_app_store: empresa.link_app_store,
+             link_meu_rh: empresa.link_meu_rh,
+             link_saldo_fora: empresa.link_saldo_fora,
+             link_saldo_dentro: empresa.link_saldo_dentro,
+             link_cotacao: empresa.link_cotacao,
              manutencao_ativa: empresa.manutencao_ativa
            }]);
            
@@ -207,6 +223,25 @@ export const ConfiguracoesEditor = () => {
                 placeholder="Link do App na App Store"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none" 
               />
+            </div>
+            <div className="md:col-span-2 mt-4 pt-4 border-t border-gray-100">
+               <h3 className="font-semibold text-gray-800 mb-4">Configurações Área Restrita</h3>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link MEU RH</label>
+              <input type="text" name="link_meu_rh" value={empresa.link_meu_rh} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link Saldo Convênio Fora</label>
+              <input type="text" name="link_saldo_fora" value={empresa.link_saldo_fora} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link Saldo Convênio Dentro</label>
+              <input type="text" name="link_saldo_dentro" value={empresa.link_saldo_dentro} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link Participar da Cotação</label>
+              <input type="text" name="link_cotacao" value={empresa.link_cotacao} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] outline-none" />
             </div>
          </div>
       </div>
