@@ -116,9 +116,9 @@ export const DashboardLayout = () => {
               <Link 
                 key={item.path} 
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-white/20 font-bold text-[#D62828]' : 'text-white hover:bg-white/10 hover:text-[#D62828]'}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-white/20 font-bold text-white' : 'text-white hover:bg-white/10'}`}
               >
-                <item.icon className="h-5 w-5 text-[#D62828] shrink-0" />
+                <item.icon className="h-5 w-5 text-white shrink-0" />
                 {item.name}
               </Link>
             )
@@ -127,16 +127,16 @@ export const DashboardLayout = () => {
         <div className="p-4 border-t border-white/20">
           <Link 
             to="/" 
-            className="w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors mb-2"
+            className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors mb-2"
           >
-            <Home className="h-5 w-5 text-[#D62828] shrink-0" />
+            <Home className="h-5 w-5 text-white shrink-0" />
             Voltar para o Site
           </Link>
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
           >
-            <LogOut className="h-5 w-5 text-[#D62828] shrink-0" />
+            <LogOut className="h-5 w-5 text-white shrink-0" />
             Sair do Painel
           </button>
         </div>
