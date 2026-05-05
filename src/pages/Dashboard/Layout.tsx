@@ -9,9 +9,11 @@ export const DashboardLayout = () => {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [candidatosCount, setCandidatosCount] = useState(0);
+  const [sacCount, setSacCount] = useState(0);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthAndCounts = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -39,6 +41,15 @@ export const DashboardLayout = () => {
         
         setRole(userRole);
 
+        // Buscar contadores
+        const [candidatoRes, sacRes] = await Promise.all([
+          supabase.from('candidatos').select('*', { count: 'exact', head: true }),
+          supabase.from('mensagens_contato').select('*', { count: 'exact', head: true })
+        ]);
+        
+        setCandidatosCount(candidatoRes.count || 0);
+        setSacCount(sacRes.count || 0);
+
         // Verificação de segurança: se a rota atual for adminOnly e o usuário for operador
         const currentPath = location.pathname;
         const adminOnlyPaths = [
@@ -56,12 +67,12 @@ export const DashboardLayout = () => {
           navigate("/admin");
         }
       } catch (err) {
-        console.error("Erro crítico no checkAuth:", err);
+        console.error("Erro crítico no checkAuthAndCounts:", err);
       } finally {
         setLoading(false);
       }
     };
-    checkAuth();
+    checkAuthAndCounts();
   }, [navigate, location.pathname]);
 
   const handleLogout = async () => {
@@ -119,7 +130,17 @@ export const DashboardLayout = () => {
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-white/20 font-bold text-white' : 'text-white hover:bg-white/10'}`}
               >
                 <item.icon className="h-5 w-5 text-white shrink-0" />
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {(item.path === "/admin/candidatos" && candidatosCount > 0) && (
+                    <span className="bg-[#D62828] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center ml-auto">
+                        {candidatosCount}
+                    </span>
+                )}
+                {(item.path === "/admin/sac" && sacCount > 0) && (
+                    <span className="bg-[#D62828] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center ml-auto">
+                        {sacCount}
+                    </span>
+                )}
               </Link>
             )
           })}

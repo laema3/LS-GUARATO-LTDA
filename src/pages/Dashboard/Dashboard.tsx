@@ -20,7 +20,7 @@ export const Dashboard = () => {
     try {
       const { count: candidatosCount } = await supabase.from('candidatos').select('*', { count: 'exact', head: true });
       const { count: vagasCount } = await supabase.from('vagas').select('*', { count: 'exact', head: true });
-      const { count: mensagensCount } = await supabase.from('contatos_sac').select('*', { count: 'exact', head: true });
+      const { count: mensagensCount } = await supabase.from('mensagens_contato').select('*', { count: 'exact', head: true });
       const { count: servicosCount } = await supabase.from('jornal_ofertas').select('*', { count: 'exact', head: true });
 
       setStats({
