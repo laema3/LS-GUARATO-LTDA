@@ -70,14 +70,21 @@ export const SetoresEditor = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editId) {
-      await supabase.from('setores').update(formData).eq('id', editId);
-    } else {
-      await supabase.from('setores').insert([formData]);
+    try {
+      if (editId) {
+        const { error } = await supabase.from('setores').update(formData).eq('id', editId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('setores').insert([formData]);
+        if (error) throw error;
+      }
+      loadSetores();
+      resetForm();
+      setShowToast(true);
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao salvar setor: " + (e as Error).message);
     }
-    loadSetores();
-    resetForm();
-    setShowToast(true);
   };
 
   const handleDelete = async () => {

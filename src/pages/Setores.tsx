@@ -8,7 +8,8 @@ export const Setores = () => {
 
   useEffect(() => {
     const loadSetores = async () => {
-      const { data } = await supabase.from('setores').select('*').order('nome');
+      const { data, error } = await supabase.from('setores').select('*').order('nome');
+      if (error) console.error("Erro ao carregar setores:", error);
       if (data) setSetores(data);
     };
     loadSetores();
