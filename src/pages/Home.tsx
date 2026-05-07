@@ -19,30 +19,30 @@ export const Home = () => {
   }, []);
 
   const loadData = async () => {
-    console.log("Iniciando loadData na Home...");
     try {
-      const { data, error } = await supabase.from('home_settings').select('*').eq('id', 1).single();
-      console.log("Home settings fetch result:", data, error);
-      if (error) throw error;
+      const { data } = await supabase.from('home_settings').select('*').eq('id', 1).single();
       
       if (data) {
-        if (data.slides && data.slides.length > 0) {
-          // Only override if slides have real data/images
-          const validSlides = data.slides.filter((s:any) => s.image && s.title);
+        if (data.slides && Array.isArray(data.slides) && data.slides.length > 0) {
+          const validSlides = data.slides.filter((s:any) => s && s.image && s.title);
           if (validSlides.length > 0) setSlides(validSlides);
         }
-        if (data.sobre_title) {
-          // Try to split the title if there's a natural break, assuming user wrote a single line
+        if (data.sobre_title && typeof data.sobre_title === 'string') {
           const words = data.sobre_title.split(' ');
-          const lastTwo = words.splice(-2).join(' ');
-          setSobreTitle(words.join(' '));
-          setSobreHighlight(' ' + lastTwo);
+          if (words.length > 1) {
+            const lastTwo = words.splice(-2).join(' ');
+            setSobreTitle(words.join(' '));
+            setSobreHighlight(' ' + lastTwo);
+          } else {
+            setSobreTitle(data.sobre_title);
+            setSobreHighlight('');
+          }
         }
         if (data.sobre_description) setSobreDescription(data.sobre_description);
         if (data.sobre_image) setSobreImage(data.sobre_image);
       }
     } catch (err) {
-      console.error("Erro ao carregar dados da Home:", err);
+      // Silently fail to fallback to mocks
     }
   };
 

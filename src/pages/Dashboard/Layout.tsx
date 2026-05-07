@@ -21,37 +21,33 @@ export const DashboardLayout = () => {
           return;
         }
 
-        const email = session.user.email?.toLowerCase().trim();
+        const email = (session.user.email || '').toLowerCase().trim();
         setUserEmail(email || null);
 
         // Buscar o papel do usuário
-        console.log("Email buscando perfil:", email);
         let userRole = 'operator'; // Default
         try {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('role')
-            .ilike('email', email || '')
-            .maybeSingle();
+          if (email) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .ilike('email', email)
+              .maybeSingle();
+            
+            if (profile?.role) {
+                userRole = profile.role;
+            }
+          }
           
-          if (error) throw error;
-          
-          console.log("Perfil buscado:", profile);
-          
-          // Fallback de segurança: se for o e-mail da proprietária, garantir admin
-          if (profile?.role) {
-              userRole = profile.role;
-          } else if (email === 'camillasites@gmail.com') {
+          if (email === 'camillasites@gmail.com') {
             userRole = 'admin';
           }
         } catch (err) {
-          console.error("Erro ao buscar perfil, usando fallback:", err);
           if (email === 'camillasites@gmail.com') {
             userRole = 'admin';
           }
         }
         
-        console.log("Papel final:", userRole);
         setRole(userRole);
 
         // Buscar contadores de forma independente para não travar a UI
