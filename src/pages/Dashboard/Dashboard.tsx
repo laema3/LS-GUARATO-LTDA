@@ -18,19 +18,25 @@ export const Dashboard = () => {
   const loadStats = async () => {
     setLoading(true);
     try {
+      // Restaurando nome da tabela original e tornando consultas mais seguras
       const { count: candidatosCount } = await supabase.from('candidatos').select('*', { count: 'exact', head: true });
       const { count: vagasCount } = await supabase.from('vagas').select('*', { count: 'exact', head: true });
       const { count: mensagensCount } = await supabase.from('mensagens_contato').select('*', { count: 'exact', head: true });
+      const { count: servicosCount } = await supabase.from('servicos_settings').select('*', { count: 'exact', head: true });
       
-      // Tabela jornal_ofertas contém os registros de encartes (PDFs)
-      const { count: servicosCount } = await supabase.from('jornal_ofertas').select('*', { count: 'exact', head: true });
-      const { count: setoresCount } = await supabase.from('setores').select('*', { count: 'exact', head: true });
+      let setoresCount = 0;
+      try {
+        const { count } = await supabase.from('setores').select('*', { count: 'exact', head: true });
+        setoresCount = count || 0;
+      } catch (e) {
+        // Tabela setores pode não existir ainda
+      }
 
       setStats({
         candidatos: candidatosCount || 0,
         vagas: vagasCount || 0,
         mensagens: mensagensCount || 0,
-        servicos: (servicosCount || 0) + (setoresCount || 0)
+        servicos: (servicosCount || 0) + setoresCount
       });
     } catch (error) {
       console.error("Erro ao carregar estatísticas:", error);

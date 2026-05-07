@@ -14,7 +14,7 @@ export const ServicosEditor = () => {
   }, []);
 
   const loadData = async () => {
-    const { data } = await supabase.from('jornal_ofertas').select('*').eq('id', 1).single();
+    const { data } = await supabase.from('servicos_settings').select('*').eq('id', 1).single();
     if (data) {
       if (data.encarte_pdf) setEncartePdf(data.encarte_pdf);
       if (data.transparencia_pdfs) setPdfsTransparencia(data.transparencia_pdfs);
@@ -22,7 +22,7 @@ export const ServicosEditor = () => {
   };
 
   const handleSave = async () => {
-    const { error } = await supabase.from('jornal_ofertas').upsert({
+    const { error } = await supabase.from('servicos_settings').upsert({
       id: 1,
       encarte_pdf: encartePdf,
       transparencia_pdfs: pdfsTransparencia

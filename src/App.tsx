@@ -48,12 +48,12 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  // Alterado para default true conforme pedido para colocar em manutenção enquanto resolve o banco
-  // Isso evita que a tela fique branca se o banco falhar no boot
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
+  // Alterado para default false para carregar o site normalmente
+  // Só entrará em manutenção se o banco explicitamente retornar true
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
 
   useEffect(() => {
-    // Tenta carregar do banco, mas se falhar ou estiver em manutenção no banco, mantém true
+    // Tenta carregar do banco
     const checkMaintenance = async () => {
       try {
         const { data, error } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1).single();
@@ -61,7 +61,8 @@ export default function App() {
           setMaintenanceMode(data.manutencao_ativa);
         }
       } catch (err) {
-        console.error("Erro na verificação de manutenção:", err);
+        // Se houver erro de conexão, mantém o site aberto (false) por segurança
+        setMaintenanceMode(false);
       }
     };
     

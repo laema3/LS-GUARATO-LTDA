@@ -7,7 +7,7 @@ export const JornalOfertas = () => {
 
   useEffect(() => {
     const loadEncarte = async () => {
-      const { data } = await supabase.from('jornal_ofertas').select('encarte_pdf').eq('id', 1).single();
+      const { data } = await supabase.from('servicos_settings').select('encarte_pdf').eq('id', 1).single();
       if (data && data.encarte_pdf) {
         setEncartePdf(data.encarte_pdf);
       }
