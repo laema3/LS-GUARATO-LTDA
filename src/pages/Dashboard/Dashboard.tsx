@@ -22,15 +22,15 @@ export const Dashboard = () => {
       const { count: vagasCount } = await supabase.from('vagas').select('*', { count: 'exact', head: true });
       const { count: mensagensCount } = await supabase.from('mensagens_contato').select('*', { count: 'exact', head: true });
       
-      // Corrigindo nome da tabela: jornal_ofertas para servicos_settings (esta tabela é single row, não queremos count de registros mas saber se existe algo)
-      // Na verdade, servicos_settings armazena o link do encarte, então Head: true já basta se existir.
-      const { count: servicosCount } = await supabase.from('servicos_settings').select('*', { count: 'exact', head: true });
+      // Tabela jornal_ofertas contém os registros de encartes (PDFs)
+      const { count: servicosCount } = await supabase.from('jornal_ofertas').select('*', { count: 'exact', head: true });
+      const { count: setoresCount } = await supabase.from('setores').select('*', { count: 'exact', head: true });
 
       setStats({
         candidatos: candidatosCount || 0,
         vagas: vagasCount || 0,
         mensagens: mensagensCount || 0,
-        servicos: servicosCount || 0
+        servicos: (servicosCount || 0) + (setoresCount || 0)
       });
     } catch (error) {
       console.error("Erro ao carregar estatísticas:", error);

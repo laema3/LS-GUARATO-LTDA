@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play } from "lucide-react";
+import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
@@ -32,6 +32,7 @@ const Header = () => {
   ];
 
   const serviceLinks = [
+    { name: "Nossos Setores", path: "/servicos/setores", icon: LayoutGrid },
     { name: "Jornal de Ofertas", path: "/servicos/jornal-de-ofertas", icon: FileText },
     { name: "Transparência Salarial", path: "/servicos/transparencia-salarial", icon: TrendingUp },
     { name: "Vagas de Empregos", path: "/servicos/vagas", icon: Briefcase },

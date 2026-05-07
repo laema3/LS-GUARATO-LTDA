@@ -52,12 +52,16 @@ export const DashboardLayout = () => {
 
         // Buscar contadores de forma independente para não travar a UI
         supabase.from('candidatos').select('*', { count: 'exact', head: true })
-          .then(res => setCandidatosCount(res.count || 0))
-          .catch(err => console.error("Erro count candidatos:", err));
+          .then(
+            res => setCandidatosCount(res.count || 0),
+            err => console.error("Erro count candidatos:", err)
+          );
           
         supabase.from('mensagens_contato').select('*', { count: 'exact', head: true })
-          .then(res => setSacCount(res.count || 0))
-          .catch(err => console.error("Erro count mensagens:", err));
+          .then(
+            res => setSacCount(res.count || 0),
+            err => console.error("Erro count mensagens:", err)
+          );
 
         // Verificação de segurança: se a rota atual for adminOnly e o usuário for operador
         const currentPath = location.pathname;
@@ -100,6 +104,7 @@ export const DashboardLayout = () => {
     { name: "Rodapé", path: "/admin/rodape", icon: LayoutDashboard, adminOnly: true },
     { name: "SAC / Mensagens", path: "/admin/sac", icon: MessageSquare },
     { name: "Serviços (PDFs)", path: "/admin/servicos", icon: FileText, adminOnly: true },
+    { name: "Setores da Loja", path: "/admin/setores", icon: LayoutGrid, adminOnly: true },
     { name: "Vagas: Cadastrar", path: "/admin/vagas/cadastrar", icon: Briefcase },
     { name: "Vagas: Parâmetros", path: "/admin/vagas/parametros", icon: Settings2 },
     { name: "Usuários do Sistema", path: "/admin/usuarios", icon: Users, adminOnly: true },
