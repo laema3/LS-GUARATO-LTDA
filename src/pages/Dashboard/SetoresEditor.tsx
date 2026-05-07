@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Save, PlusCircle, Trash2, Edit, X, AlertTriangle, Image as ImageIcon } from "lucide-react";
+import { Save, PlusCircle, Trash2, Edit, Wand2, Loader2 } from "lucide-react";
 import { SaveToast } from "../../components/ui/SaveToast";
-import { FileUpload } from "../../components/ui/FileUpload";
+import { MultiFileUpload } from "../../components/ui/MultiFileUpload";
 import { supabase } from "../../lib/supabase";
+import { GoogleGenAI } from "@google/genai";
+
+let ai: GoogleGenAI | null = null;
+const getAI = () => {
+    if (!ai) {
+        const key = process.env.GEMINI_API_KEY;
+        if (!key) throw new Error("GEMINI_API_KEY environment variable is required");
+        ai = new GoogleGenAI({ apiKey: key });
+    }
+    return ai;
+};
 
 export const SetoresEditor = () => {
   const [showToast, setShowToast] = useState(false);
@@ -16,6 +27,7 @@ export const SetoresEditor = () => {
     fotos: [] as string[]
   });
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     loadSetores();
@@ -24,6 +36,30 @@ export const SetoresEditor = () => {
   const loadSetores = async () => {
     const { data } = await supabase.from('setores').select('*').order('nome');
     if (data) setSetores(data);
+  };
+
+  const generateAIContent = async () => {
+    if (!formData.nome) {
+      alert("Por favor, preencha o nome do setor primeiro.");
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const gAI = getAI();
+      const prompt = `Crie um título e uma descrição para um setor de supermercado chamado "${formData.nome}". Retorne em formato JSON: { "titulo": "...", "descricao": "..." }`;
+      const result = await gAI.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+      });
+      const text = result.text || "";
+      const json = JSON.parse(text.replace(/```json/g, "").replace(/```/g, ""));
+      setFormData(prev => ({ ...prev, titulo: json.titulo, descricao: json.descricao }));
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao gerar conteúdo.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const resetForm = () => {
@@ -63,29 +99,20 @@ export const SetoresEditor = () => {
 
         {isFormOpen && (
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 space-y-4">
-                <input required placeholder="Nome do Setor" value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="w-full p-2 border rounded" />
+                <div className="relative">
+                    <input required placeholder="Nome do Setor" value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="w-full p-2 border rounded" />
+                    <button type="button" onClick={generateAIContent} disabled={isGenerating} className="absolute right-2 top-2 p-1 bg-[#0B3C8C] text-white rounded">
+                        {isGenerating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5" />}
+                    </button>
+                </div>
                 <input required placeholder="Título" value={formData.titulo} onChange={e => setFormData({...formData, titulo: e.target.value})} className="w-full p-2 border rounded" />
                 <textarea required placeholder="Descrição" value={formData.descricao} onChange={e => setFormData({...formData, descricao: e.target.value})} className="w-full p-2 border rounded h-24" />
                 
                 <h3 className="font-bold">Fotos (Máximo 10)</h3>
-                <div className="grid grid-cols-2 gap-4">
-                    {Array.from({ length: 10 }).map((_, i) => (
-                        <FileUpload
-                            key={i}
-                            value={formData.fotos[i] || ""}
-                            onChange={(val) => {
-                                const newFotos = [...formData.fotos];
-                                newFotos[i] = val;
-                                setFormData({...formData, fotos: newFotos.filter(f => f)});
-                            }}
-                            title={`Foto ${i + 1}`}
-                            accept="image/*"
-                            type="image"
-                            bucket="assets"
-                            folder="setores"
-                        />
-                    ))}
-                </div>
+                <MultiFileUpload 
+                    value={formData.fotos}
+                    onChange={(urls) => setFormData({...formData, fotos: urls})}
+                />
                 <div className="flex gap-2">
                     <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Salvar</button>
                     <button type="button" onClick={resetForm} className="bg-gray-200 px-4 py-2 rounded">Cancelar</button>

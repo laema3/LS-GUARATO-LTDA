@@ -34,21 +34,18 @@ export const DashboardLayout = () => {
         if (error) console.error("Erro ao buscar perfil:", error);
         
         // Fallback de segurança: se for o e-mail da proprietária, garantir admin
-        let userRole = profile?.role || 'operator';
-        if (email === 'camillasites@gmail.com') {
+        let userRole = 'operator';
+        if (profile?.role) {
+            userRole = profile.role;
+        } else if (email === 'camillasites@gmail.com') {
           userRole = 'admin';
         }
         
         setRole(userRole);
 
-        // Buscar contadores
-        const [candidatoRes, sacRes] = await Promise.all([
-          supabase.from('candidatos').select('*', { count: 'exact', head: true }),
-          supabase.from('mensagens_contato').select('*', { count: 'exact', head: true })
-        ]);
-        
-        setCandidatosCount(candidatoRes.count || 0);
-        setSacCount(sacRes.count || 0);
+        // Buscar contadores de forma independente para não travar a UI
+        supabase.from('candidatos').select('*', { count: 'exact', head: true }).then(res => setCandidatosCount(res.count || 0));
+        supabase.from('mensagens_contato').select('*', { count: 'exact', head: true }).then(res => setSacCount(res.count || 0));
 
         // Verificação de segurança: se a rota atual for adminOnly e o usuário for operador
         const currentPath = location.pathname;
@@ -69,6 +66,7 @@ export const DashboardLayout = () => {
         }
       } catch (err) {
         console.error("Erro crítico no checkAuthAndCounts:", err);
+        // Mesmo em erro, marcar carregamento concluído
       } finally {
         setLoading(false);
       }
