@@ -21,7 +21,10 @@ export const Dashboard = () => {
       const { count: candidatosCount } = await supabase.from('candidatos').select('*', { count: 'exact', head: true });
       const { count: vagasCount } = await supabase.from('vagas').select('*', { count: 'exact', head: true });
       const { count: mensagensCount } = await supabase.from('mensagens_contato').select('*', { count: 'exact', head: true });
-      const { count: servicosCount } = await supabase.from('jornal_ofertas').select('*', { count: 'exact', head: true });
+      
+      // Corrigindo nome da tabela: jornal_ofertas para servicos_settings (esta tabela é single row, não queremos count de registros mas saber se existe algo)
+      // Na verdade, servicos_settings armazena o link do encarte, então Head: true já basta se existir.
+      const { count: servicosCount } = await supabase.from('servicos_settings').select('*', { count: 'exact', head: true });
 
       setStats({
         candidatos: candidatosCount || 0,

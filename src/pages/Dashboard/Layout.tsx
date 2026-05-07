@@ -55,8 +55,13 @@ export const DashboardLayout = () => {
         setRole(userRole);
 
         // Buscar contadores de forma independente para não travar a UI
-        supabase.from('candidatos').select('*', { count: 'exact', head: true }).then(res => setCandidatosCount(res.count || 0));
-        supabase.from('mensagens_contato').select('*', { count: 'exact', head: true }).then(res => setSacCount(res.count || 0));
+        supabase.from('candidatos').select('*', { count: 'exact', head: true })
+          .then(res => setCandidatosCount(res.count || 0))
+          .catch(err => console.error("Erro count candidatos:", err));
+          
+        supabase.from('mensagens_contato').select('*', { count: 'exact', head: true })
+          .then(res => setSacCount(res.count || 0))
+          .catch(err => console.error("Erro count mensagens:", err));
 
         // Verificação de segurança: se a rota atual for adminOnly e o usuário for operador
         const currentPath = location.pathname;
