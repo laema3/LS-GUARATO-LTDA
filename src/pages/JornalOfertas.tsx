@@ -17,7 +17,12 @@ export const JornalOfertas = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="bg-[#D62828] py-12 text-center text-white relative overflow-hidden">
+      <div className="relative py-12 text-center text-white overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=1600')" }}
+        ></div>
+        <div className="absolute inset-0 bg-[#D62828]/60"></div>
         {/* Pattern overlay */}
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="relative z-10 flex flex-col items-center">
