@@ -48,81 +48,83 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
+  // Alterado para default true conforme pedido para colocar em manutenção enquanto resolve o banco
+  // Isso evita que a tela fique branca se o banco falhar no boot
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
 
   useEffect(() => {
+    // Tenta carregar do banco, mas se falhar ou estiver em manutenção no banco, mantém true
     const checkMaintenance = async () => {
       try {
-        const { data } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1).single();
-        if (data && 'manutencao_ativa' in data) {
+        const { data, error } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1).single();
+        if (!error && data && 'manutencao_ativa' in data) {
           setMaintenanceMode(data.manutencao_ativa);
         }
       } catch (err) {
-        // Silently fail
+        console.error("Erro na verificação de manutenção:", err);
       }
     };
-    checkMaintenance();
-
-    let channel: any = null;
-    try {
-      channel = supabase
-        .channel('maintenance-changes')
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'footer_settings' }, (payload) => {
-          if (payload.new && 'manutencao_ativa' in payload.new) {
-            setMaintenanceMode(payload.new.manutencao_ativa);
-          }
-        })
-        .subscribe();
-    } catch (e) {
-      // Ignorar erros de realtime
+    
+    // Só tenta carregar se o supabase estiver configurado
+    if (supabase.supabaseUrl && !supabase.supabaseUrl.includes('placeholder')) {
+      checkMaintenance();
     }
-
-    return () => {
-      if (channel) supabase.removeChannel(channel);
-    };
   }, []);
 
   return (
     <BrowserRouter>
+      {/* PageLoader tem seu próprio timer interno, não deve bloquear eternamente */}
       <PageLoader />
       <ScrollToTop />
-      <Routes>
-        {/* Rotas administrativas movem para cima para prioridade */}
-        <Route path="/admin" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="home" element={<HomeEditor />} />
-          <Route path="cabecalho" element={<CabecalhoEditor />} />
-          <Route path="ajustes" element={<ConfiguracoesEditor />} />
-          <Route path="sobre" element={<SobreEditor />} />
-          <Route path="rodape" element={<FooterEditor />} />
-          <Route path="servicos" element={<ServicosEditor />} />
-          <Route path="setores" element={<SetoresEditor />} />
-          <Route path="candidatos" element={<CandidatosList />} />
-          <Route path="sac" element={<MensagensSacList />} />
-          <Route path="vagas/cadastrar" element={<VagasEditor />} />
-          <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
-          <Route path="usuarios" element={<UsuariosEditor />} />
-        </Route>
-
-        <Route path="/admin/login" element={<Login />} />
-
-        <Route path="/" element={maintenanceMode ? <Maintenance /> : <Layout />}>
-          <Route index element={<Home />} />
-          <Route path="area-restrita" element={<AreaRestrita />} />
-          <Route path="sobre" element={<Sobre />} />
-          <Route path="contato" element={<Contato />} />
-          
-          <Route path="servicos">
-            <Route path="jornal-de-ofertas" element={<JornalOfertas />} />
-            <Route path="transparencia-salarial" element={<TransparenciaSalarial />} />
-            <Route path="setores" element={<Setores />} />
-            <Route path="vagas" element={<VagasEmprego />} />
-            <Route path="vagas/:id" element={<DetalhesVaga />} />
+      
+      {maintenanceMode ? (
+        <Routes>
+          <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin" element={<DashboardLayout />}>
+             <Route index element={<Dashboard />} />
+             <Route path="*" element={<Dashboard />} />
           </Route>
-          
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+          <Route path="*" element={<Maintenance />} />
+        </Routes>
+      ) : (
+        <Routes>
+          {/* Rotas administrativas movem para cima para prioridade */}
+          <Route path="/admin" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="home" element={<HomeEditor />} />
+            <Route path="cabecalho" element={<CabecalhoEditor />} />
+            <Route path="ajustes" element={<ConfiguracoesEditor />} />
+            <Route path="sobre" element={<SobreEditor />} />
+            <Route path="rodape" element={<FooterEditor />} />
+            <Route path="servicos" element={<ServicosEditor />} />
+            <Route path="setores" element={<SetoresEditor />} />
+            <Route path="candidatos" element={<CandidatosList />} />
+            <Route path="sac" element={<MensagensSacList />} />
+            <Route path="vagas/cadastrar" element={<VagasEditor />} />
+            <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
+            <Route path="usuarios" element={<UsuariosEditor />} />
+          </Route>
+
+          <Route path="/admin/login" element={<Login />} />
+
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="area-restrita" element={<AreaRestrita />} />
+            <Route path="sobre" element={<Sobre />} />
+            <Route path="contato" element={<Contato />} />
+            
+            <Route path="servicos">
+              <Route path="jornal-de-ofertas" element={<JornalOfertas />} />
+              <Route path="transparencia-salarial" element={<TransparenciaSalarial />} />
+              <Route path="setores" element={<Setores />} />
+              <Route path="vagas" element={<VagasEmprego />} />
+              <Route path="vagas/:id" element={<DetalhesVaga />} />
+            </Route>
+            
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      )}
     </BrowserRouter>
   );
 }

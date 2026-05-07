@@ -11,9 +11,13 @@ export const PageLoader = () => {
     setIsLoading(true);
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1300);
+    }, 1500); // Aumentado um pouco para garantir que a transição ocorra
 
-    return () => clearTimeout(timer);
+    // Segurança extra: se o componente for desmontado, limpa o timer
+    return () => {
+      clearTimeout(timer);
+      setIsLoading(false);
+    };
   }, [location.pathname]);
 
   return (
