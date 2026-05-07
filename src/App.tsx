@@ -8,7 +8,6 @@ import { useState, useEffect } from "react";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
 import { Sobre } from "./pages/Sobre";
-import { Setores } from "./pages/Setores";
 import { AreaRestrita } from "./pages/AreaRestrita";
 import { JornalOfertas } from "./pages/JornalOfertas";
 import { TransparenciaSalarial } from "./pages/TransparenciaSalarial";
@@ -34,7 +33,6 @@ import { CandidatosList } from "./pages/Dashboard/CandidatosList";
 import { ConfiguracoesEditor } from "./pages/Dashboard/ConfiguracoesEditor";
 import { MensagensSacList } from "./pages/Dashboard/MensagensSacList";
 import { UsuariosEditor } from "./pages/Dashboard/UsuariosEditor";
-import { SetoresEditor } from "./pages/Dashboard/SetoresEditor";
 import { Login } from "./pages/Dashboard/Login";
 
 function ScrollToTop() {
@@ -101,7 +99,6 @@ export default function App() {
             <Route path="rodape" element={<FooterEditor />} />
             <Route path="servicos" element={<ServicosEditor />} />
             <Route path="candidatos" element={<CandidatosList />} />
-            <Route path="setores" element={<SetoresEditor />} />
             <Route path="sac" element={<MensagensSacList />} />
             <Route path="vagas/cadastrar" element={<VagasEditor />} />
             <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
@@ -114,7 +111,6 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="area-restrita" element={<AreaRestrita />} />
             <Route path="sobre" element={<Sobre />} />
-            <Route path="setores" element={<Setores />} />
             <Route path="contato" element={<Contato />} />
             
             <Route path="servicos">
