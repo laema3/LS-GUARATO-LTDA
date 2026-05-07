@@ -1,13 +1,14 @@
 import { FileText, Download, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 export const TransparenciaSalarial = () => {
   const [pdfsTransparencia, setPdfsTransparencia] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const loadPdfs = async () => {
+      if (!isSupabaseConfigured) return;
       const { data } = await supabase.from('servicos_settings').select('transparencia_pdfs').eq('id', 1).single();
       if (data && data.transparencia_pdfs) {
         setPdfsTransparencia(data.transparencia_pdfs);

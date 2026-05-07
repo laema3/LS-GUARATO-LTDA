@@ -18,7 +18,7 @@ import { Contato } from "./pages/Contato";
 import { NotFound } from "./pages/NotFound";
 import { PageLoader } from "./components/ui/Loader";
 import Maintenance from "./pages/Maintenance";
-import { supabase } from "./lib/supabase";
+import { supabase, isSupabaseConfigured } from "./lib/supabase";
 
 // Import Admin Routes
 import { DashboardLayout } from "./pages/Dashboard/Layout";
@@ -48,18 +48,23 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  // Forçado para true conforme solicitado para manter o sistema em manutenção em produção
   const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
 
   useEffect(() => {
+    // Se não estiver configurado, forçamos manutenção
+    if (!isSupabaseConfigured) {
+      setMaintenanceMode(true);
+      return;
+    }
+
     const checkMaintenance = async () => {
       try {
-        const { data, error } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1).single();
-        if (!error && data && 'manutencao_ativa' in data) {
-          // Se o banco estiver configurado, respeitamos o valor do banco
+        const { data, error } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1).maybeSingle();
+        
+        if (!error && data) {
           setMaintenanceMode(data.manutencao_ativa);
         } else {
-          // Se houver erro de conexão, deixamos em manutenção por segurança
+          // Se houver erro ou não encontrar o registro, mantemos em manutenção por precaução
           setMaintenanceMode(true);
         }
       } catch (err) {

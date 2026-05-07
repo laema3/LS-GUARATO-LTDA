@@ -1,12 +1,13 @@
 import { FileText, Download } from "lucide-react";
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 export const JornalOfertas = () => {
   const [encartePdf, setEncartePdf] = useState("");
 
   useEffect(() => {
     const loadEncarte = async () => {
+      if (!isSupabaseConfigured) return;
       const { data } = await supabase.from('servicos_settings').select('encarte_pdf').eq('id', 1).single();
       if (data && data.encarte_pdf) {
         setEncartePdf(data.encarte_pdf);

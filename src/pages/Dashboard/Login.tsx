@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { ShieldCheck, Mail, Lock, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -15,6 +15,7 @@ export const Login = () => {
 
   // Check if session already exists
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/admin");
@@ -24,6 +25,10 @@ export const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSupabaseConfigured) {
+      setError("Supabase não configurado corretamente nas configurações do AI Studio.");
+      return;
+    }
     setLoading(true);
     setError(null);
 

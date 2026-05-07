@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { Users, FileText, MessageSquare, Briefcase, TrendingUp } from "lucide-react";
 
 export const Dashboard = () => {
@@ -16,6 +16,10 @@ export const Dashboard = () => {
   }, []);
 
   const loadStats = async () => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const { count: candidatosCount } = await supabase.from('candidatos').select('*', { count: 'exact', head: true });
