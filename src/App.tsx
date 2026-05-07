@@ -48,17 +48,22 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
+  // Forçado para true conforme solicitado para manter o sistema em manutenção em produção
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
 
   useEffect(() => {
     const checkMaintenance = async () => {
       try {
         const { data, error } = await supabase.from('footer_settings').select('manutencao_ativa').eq('id', 1).single();
         if (!error && data && 'manutencao_ativa' in data) {
+          // Se o banco estiver configurado, respeitamos o valor do banco
           setMaintenanceMode(data.manutencao_ativa);
+        } else {
+          // Se houver erro de conexão, deixamos em manutenção por segurança
+          setMaintenanceMode(true);
         }
       } catch (err) {
-        setMaintenanceMode(false);
+        setMaintenanceMode(true);
       }
     };
     checkMaintenance();
