@@ -83,36 +83,29 @@ export default function App() {
       <PageLoader />
       <ScrollToTop />
       
-      {maintenanceMode ? (
-        <Routes>
-          <Route path="/admin/login" element={<Login />} />
-          <Route path="/admin" element={<DashboardLayout />}>
-             <Route index element={<Dashboard />} />
-             <Route path="*" element={<Dashboard />} />
-          </Route>
+      <Routes>
+        {/* Rotas administrativas sempre disponíveis */}
+        <Route path="/admin/login" element={<Login />} />
+        <Route path="/admin" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="home" element={<HomeEditor />} />
+          <Route path="cabecalho" element={<CabecalhoEditor />} />
+          <Route path="ajustes" element={<ConfiguracoesEditor />} />
+          <Route path="sobre" element={<SobreEditor />} />
+          <Route path="rodape" element={<FooterEditor />} />
+          <Route path="servicos" element={<ServicosEditor />} />
+          <Route path="setores" element={<SetoresEditor />} />
+          <Route path="candidatos" element={<CandidatosList />} />
+          <Route path="sac" element={<MensagensSacList />} />
+          <Route path="vagas/cadastrar" element={<VagasEditor />} />
+          <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
+          <Route path="usuarios" element={<UsuariosEditor />} />
+        </Route>
+
+        {/* Parte Pública do Site */}
+        {maintenanceMode ? (
           <Route path="*" element={<Maintenance />} />
-        </Routes>
-      ) : (
-        <Routes>
-          {/* Rotas administrativas movem para cima para prioridade */}
-          <Route path="/admin" element={<DashboardLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="home" element={<HomeEditor />} />
-            <Route path="cabecalho" element={<CabecalhoEditor />} />
-            <Route path="ajustes" element={<ConfiguracoesEditor />} />
-            <Route path="sobre" element={<SobreEditor />} />
-            <Route path="rodape" element={<FooterEditor />} />
-            <Route path="servicos" element={<ServicosEditor />} />
-            <Route path="setores" element={<SetoresEditor />} />
-            <Route path="candidatos" element={<CandidatosList />} />
-            <Route path="sac" element={<MensagensSacList />} />
-            <Route path="vagas/cadastrar" element={<VagasEditor />} />
-            <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
-            <Route path="usuarios" element={<UsuariosEditor />} />
-          </Route>
-
-          <Route path="/admin/login" element={<Login />} />
-
+        ) : (
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="area-restrita" element={<AreaRestrita />} />
@@ -129,8 +122,8 @@ export default function App() {
             
             <Route path="*" element={<NotFound />} />
           </Route>
-        </Routes>
-      )}
+        )}
+      </Routes>
     </BrowserRouter>
   );
 }
