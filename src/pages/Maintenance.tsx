@@ -41,7 +41,7 @@ export default function Maintenance() {
           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
             <Phone className="h-6 w-6 text-[#0B3C8C] mx-auto mb-3" />
             <span className="block font-bold text-gray-900">Atendimento</span>
-            <span className="text-gray-500 text-sm">:34-3318-600</span>
+            <span className="text-gray-500 text-sm">(34) 3318-6400</span>
           </div>
         </div>
         
