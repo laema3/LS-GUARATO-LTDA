@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeft, ChevronRight, ShoppingBag, Truck, CreditCard, Clock, Apple, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingBag, Truck, CreditCard, Clock, Apple, Play, MessageCircle, ArrowRight } from "lucide-react";
 import { mockFAQs, mockSlides } from "../data/mockData";
 import { Accordion } from "../components/ui/Accordion";
 import { supabase } from "../lib/supabase";
@@ -63,162 +63,219 @@ export const Home = () => {
     { icon: Clock, title: "Comodidade", desc: "Aberto todos os dias" },
   ];
 
+  // Helper to split title for coloring
+  const renderTitle = (title: string) => {
+    const words = title.split(' ');
+    if (words.length <= 1) return <span className="text-white">{title}</span>;
+    
+    // For titles like "Festival de Carnes", "Hortifruti Fresquinho", etc.
+    // Try to highlight the last word/part
+    const lastWord = words.pop();
+    const firstPart = words.join(' ');
+    
+    return (
+      <>
+        <span className="text-white">{firstPart} </span>
+        <span className="text-[#FABC05]">{lastWord}</span>
+      </>
+    );
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Banner / Slider Section */}
-      <section className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-blue-900">
+      <section className="relative h-[550px] md:h-[700px] w-full overflow-hidden bg-gray-900">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.8 }}
             className="absolute inset-0"
           >
-            <div className="absolute inset-0 bg-black/40 z-10" />
+            <div className="absolute inset-0 bg-black/50 z-10" />
             <img 
               src={slides[currentSlide].image} 
               alt={slides[currentSlide].title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
-              <div className="max-w-3xl">
-                <motion.h1 
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-4xl md:text-6xl font-sans font-bold text-white mb-4 shadow-sm"
-                >
-                  {slides[currentSlide].title}
-                </motion.h1>
-                <motion.p 
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-lg md:text-2xl text-gray-100 mb-8 max-w-2xl mx-auto drop-shadow-md bg-transparent"
-                >
-                  {slides[currentSlide].description}
-                </motion.p>
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  {slides[currentSlide].cta ? (
+            <div className="absolute inset-0 z-20 flex items-center px-4 md:px-0">
+              <div className="container mx-auto">
+                <div className="max-w-4xl text-left">
+                  {/* Badge */}
+                  <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-black/20 backdrop-blur-sm mb-8"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-[#FABC05] animate-pulse" />
+                    <span className="text-white text-[10px] md:text-xs font-bold tracking-widest uppercase">
+                      LÍDER EM QUALIDADE E TRADIÇÃO
+                    </span>
+                  </motion.div>
+
+                  {/* Heading */}
+                  <motion.h1 
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
+                    className="text-5xl md:text-8xl font-sans font-bold leading-[1.1] mb-6 tracking-tight"
+                  >
+                    {renderTitle(slides[currentSlide].title)}
+                  </motion.h1>
+
+                  {/* Description */}
+                  <motion.p 
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed font-light"
+                  >
+                    {slides[currentSlide].description}
+                  </motion.p>
+
+                  {/* Buttons */}
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="flex flex-col sm:flex-row gap-4"
+                  >
+                    {slides[currentSlide].cta && (
+                      <Link 
+                        to={slides[currentSlide].link || "/"}
+                        className="flex items-center justify-center gap-3 bg-[#FABC05] hover:bg-[#eab308] text-black font-bold py-4 px-8 rounded-lg text-lg transition-all hover:scale-105 shadow-xl group"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        {slides[currentSlide].cta}
+                      </Link>
+                    )}
                     <Link 
-                      to={slides[currentSlide].link || "/"}
-                      className="inline-block bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-4 px-8 rounded-full text-lg transition-transform hover:scale-105 shadow-lg"
+                      to="/servicos/jornal-de-ofertas"
+                      className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-4 px-8 rounded-lg border border-white/30 backdrop-blur-md text-lg transition-all group"
                     >
-                      {slides[currentSlide].cta}
+                      Ver Ofertas
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
-                  ) : null}
-                </motion.div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </motion.div>
         </AnimatePresence>
 
         {/* Slider Controls */}
-        <button 
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
-        >
-          <ChevronLeft className="h-8 w-8" />
-        </button>
-        <button 
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
-        >
-          <ChevronRight className="h-8 w-8" />
-        </button>
-      </section>
-
-      {/* Features bar */}
-      <section className="bg-white border-b border-gray-100 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {features.map((feat, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center gap-3">
-                <div className="bg-[#0B3C8C]/10 p-4 rounded-full text-[#0B3C8C]">
-                  <feat.icon className="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 font-sans">{feat.title}</h3>
-                  <p className="text-sm text-gray-500">{feat.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="absolute bottom-10 right-10 z-30 flex gap-4">
+          <button 
+            onClick={prevSlide}
+            className="bg-white/10 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/10"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button 
+            onClick={nextSlide}
+            className="bg-white/10 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-md transition-all border border-white/10"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
         </div>
       </section>
 
-      {/* Sobre Nós Section (Re-usable Layout Pattern) */}
-      <section className="py-20 bg-gray-50">
+      {/* Features bar */}
+      <section className="bg-white border-b border-gray-100 py-10 relative z-20 -mt-8 md:-mt-12 container mx-auto px-4 rounded-xl shadow-2xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {features.map((feat, idx) => (
+            <div key={idx} className="flex items-center gap-4 group cursor-default">
+              <div className="bg-[#0B3C8C] text-white p-3 rounded-xl transition-transform group-hover:scale-110">
+                <feat.icon className="h-6 w-6" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-bold text-gray-900 font-sans group-hover:text-[#0B3C8C] transition-colors">{feat.title}</h3>
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{feat.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sobre Nós Section */}
+      <section className="py-24 bg-white overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="lg:w-1/2 space-y-6">
-              <div className="inline-block px-3 py-1 bg-[#0B3C8C]/10 text-[#0B3C8C] font-bold text-sm rounded-full mb-2 border border-[#0B3C8C]/20">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="lg:w-1/2 space-y-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#0B3C8C]/5 text-[#0B3C8C] font-black text-[10px] tracking-[0.2em] rounded-md uppercase border border-[#0B3C8C]/10">
+                <div className="w-4 h-[1px] bg-[#0B3C8C]" />
                 Tradição e Qualidade
               </div>
-              <h2 className="text-4xl font-bold font-sans text-gray-900 leading-tight">
+              <h2 className="text-5xl font-bold font-sans text-gray-900 leading-tight tracking-tight">
                 {sobreTitle} <span className="text-[#0B3C8C]">{sobreHighlight}</span>
               </h2>
-              {sobreDescription.split('\n').map((paragraph, index) => (
-                <p key={index} className="text-gray-600 text-lg leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
-              <div className="pt-4">
-                <Link to="/sobre" className="inline-flex items-center gap-2 text-[#0B3C8C] font-bold hover:text-[#082a63] transition-colors border-b-2 border-transparent hover:border-[#0B3C8C] pb-1">
-                  Conheça mais da nossa história <ChevronRight className="h-5 w-5" />
+              <div className="space-y-4">
+                {sobreDescription.split('\n').map((paragraph, index) => (
+                  <p key={index} className="text-gray-500 text-lg leading-[1.8] font-light">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+              <div className="pt-6">
+                <Link to="/sobre" className="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-lg font-bold hover:bg-[#0B3C8C] transition-all hover:translate-x-2">
+                  Nossa História <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
             </div>
-            <div className="lg:w-1/2">
-              <div className="relative">
-                <img 
-                  src={sobreImage} 
-                  alt="Fachada Supermercado" 
-                  className="rounded-2xl shadow-xl relative z-10 w-full object-cover h-[400px]"
-                />
-              </div>
+            <div className="lg:w-1/2 relative">
+              <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#0B3C8C]/5 rounded-full blur-3xl -z-10" />
+              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-red-500/5 rounded-full blur-3xl -z-10" />
+              <img 
+                src={sobreImage} 
+                alt="Fachada Supermercado" 
+                className="rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative z-10 w-full object-cover h-[500px] hover:scale-[1.02] transition-transform duration-500"
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold font-sans text-gray-900 mb-4">
-              TIRE SUAS DÚVIDAS
-            </h2>
-            <div className="w-24 h-1 bg-[#0B3C8C] mx-auto rounded-full"></div>
-            <p className="mt-4 text-gray-500 max-w-2xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div className="text-left">
+              <span className="text-[#0B3C8C] font-bold text-sm tracking-widest uppercase mb-4 block">Central de Ajuda</span>
+              <h2 className="text-4xl md:text-5xl font-bold font-sans text-gray-900 leading-tight">
+                TIRE SUAS <br /> <span className="text-gray-400">DÚVIDAS</span>
+              </h2>
+            </div>
+            <p className="text-gray-500 max-w-md text-lg font-light leading-relaxed">
               Separamos as perguntas mais frequentes dos nossos clientes para facilitar o seu dia a dia.
             </p>
           </div>
           
-          <Accordion items={mockFAQs} />
+          <div className="max-w-4xl">
+            <Accordion items={mockFAQs} />
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-[#0B3C8C] py-16 text-center text-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold font-sans mb-6">Ainda não tem o nosso aplicativo?</h2>
-          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">Baixe agora e tenha acesso a ofertas exclusivas, clube de benefícios e faça suas compras sem sair de casa.</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
-              <Apple className="h-5 w-5 text-[#D62828]" />
-              Baixar na App Store
-            </button>
-            <button className="bg-[#0B3C8C] hover:bg-[#082a63] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors">
-              <Play className="h-5 w-5 text-[#D62828]" />
-              Baixar no Google Play
-            </button>
+      <section className="bg-[#0B3C8C] py-24 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 skew-x-12 translate-x-1/2" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <h2 className="text-4xl md:text-6xl font-bold font-sans text-white leading-tight">Ainda não tem o nosso <br /> <span className="text-red-400">aplicativo?</span></h2>
+            <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">Baixe agora e tenha acesso a ofertas exclusivas, clube de benefícios e faça suas compras sem sair de casa.</p>
+            <div className="flex flex-col sm:flex-row justify-center gap-6 pt-6">
+              <button className="bg-white text-black px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-2xl shadow-blue-900/40">
+                <Apple className="h-6 w-6" />
+                Download App Store
+              </button>
+              <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-white/20">
+                <Play className="h-6 w-6" />
+                Download Google Play
+              </button>
+            </div>
           </div>
         </div>
       </section>
