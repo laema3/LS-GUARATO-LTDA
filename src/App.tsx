@@ -48,12 +48,12 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(false);
 
   useEffect(() => {
-    // Se não estiver configurado, forçamos manutenção
+    // Se o banco não estiver configurado, não forçamos manutenção aqui,
+    // pois o site precisa tentar carregar para o usuário ver se há erros.
     if (!isSupabaseConfigured) {
-      setMaintenanceMode(true);
       return;
     }
 
@@ -63,12 +63,11 @@ export default function App() {
         
         if (!error && data) {
           setMaintenanceMode(data.manutencao_ativa);
-        } else {
-          // Se houver erro ou não encontrar o registro, mantemos em manutenção por precaução
-          setMaintenanceMode(true);
         }
+        // Se não houver data ou houver erro, mantemos o default false 
+        // para que o site tente carregar normalmente.
       } catch (err) {
-        setMaintenanceMode(true);
+        console.error("Erro ao verificar manutenção:", err);
       }
     };
     checkMaintenance();
