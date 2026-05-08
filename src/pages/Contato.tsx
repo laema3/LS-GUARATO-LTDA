@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, MessageCircle } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -117,12 +117,34 @@ export const Contato = () => {
                 </div>
 
                 <div className="flex items-start gap-4">
+                  <div className="bg-green-50 p-3 rounded-lg text-[#25D366] shrink-0">
+                    <MessageCircle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900">WhatsApp</h3>
+                    <a 
+                      href="https://wa.me/5534997283342" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-[#25D366] font-semibold hover:underline mt-1 block"
+                    >
+                      (34) 99728-3342
+                    </a>
+                    <p className="text-gray-500 text-sm mt-1">Atendimento rápido via chat</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
                   <div className="bg-gray-50 p-3 rounded-lg text-gray-700 shrink-0">
                     <Clock className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Horário de Atendimento SAC</h3>
-                    <p className="text-gray-600 mt-1">Segunda a Sexta: 08h às 18h<br />Sábados: 08h às 12h</p>
+                    <h3 className="font-bold text-gray-900">Horário de Funcionamento</h3>
+                    <p className="text-gray-600 mt-1">
+                      Segunda a Sexta: 07:30 às 21:00h<br />
+                      Sábados: 07:30 às 20:00h<br />
+                      Domingos: 08:00 às 13:00h
+                    </p>
                   </div>
                 </div>
               </div>

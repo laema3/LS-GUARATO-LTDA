@@ -5,7 +5,7 @@ export const mockFAQs = [
   },
   {
     question: "Quais os horários de funcionamento das lojas?",
-    answer: "Nossas lojas funcionam de segunda a sábado das 07h00 às 22h00 e aos domingos e feriados das 07h00 às 20h00."
+    answer: "Nossas lojas funcionam de segunda a sexta das 07h30 às 21h00, aos sábados das 07h30 às 20h00 e aos domingos das 08h00 às 13h00."
   },
   {
     question: "Vocês possuem loja virtual para comprar online?",

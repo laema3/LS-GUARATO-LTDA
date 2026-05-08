@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid } from "lucide-react";
+import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid, Clock, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
@@ -47,16 +47,29 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full bg-[#0B3C8C] shadow-lg text-white">
       <div className="container mx-auto px-4">
         <div className="flex py-4 min-h-[5rem] items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            {logo ? (
-              <img src={logo} alt="LS GUARATO" className="h-[78px] md:h-[84px] object-contain" />
-            ) : (
-              <>
-                <Store className="h-8 w-8 text-[#D62828]" />
-                <span className="font-sans font-bold text-2xl tracking-tight">LS GUARATO</span>
-              </>
-            )}
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center gap-2">
+              {logo ? (
+                <img src={logo} alt="LS GUARATO" className="h-[78px] md:h-[84px] object-contain" />
+              ) : (
+                <>
+                  <Store className="h-8 w-8 text-[#D62828]" />
+                  <span className="font-sans font-bold text-2xl tracking-tight">LS GUARATO</span>
+                </>
+              )}
+            </Link>
+
+            {/* Header WhatsApp - Desktop only */}
+            <a 
+              href="https://wa.me/5534997283342" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] px-3 py-1.5 rounded-full text-white font-bold text-sm transition-all hover:scale-105"
+            >
+              <MessageCircle className="h-4 w-4 fill-white" />
+              <span>WhatsApp</span>
+            </a>
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8 font-medium">
@@ -220,6 +233,9 @@ const Footer = () => {
               <a href="#" className="bg-gray-800 p-2 rounded-full hover:bg-[#D62828] hover:text-white transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
+              <a href="https://wa.me/5534997283342" target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-2 rounded-full hover:bg-[#25D366] hover:text-white transition-colors">
+                <MessageCircle className="h-5 w-5" />
+              </a>
             </div>
           </div>
 
@@ -237,6 +253,18 @@ const Footer = () => {
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-[#D62828] shrink-0" />
                 <span className="text-sm">{email}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <MessageCircle className="h-5 w-5 text-[#25D366] shrink-0" />
+                <a href="https://wa.me/5534997283342" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-[#25D366] transition-colors">(34) 99728-3342 (WhatsApp)</a>
+              </li>
+              <li className="flex items-start gap-3 pt-2">
+                <Clock className="h-5 w-5 text-[#D62828] shrink-0 mt-0.5" />
+                <div className="text-sm space-y-1">
+                  <p><span className="font-semibold text-white">Segunda à sexta:</span> 07:30 às 21:00h</p>
+                  <p><span className="font-semibold text-white">Sábado:</span> 07:30 às 20:00h</p>
+                  <p><span className="font-semibold text-white">Domingo:</span> 08:00 às 13:00h</p>
+                </div>
               </li>
             </ul>
           </div>
@@ -292,12 +320,26 @@ const Footer = () => {
 
 export const Layout = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
       <Header />
       <main className="flex-grow">
         <Outlet />
       </main>
       <Footer />
+      
+      {/* WhatsApp Floating Button */}
+      <a 
+        href="https://wa.me/5534997283342" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-[999] flex items-center justify-center w-16 h-16 bg-[#25D366] text-white rounded-full shadow-[0_4px_15px_rgba(37,211,102,0.4)] transition-all hover:scale-110 active:scale-95 group"
+        title="Fale conosco no WhatsApp"
+      >
+        <MessageCircle className="w-8 h-8 fill-white" />
+        <span className="absolute right-full mr-3 px-3 py-1.5 bg-white text-gray-800 text-sm font-bold rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap border border-gray-100">
+           Fale com a LS GUARATO
+        </span>
+      </a>
     </div>
   );
 };
