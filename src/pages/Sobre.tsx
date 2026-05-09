@@ -1,6 +1,7 @@
 import { Store, Heart, Users, Target } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { supabase } from "../lib/supabase";
 
 export const Sobre = () => {
@@ -11,6 +12,14 @@ export const Sobre = () => {
   const [missao, setMissao] = useState("Oferecer produtos de alta qualidade, com variedade e preço justo, garantindo um atendimento de excelência e comodidade aos nossos clientes em um ambiente acolhedor.");
   const [visao, setVisao] = useState("Ser reconhecido como o supermercado referência em qualidade e relacionamento na região de Uberaba, inovando sempre e crescendo junto com a nossa comunidade.");
   const [valores, setValores] = useState("Respeito e Ética\nFoco no Cliente\nValorização das Pessoas\nQualidade Garantida\nResponsabilidade Social");
+
+  const heroRef = useRef(null);
+  const { scrollYProgress: heroScrollY } = useScroll({ target: heroRef });
+  const yHero = useTransform(heroScrollY, [0, 1], ["0%", "30%"]);
+  
+  const historiaRef = useRef(null);
+  const { scrollYProgress: historiaScrollY } = useScroll({ target: historiaRef });
+  const yHistoria = useTransform(historiaScrollY, [0, 1], ["0%", "15%"]);
 
   useEffect(() => {
     const loadSobre = async () => {
@@ -31,12 +40,13 @@ export const Sobre = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <div className="relative h-[400px] w-full bg-gray-900 flex items-center justify-center overflow-hidden">
+      <div ref={heroRef} className="relative h-[400px] w-full bg-gray-900 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
-        <img 
+        <motion.img 
+          style={{ y: yHero, scale: 1.2 }}
           src={bannerImage} 
           alt="Interior do supermercado"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-cover"
         />
         <div className="relative z-20 text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold font-sans text-white mb-4">Nossa História</h1>
@@ -49,7 +59,7 @@ export const Sobre = () => {
       <div className="container mx-auto px-4 py-20">
         
         {/* História */}
-        <div className="flex flex-col lg:flex-row items-center gap-16 mb-24">
+        <div ref={historiaRef} className="flex flex-col lg:flex-row items-center gap-16 mb-24">
           <div className="lg:w-1/2">
             <h2 className="text-3xl md:text-4xl font-bold font-sans text-gray-900 mb-6 relative">
               <span className="relative z-10">{historiaTitle}</span>
@@ -64,11 +74,11 @@ export const Sobre = () => {
           <div className="lg:w-1/2 grid grid-cols-2 gap-4 relative">
              <div className="bg-[#0B3C8C] absolute -inset-4 rounded-3xl opacity-10 blur-xl"></div>
              {historiaImage ? (
-               <img src={historiaImage} alt="Nossa história" className="rounded-xl shadow-md w-full h-64 object-cover transform translate-y-8 col-span-2" />
+               <motion.img style={{ y: yHistoria, scale: 1.1 }} src={historiaImage} alt="Nossa história" className="rounded-xl shadow-md w-full h-64 object-cover col-span-2" />
              ) : (
                <>
-                 <img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=600" alt="Hortifruti" className="rounded-xl shadow-md w-full h-64 object-cover transform translate-y-8" />
-                 <img src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&q=80&w=600" alt="Padaria" className="rounded-xl shadow-md w-full h-64 object-cover" />
+                 <motion.img style={{ y: yHistoria, scale: 1.1 }} src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=600" alt="Hortifruti" className="rounded-xl shadow-md w-full h-64 object-cover" />
+                 <motion.img style={{ y: yHistoria, scale: 1.1 }} src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&q=80&w=600" alt="Padaria" className="rounded-xl shadow-md w-full h-64 object-cover" />
                </>
              )}
           </div>

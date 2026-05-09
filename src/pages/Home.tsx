@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { ChevronLeft, ChevronRight, ShoppingBag, Truck, CreditCard, Clock, Apple, Play, MessageCircle, ArrowRight } from "lucide-react";
 import { mockFAQs, mockSlides } from "../data/mockData";
 import { Accordion } from "../components/ui/Accordion";
@@ -13,6 +13,14 @@ export const Home = () => {
   const [sobreHighlight, setSobreHighlight] = useState(" LS Guarato");
   const [sobreDescription, setSobreDescription] = useState("Há muitos anos fazendo parte do dia a dia da família uberabense, o LS Guarato se destaca pelo atendimento humanizado, produtos sempre frescos e preços que cabem no seu bolso.\nNosso compromisso é entregar a melhor experiência de compra, seja nas nossas lojas físicas amplas e confortáveis ou através do nosso aplicativo de delivery.");
   const [sobreImage, setSobreImage] = useState("https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&q=80&w=800");
+
+  const sobreRef = useRef(null);
+  const { scrollYProgress: sobreScrollY } = useScroll({ target: sobreRef, offset: ["start end", "end start"] });
+  const ySobre = useTransform(sobreScrollY, [0, 1], ["0%", "20%"]);
+
+  const bannerRef = useRef(null);
+  const { scrollYProgress: bannerScrollY } = useScroll({ target: bannerRef });
+  const yBanner = useTransform(bannerScrollY, [0, 1], ["0%", "10%"]);
 
   useEffect(() => {
     loadData();
@@ -84,7 +92,7 @@ export const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Banner / Slider Section */}
-      <section className="relative h-[550px] md:h-[700px] w-full overflow-hidden bg-gray-900">
+      <section ref={bannerRef} className="relative h-[550px] md:h-[700px] w-full overflow-hidden bg-gray-900">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -95,7 +103,8 @@ export const Home = () => {
             className="absolute inset-0"
           >
             <div className="absolute inset-0 bg-black/50 z-10" />
-            <img 
+            <motion.img 
+              style={{ y: yBanner, scale: 1.4 }}
               src={slides[currentSlide].image} 
               alt={slides[currentSlide].title}
               className="w-full h-full object-cover"
@@ -225,13 +234,14 @@ export const Home = () => {
                 </Link>
               </div>
             </div>
-            <div className="lg:w-1/2 relative">
+            <div ref={sobreRef} className="lg:w-1/2 relative overflow-hidden rounded-3xl">
               <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#0B3C8C]/5 rounded-full blur-3xl -z-10" />
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-red-500/5 rounded-full blur-3xl -z-10" />
-              <img 
+              <motion.img 
+                style={{ y: ySobre, scale: 1.2 }}
                 src={sobreImage} 
                 alt="Fachada Supermercado" 
-                className="rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative z-10 w-full object-cover h-[500px] hover:scale-[1.02] transition-transform duration-500"
+                className="relative z-10 w-full object-cover h-[500px]"
               />
             </div>
           </div>
