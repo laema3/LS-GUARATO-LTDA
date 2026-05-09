@@ -76,7 +76,7 @@ export const Home = () => {
     return (
       <>
         <span className="text-white">{firstPart} </span>
-        <span className="text-[#FABC05]">{lastWord}</span>
+        <span className="text-[#D62828]">{lastWord}</span>
       </>
     );
   };
@@ -110,7 +110,7 @@ export const Home = () => {
                     transition={{ delay: 0.1 }}
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-black/20 backdrop-blur-sm mb-8"
                   >
-                    <div className="w-2 h-2 rounded-full bg-[#FABC05] animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-[#D62828] animate-pulse" />
                     <span className="text-white text-[10px] md:text-xs font-bold tracking-widest uppercase">
                       LÍDER EM QUALIDADE E TRADIÇÃO
                     </span>
@@ -146,7 +146,7 @@ export const Home = () => {
                     {slides[currentSlide].cta && (
                       <Link 
                         to={slides[currentSlide].link || "/"}
-                        className="flex items-center justify-center gap-3 bg-[#FABC05] hover:bg-[#eab308] text-black font-bold py-4 px-8 rounded-lg text-lg transition-all hover:scale-105 shadow-xl group"
+                        className="flex items-center justify-center gap-3 bg-[#D62828] hover:bg-[#b02222] text-white font-bold py-4 px-8 rounded-lg text-lg transition-all hover:scale-105 shadow-xl group"
                       >
                         <MessageCircle className="w-5 h-5" />
                         {slides[currentSlide].cta}
