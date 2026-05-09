@@ -150,12 +150,17 @@ export const Contato = () => {
               </div>
             </div>
             
-            <div className="bg-gray-100 rounded-xl overflow-hidden h-64 border border-gray-200 flex items-center justify-center text-gray-400">
-               {/* Embed map would go here */}
-               <div className="text-center p-4">
-                 <MapPin className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                 <p>Mapa do Google Embutido</p>
-               </div>
+            <div className="rounded-xl overflow-hidden h-64 border border-gray-200">
+               <iframe 
+                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1862.6395349488344!2d-47.93925000000001!3d-19.7472000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ba1eb7b6f6f97f%3A0x4a4a4a4a4a4a4a4a!2sRua+Novo+Horizonte%2C+948+-+Uberaba+-+MG!5e0!3m2!1spt-BR!2sbr!4v1715291234567!5m2!1spt-BR!2sbr"
+                 width="100%" 
+                 height="100%" 
+                 style={{ border: 0 }} 
+                 allowFullScreen 
+                 loading="lazy" 
+                 referrerPolicy="no-referrer-when-downgrade"
+                 title="Mapa Localização LS Guarato"
+               ></iframe>
             </div>
           </div>
 
