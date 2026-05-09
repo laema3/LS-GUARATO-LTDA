@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
@@ -47,6 +47,13 @@ function ScrollToTop() {
   return null;
 }
 
+const ExternalRedirect = ({ url }: { url: string }) => {
+  useEffect(() => {
+    window.location.replace(url);
+  }, [url]);
+  return null;
+};
+
 export default function App() {
   const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
 
@@ -84,6 +91,12 @@ export default function App() {
       <ScrollToTop />
       
       <Routes>
+        {/* Redirecionamento da URL antiga para a nova */}
+        <Route 
+          path="/vagas-de-empregos-disponiveis" 
+          element={<ExternalRedirect url="https://www.guarato.com.br/servicos/vagas" />} 
+        />
+
         {/* Rotas administrativas sempre disponíveis */}
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin" element={<DashboardLayout />}>

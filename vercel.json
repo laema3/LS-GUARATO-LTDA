@@ -4,6 +4,11 @@
       "source": "/vagas-de-empregos-disponiveis/",
       "destination": "https://www.guarato.com.br/servicos/vagas",
       "permanent": true
+    },
+    {
+      "source": "/vagas-de-empregos-disponiveis",
+      "destination": "https://www.guarato.com.br/servicos/vagas",
+      "permanent": true
     }
   ],
   "rewrites": [
