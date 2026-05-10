@@ -59,7 +59,7 @@ export const Sobre = () => {
       <div className="container mx-auto px-4 py-20">
         
         {/* História */}
-        <div ref={historiaRef} className="flex flex-col lg:flex-row items-center gap-16 mb-24">
+        <div ref={historiaRef} className="flex flex-col lg:flex-row items-center gap-16 mb-24 relative">
           <div className="lg:w-1/2">
             <h2 className="text-3xl md:text-4xl font-bold font-sans text-gray-900 mb-6 relative">
               <span className="relative z-10">{historiaTitle}</span>
@@ -74,11 +74,17 @@ export const Sobre = () => {
           <div className="lg:w-1/2 grid grid-cols-2 gap-4 relative">
              <div className="bg-[#0B3C8C] absolute -inset-4 rounded-3xl opacity-10 blur-xl"></div>
              {historiaImage ? (
-               <motion.img style={{ y: yHistoria, scale: 1.1 }} src={historiaImage} alt="Nossa história" className="rounded-xl shadow-md w-full h-64 object-cover col-span-2" />
+               <div className="rounded-xl shadow-md overflow-hidden bg-gray-100 col-span-2">
+                 <motion.img style={{ y: yHistoria }} src={historiaImage} alt="Nossa história" className="w-full h-auto" />
+               </div>
              ) : (
                <>
-                 <motion.img style={{ y: yHistoria, scale: 1.1 }} src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=600" alt="Hortifruti" className="rounded-xl shadow-md w-full h-64 object-cover" />
-                 <motion.img style={{ y: yHistoria, scale: 1.1 }} src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&q=80&w=600" alt="Padaria" className="rounded-xl shadow-md w-full h-64 object-cover" />
+                 <div className="rounded-xl shadow-md overflow-hidden bg-gray-100">
+                   <motion.img style={{ y: yHistoria }} src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=600" alt="Hortifruti" className="w-full h-auto" />
+                 </div>
+                 <div className="rounded-xl shadow-md overflow-hidden bg-gray-100">
+                   <motion.img style={{ y: yHistoria }} src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&q=80&w=600" alt="Padaria" className="w-full h-auto" />
+                 </div>
                </>
              )}
           </div>
