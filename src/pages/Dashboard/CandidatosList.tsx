@@ -7,6 +7,7 @@ export const CandidatosList = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState<{nome: string, mensagem: string} | null>(null);
 
   useEffect(() => {
     loadCandidatos();
@@ -90,6 +91,36 @@ export const CandidatosList = () => {
         </div>
       )}
 
+      {/* Message Modal */}
+      {selectedMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between mb-4 pb-4 border-b">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Mensagem do Candidato</h3>
+                <p className="text-sm text-[#0B3C8C] font-medium">{selectedMessage.nome}</p>
+              </div>
+              <button onClick={() => setSelectedMessage(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto pr-2">
+              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {selectedMessage.mensagem}
+              </p>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button 
+                onClick={() => setSelectedMessage(null)}
+                className="px-6 py-2 bg-[#0B3C8C] hover:bg-opacity-90 text-white rounded-lg font-medium transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
         <div>
           <h1 className="text-2xl font-bold font-sans text-gray-900">Candidatos e Currículos</h1>
@@ -134,9 +165,17 @@ export const CandidatosList = () => {
                           <div>
                             <p className="font-bold text-gray-900">{candidato.nome}</p>
                             {candidato.mensagem && (
-                              <p className="text-xs text-gray-500 max-w-[200px] truncate" title={candidato.mensagem}>
-                                {candidato.mensagem}
-                              </p>
+                              <div className="flex flex-col">
+                                <p className="text-xs text-gray-500 max-w-[200px] truncate">
+                                  {candidato.mensagem}
+                                </p>
+                                <button 
+                                  onClick={() => setSelectedMessage({ nome: candidato.nome, mensagem: candidato.mensagem })}
+                                  className="text-[10px] text-[#0B3C8C] font-bold hover:underline text-left mt-0.5"
+                                >
+                                  Leia mais...
+                                </button>
+                              </div>
                             )}
                           </div>
                         </div>
