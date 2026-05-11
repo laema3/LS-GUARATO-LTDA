@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
-import { Download, FileText, Search, User, Trash2, X, AlertTriangle } from "lucide-react";
+import { Download, FileText, Search, User, Trash2, X, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const CandidatosList = () => {
   const [candidatos, setCandidatos] = useState<any[]>([]);
@@ -8,10 +8,15 @@ export const CandidatosList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<{nome: string, mensagem: string} | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     loadCandidatos();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const loadCandidatos = async () => {
     setLoading(true);
@@ -54,6 +59,10 @@ export const CandidatosList = () => {
     (c.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (c.cargo_desejado || c.vaga_nome || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(filteredCandidatos.length / itemsPerPage);
+  const paginatedCandidatos = filteredCandidatos.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
@@ -154,8 +163,8 @@ export const CandidatosList = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredCandidatos.length > 0 ? (
-                  filteredCandidatos.map((candidato, idx) => (
+                {paginatedCandidatos.length > 0 ? (
+                  paginatedCandidatos.map((candidato, idx) => (
                     <tr key={candidato.id || idx} className="hover:bg-gray-50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -234,6 +243,27 @@ export const CandidatosList = () => {
                 )}
               </tbody>
             </table>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between p-4 border-t border-gray-200">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                    >
+                      <ChevronLeft className="h-4 w-4" /> Anterior
+                    </button>
+                    <span className="text-sm text-gray-600">
+                      Página {currentPage} de {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                    >
+                      Próximo <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
           </div>
         )}
       </div>
