@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
-import { Download, FileText, Search, User, Trash2, X, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, FileText, Search, User, Trash2, X, AlertTriangle, ChevronLeft, ChevronRight, Clock, CheckCircle } from "lucide-react";
 
 export const CandidatosList = () => {
   const [candidatos, setCandidatos] = useState<any[]>([]);
@@ -35,6 +35,23 @@ export const CandidatosList = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('candidatos')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) {
+        console.error(error);
+      } else {
+        setCandidatos(candidatos.map(c => c.id === id ? { ...c, status: newStatus } : c));
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -156,6 +173,7 @@ export const CandidatosList = () => {
               <thead>
                 <tr className="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider border-b border-gray-200">
                   <th className="p-4 font-semibold">Candidato</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Status</th>
                   <th className="p-4 font-semibold">Contato</th>
                   <th className="p-4 font-semibold">Vaga/Interesse</th>
                   <th className="p-4 font-semibold">Data</th>
@@ -189,6 +207,19 @@ export const CandidatosList = () => {
                           </div>
                         </div>
                       </td>
+                      <td className="p-4">
+                        {candidato.status === 'CONTACTADO' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 uppercase tracking-wider">
+                            <CheckCircle className="h-3 w-3" />
+                            Contactado
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-wider">
+                            <Clock className="h-3 w-3" />
+                            Pendente
+                          </span>
+                        )}
+                      </td>
                       <td className="p-4 text-sm text-gray-600">
                         <p>{candidato.email}</p>
                         <p className="font-medium text-gray-800">{candidato.telefone}</p>
@@ -203,6 +234,27 @@ export const CandidatosList = () => {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-2">
+                          <div className="flex flex-col gap-1 mr-2">
+                            {candidato.status !== 'CONTACTADO' && (
+                              <button 
+                                onClick={() => handleStatusChange(candidato.id, 'CONTACTADO')}
+                                className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-0.5 rounded border border-green-200 transition-colors whitespace-nowrap"
+                                title="Marcar como Contactado"
+                              >
+                                CONTACTADO
+                              </button>
+                            )}
+                            {(candidato.status === 'CONTACTADO' || !candidato.status) && candidato.status !== 'PENDENTE DE CONTATO' && (
+                              <button 
+                                onClick={() => handleStatusChange(candidato.id, 'PENDENTE DE CONTATO')}
+                                className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 transition-colors whitespace-nowrap"
+                                title="Marcar como Pendente"
+                              >
+                                PENDENTE
+                              </button>
+                            )}
+                          </div>
+
                           {candidato.curriculo_url ? (
                             <a 
                               href={candidato.curriculo_url} 
@@ -229,7 +281,7 @@ export const CandidatosList = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="p-12 text-center">
+                    <td colSpan={6} className="p-12 text-center">
                        <div className="flex flex-col items-center justify-center text-gray-500">
                          <div className="mb-4 bg-gray-100 p-4 rounded-full">
                            <User className="h-8 w-8 text-gray-400" />
