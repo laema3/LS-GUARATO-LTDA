@@ -9,6 +9,7 @@ export const CandidatosList = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<{nome: string, mensagem: string} | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
     loadCandidatos();
@@ -21,15 +22,26 @@ export const CandidatosList = () => {
   const loadCandidatos = async () => {
     setLoading(true);
     try {
+      // Tenta carregar com status para verificar se a coluna existe
       const { data, error } = await supabase.from('candidatos').select('*').order('created_at', { ascending: false });
-      if (data) {
-        setCandidatos(data);
-      } else if (error) {
-        if (error.code === '42P01') {
+      
+      if (error) {
+        if (error.code === 'PGRST204') {
+          // Se falhar por causa da coluna status, tenta carregar sem ela para não quebrar a listagem
+          const { data: retryData, error: retryError } = await supabase.from('candidatos').select('id, nome, email, telefone, cargo_desejado, vaga_nome, mensagem, curriculo_url, created_at').order('created_at', { ascending: false });
+          if (retryData) {
+            setCandidatos(retryData);
+            setDbError("A coluna 'status' está ausente.");
+          } else {
+            console.error(retryError);
+          }
+        } else if (error.code === '42P01') {
           console.error("A tabela 'candidatos' não existe.");
         } else {
           console.error(error);
         }
+      } else if (data) {
+        setCandidatos(data);
       }
     } catch (err) {
       console.error(err);
@@ -46,12 +58,15 @@ export const CandidatosList = () => {
         .eq('id', id);
 
       if (error) {
-        console.error(error);
+        console.error("Erro ao atualizar status:", error.message);
+        if (error.code === 'PGRST204') {
+          setDbError("A coluna 'status' não existe na tabela 'candidatos'.");
+        }
       } else {
         setCandidatos(candidatos.map(c => c.id === id ? { ...c, status: newStatus } : c));
       }
     } catch (err) {
-      console.error(err);
+      console.error("Erro inesperado:", err);
     }
   };
 
@@ -83,6 +98,39 @@ export const CandidatosList = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+      {/* DB Column Error Modal */}
+      {dbError && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-amber-600 mb-4">
+              <AlertTriangle className="h-8 w-8" />
+              <h3 className="text-xl font-bold text-gray-900">Configuração Necessária</h3>
+            </div>
+            
+            <p className="text-gray-600 mb-4">
+              A coluna <span className="font-mono bg-gray-100 px-1 rounded text-red-600">status</span> não foi encontrada na tabela <span className="font-mono bg-gray-100 px-1 rounded text-[#0B3C8C]">candidatos</span> do seu Banco de Dados Supabase.
+            </p>
+            
+            <div className="bg-gray-900 rounded-lg p-4 mb-6 relative group">
+              <p className="text-blue-400 text-xs mb-2 uppercase font-bold">Execute este SQL no Supabase:</p>
+              <pre className="text-gray-100 font-mono text-sm overflow-x-auto whitespace-pre-wrap">
+                ALTER TABLE candidatos ADD COLUMN status TEXT DEFAULT 'PENDENTE DE CONTATO';
+              </pre>
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-gray-400">Após executar o SQL, atualize a página.</p>
+              <button 
+                onClick={() => setDbError(null)}
+                className="px-6 py-2 bg-[#0B3C8C] text-white rounded-lg font-bold hover:bg-opacity-90 transition-colors"
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -235,22 +283,21 @@ export const CandidatosList = () => {
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-2">
                           <div className="flex flex-col gap-1 mr-2">
-                            {candidato.status !== 'CONTACTADO' && (
-                              <button 
-                                onClick={() => handleStatusChange(candidato.id, 'CONTACTADO')}
-                                className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-0.5 rounded border border-green-200 transition-colors whitespace-nowrap"
-                                title="Marcar como Contactado"
-                              >
-                                CONTACTADO
-                              </button>
-                            )}
-                            {(candidato.status === 'CONTACTADO' || !candidato.status) && candidato.status !== 'PENDENTE DE CONTATO' && (
+                            {candidato.status === 'CONTACTADO' ? (
                               <button 
                                 onClick={() => handleStatusChange(candidato.id, 'PENDENTE DE CONTATO')}
-                                className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 transition-colors whitespace-nowrap"
-                                title="Marcar como Pendente"
+                                className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-1 rounded border border-amber-200 transition-colors whitespace-nowrap"
+                                title="Mudar para Pendente"
                               >
                                 PENDENTE
+                              </button>
+                            ) : (
+                              <button 
+                                onClick={() => handleStatusChange(candidato.id, 'CONTACTADO')}
+                                className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-1 rounded border border-green-200 transition-colors whitespace-nowrap"
+                                title="Mudar para Contactado"
+                              >
+                                CONTACTADO
                               </button>
                             )}
                           </div>
