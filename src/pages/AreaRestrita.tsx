@@ -61,7 +61,7 @@ export const AreaRestrita = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="bg-[#0B3C8C] py-16 text-center shadow-inner">
         <ShieldCheck className="h-16 w-16 text-white/80 mx-auto mb-4" />
-        <h1 className="text-3xl md:text-5xl font-bold font-sans text-white mb-4">Área Restrita</h1>
+        <h1 className="text-3xl md:text-5xl font-bold font-sans !text-white mb-4">Área Restrita</h1>
         <p className="text-blue-100 max-w-xl mx-auto px-4 text-lg">
           Portal de acesso seguro para colaboradores e parceiros do LS Guarato. Selecione a opção desejada.
         </p>
@@ -85,7 +85,7 @@ export const AreaRestrita = () => {
                 <action.icon className="h-12 w-12 text-white" />
               </div>
               
-              <h2 className="text-xl md:text-2xl font-bold font-sans tracking-wide z-10 max-w-[80%] uppercase leading-tight">
+              <h2 className="text-xl md:text-2xl font-bold font-sans tracking-wide z-10 max-w-[80%] uppercase leading-tight !text-white">
                 {action.title}
               </h2>
               

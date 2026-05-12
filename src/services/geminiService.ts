@@ -1,51 +1,54 @@
 import { GoogleGenAI } from "@google/genai";
 
-let ai: GoogleGenAI | null = null;
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
-export function getGemini(): GoogleGenAI {
-  if (!ai) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      console.warn('GEMINI_API_KEY environment variable is missing');
-    }
-    ai = new GoogleGenAI({ apiKey: key || '' });
-  }
-  return ai;
-}
-
-export const suggestText = async (context: string, prompt: string, maxLength: string = "50 palavras"): Promise<string> => {
-  try {
-    const client = getGemini();
-    const response = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Atue como um especialista em marketing e comunicação institucional do supermercado "LS Guarato".
-      O usuário quer ajuda para escrever: "${context}".
-      
-      Detalhes/Dicas fornecidas pelo usuário ou contexto: "${prompt}"
-      
-      Crie um texto profissional, focado no cliente e na qualidade do supermercado, com no máximo ${maxLength}.
-      Responda apenas com o texto final, sem introduções ou aspas.`,
-    });
-    return response.text || "";
-  } catch (error) {
-    console.error("Erro ao gerar texto com IA:", error);
-    return "Erro ao gerar sugestão. Tente novamente.";
-  }
-};
-export const suggestSlideDescription = async (title: string): Promise<string> => {
-  if (!title) return "Por favor, insira um título primeiro.";
+export const generateSectorDescription = async (sectorTitle: string): Promise<string> => {
+  if (!sectorTitle) return "";
   
   try {
-    const client = getGemini();
-    const response = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Atue como um especialista em marketing do supermercado "LS Guarato".
-      Crie uma frase curta, atrativa e vendedora (máximo 15 palavras) para o banner do site, baseada no título: "${title}".
-      Responda apenas com a frase, sem aspas, formatação ou explicações.`,
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: `Você é um redator especializado em varejo e supermercados. 
+      Crie uma descrição curta, atraente e profissional para o setor de "${sectorTitle}" de um supermercado de excelência. 
+      A descrição deve destacar a qualidade, o frescor e a variedade dos produtos.
+      Máximo de 30 palavras. Responda apenas com o texto da descrição.` }] }]
     });
-    return response.text || "";
+
+    return response.text?.trim() || "";
   } catch (error) {
-    console.error("Erro ao gerar descrição com IA:", error);
-    return "Erro ao gerar sugestão. Tente novamente.";
+    console.error("Erro ao gerar descrição com Gemini:", error);
+    return "";
+  }
+};
+
+export const suggestText = async (type: string, context: string, limit: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: `Aja como um redator publicitário de supermercados de luxo/conveniência.
+      Gere um(a) ${type} para o seguinte contexto: "${context}".
+      Limite: ${limit}.
+      Responda apenas com o texto sugerido, sem aspas ou explicações.` }] }]
+    });
+
+    return response.text?.trim() || "";
+  } catch (error) {
+    console.error("Erro ao sugerir texto:", error);
+    return "";
+  }
+};
+
+export const suggestSlideDescription = async (title: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: `Crie uma frase curta e impactante de marketing para um slide de destaque de um supermercado com o tema: "${title}".
+      Máximo 15 palavras. Responda apenas o texto.` }] }]
+    });
+
+    return response.text?.trim() || "";
+  } catch (error) {
+    console.error("Erro ao sugerir descrição de slide:", error);
+    return "";
   }
 };
