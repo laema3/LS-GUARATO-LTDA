@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid, Clock, MessageCircle } from "lucide-react";
+import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid, Clock, MessageCircle, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
@@ -29,11 +29,13 @@ const Header = () => {
   const navLinks = [
     { name: "Home", path: "/", icon: Store },
     { name: "Sobre", path: "/sobre", icon: Store },
+    { name: "Loja", path: "https://applsguarato.com.br", icon: Store, isExternal: true },
   ];
 
   const serviceLinks = [
-    { name: "Nossos Setores", path: "/servicos/setores", icon: LayoutGrid },
+    { name: "Eventos", path: "/servicos/eventos", icon: Calendar },
     { name: "Jornal de Ofertas", path: "/servicos/jornal-de-ofertas", icon: FileText },
+    { name: "Nossos Setores", path: "/servicos/setores", icon: LayoutGrid },
     { name: "Transparência Salarial", path: "/servicos/transparencia-salarial", icon: TrendingUp },
     { name: "Vagas de Empregos", path: "/servicos/vagas", icon: Briefcase },
   ];
@@ -74,17 +76,30 @@ const Header = () => {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8 font-medium">
             {navLinks.map((link) => (
-              <Link 
-                key={link.path} 
-                to={link.path}
-                className={cn(
-                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
-                  location.pathname === link.path && "text-[#D62828] underline underline-offset-4 decoration-2"
-                )}
-              >
-                <link.icon className="h-5 w-5 text-[#D62828]" />
-                {link.name}
-              </Link>
+              link.isExternal ? (
+                <a 
+                  key={link.path}
+                  href={link.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-[#D62828] transition-colors text-white"
+                >
+                  <link.icon className="h-5 w-5 text-[#D62828]" />
+                  {link.name}
+                </a>
+              ) : (
+                <Link 
+                  key={link.path} 
+                  to={link.path}
+                  className={cn(
+                    "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
+                    location.pathname === link.path && "text-[#D62828] underline underline-offset-4 decoration-2"
+                  )}
+                >
+                  <link.icon className="h-5 w-5 text-[#D62828]" />
+                  {link.name}
+                </Link>
+              )
             ))}
 
             {/* Dropdown Menu */}
@@ -142,10 +157,24 @@ const Header = () => {
         <div className="md:hidden bg-[#082a63] border-t border-white/10">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-white hover:text-[#D62828]">
-                <link.icon className="h-5 w-5 text-[#D62828]" />
-                {link.name}
-              </Link>
+              link.isExternal ? (
+                <a 
+                  key={link.path} 
+                  href={link.path} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-lg font-medium py-2 text-white hover:text-[#D62828]"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <link.icon className="h-5 w-5 text-[#D62828]" />
+                  {link.name}
+                </a>
+              ) : (
+                <Link key={link.path} to={link.path} className="flex items-center gap-2 text-lg font-medium py-2 text-white hover:text-[#D62828]">
+                  <link.icon className="h-5 w-5 text-[#D62828]" />
+                  {link.name}
+                </Link>
+              )
             ))}
             
             <div className="flex flex-col gap-2">

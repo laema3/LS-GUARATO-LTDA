@@ -52,3 +52,22 @@ export const suggestSlideDescription = async (title: string): Promise<string> =>
     return "";
   }
 };
+
+export const generateEventDescription = async (eventTitle: string): Promise<string> => {
+  if (!eventTitle) return "";
+  
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [{ role: "user", parts: [{ text: `Você é um redator de eventos para um supermercado premium. 
+      Crie uma descrição curta, emocionante e convidativa para o evento "${eventTitle}". 
+      Destaque a experiência memorável, ofertas especiais e o clima festivo na loja.
+      Máximo de 40 palavras. Responda apenas com o texto da descrição.` }] }]
+    });
+
+    return response.text?.trim() || "";
+  } catch (error) {
+    console.error("Erro ao gerar descrição de evento com Gemini:", error);
+    return "";
+  }
+};

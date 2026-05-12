@@ -14,6 +14,7 @@ import { TransparenciaSalarial } from "./pages/TransparenciaSalarial";
 import { VagasEmprego } from "./pages/VagasEmprego";
 import { DetalhesVaga } from "./pages/DetalhesVaga";
 import { Setores } from "./pages/Setores";
+import { Eventos } from "./pages/Eventos";
 import { Contato } from "./pages/Contato";
 import { NotFound } from "./pages/NotFound";
 import { PageLoader } from "./components/ui/Loader";
@@ -29,6 +30,7 @@ import { FooterEditor } from "./pages/Dashboard/FooterEditor";
 import { CabecalhoEditor } from "./pages/Dashboard/CabecalhoEditor";
 import { ServicosEditor } from "./pages/Dashboard/ServicosEditor";
 import { SetoresEditor } from "./pages/Dashboard/SetoresEditor";
+import { EventosEditor } from "./pages/Dashboard/EventosEditor";
 import { VagasParametrosEditor } from "./pages/Dashboard/VagasParametrosEditor";
 import { VagasEditor } from "./pages/Dashboard/VagasEditor";
 import { CandidatosList } from "./pages/Dashboard/CandidatosList";
@@ -108,6 +110,7 @@ export default function App() {
           <Route path="rodape" element={<FooterEditor />} />
           <Route path="servicos" element={<ServicosEditor />} />
           <Route path="setores" element={<SetoresEditor />} />
+          <Route path="eventos" element={<EventosEditor />} />
           <Route path="candidatos" element={<CandidatosList />} />
           <Route path="sac" element={<MensagensSacList />} />
           <Route path="vagas/cadastrar" element={<VagasEditor />} />
@@ -129,6 +132,7 @@ export default function App() {
               <Route path="jornal-de-ofertas" element={<JornalOfertas />} />
               <Route path="transparencia-salarial" element={<TransparenciaSalarial />} />
               <Route path="setores" element={<Setores />} />
+              <Route path="eventos" element={<Eventos />} />
               <Route path="vagas" element={<VagasEmprego />} />
               <Route path="vagas/:id" element={<DetalhesVaga />} />
             </Route>
