@@ -51,7 +51,7 @@ export const Dashboard = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 font-sans tracking-tight">Dashboard Geral</h1>
+          <h1 className="text-3xl font-bold text-[#D62828] font-sans tracking-tight">Dashboard Geral</h1>
           <p className="text-gray-500 mt-1">Bem-vindo ao painel de controle do LS Guarato.</p>
         </div>
         <div className="h-12 w-12 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -73,7 +73,7 @@ export const Dashboard = () => {
 
       <div className="bg-[#0B3C8C] rounded-2xl p-8 text-white relative overflow-hidden">
         <div className="relative z-10 max-w-lg">
-          <h2 className="text-2xl font-bold">Gestão Facilitada</h2>
+          <h2 className="text-2xl font-bold text-[#D62828]">Gestão Facilitada</h2>
           <p className="mt-4 text-blue-100 leading-relaxed text-lg">
             Utilize o menu lateral para gerenciar todo o conteúdo do seu site. 
             Todas as alterações são refletidas em tempo real para seus clientes.

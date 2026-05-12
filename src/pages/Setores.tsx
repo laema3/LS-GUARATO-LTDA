@@ -31,7 +31,7 @@ export const Setores = () => {
         <div className="absolute inset-0 bg-[#0B3C8C]/80"></div>
         <div className="relative z-10 flex flex-col items-center">
           <Store className="h-16 w-16 mb-4 text-[#D62828]" />
-          <h1 className="text-4xl md:text-6xl font-bold font-sans mb-4 uppercase tracking-tight">Nossos Setores</h1>
+          <h1 className="text-4xl md:text-6xl font-bold font-sans mb-4 uppercase tracking-tight text-[#D62828]">Nossos Setores</h1>
           <p className="text-blue-100 max-w-2xl mx-auto px-4 text-xl">
             Conheça todos os departamentos do LS Guarato. Qualidade e frescor em cada corredor.
           </p>
@@ -63,7 +63,7 @@ export const Setores = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-4 left-6">
-                      <h3 className="text-2xl font-bold text-white font-sans">{setor.nome}</h3>
+                      <h3 className="text-2xl font-bold text-[#D62828] font-sans">{setor.nome}</h3>
                     </div>
                   </div>
                   <div className="p-6">

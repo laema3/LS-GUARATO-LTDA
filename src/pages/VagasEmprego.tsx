@@ -77,7 +77,7 @@ export const VagasEmprego = () => {
       <div className="bg-[#0B3C8C] py-16 text-center text-white relative">
         <div className="relative z-10 flex flex-col items-center">
           <Briefcase className="h-16 w-16 mb-4 text-[#D62828]" />
-          <h1 className="text-3xl md:text-5xl font-bold font-sans mb-4 uppercase tracking-wider">Trabalhe Conosco</h1>
+          <h1 className="text-3xl md:text-5xl font-bold font-sans mb-4 uppercase tracking-wider text-[#D62828]">Trabalhe Conosco</h1>
           <p className="text-blue-100 max-w-2xl mx-auto px-4 text-lg">
             Venha fazer parte da família LS Guarato. Buscamos talentos que queiram crescer com a gente e oferecer o melhor atendimento aos nossos clientes.
           </p>
@@ -103,7 +103,7 @@ export const VagasEmprego = () => {
         </div>
 
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 font-sans">
+          <h2 className="text-2xl font-bold text-[#D62828] mb-6 font-sans">
             Vagas Abertas ({filteredJobs.length})
           </h2>
 
@@ -157,7 +157,7 @@ export const VagasEmprego = () => {
           </div>
 
           <div className="mt-12 bg-blue-50 border border-blue-100 rounded-xl p-8 text-center">
-            <h3 className="text-xl font-bold text-[#0B3C8C] mb-2 font-sans">Não encontrou a vaga ideal?</h3>
+            <h3 className="text-xl font-bold text-[#D62828] mb-2 font-sans">Não encontrou a vaga ideal?</h3>
             <p className="text-gray-600 mb-6 max-w-xl mx-auto">
               Cadastre seu currículo em nosso Banco de Talentos. Assim que surgir uma oportunidade com o seu perfil, entraremos em contato!
             </p>
@@ -180,7 +180,7 @@ export const VagasEmprego = () => {
             className="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden"
           >
             <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold font-sans text-gray-900">Banco de Talentos</h2>
+              <h2 className="text-xl font-bold font-sans text-[#D62828]">Banco de Talentos</h2>
               <button 
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -195,7 +195,7 @@ export const VagasEmprego = () => {
                   <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="h-8 w-8" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">Currículo Enviado!</h4>
+                  <h4 className="text-xl font-bold text-[#D62828] mb-2">Currículo Enviado!</h4>
                   <p className="text-gray-500 mb-6">Seu currículo foi cadastrado no nosso banco de talentos. Entraremos em contato assim que surgir uma vaga.</p>
                   <button 
                     onClick={() => setShowModal(false)}

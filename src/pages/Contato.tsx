@@ -71,7 +71,7 @@ export const Contato = () => {
       <div className="bg-[#0B3C8C] py-16 text-center text-white relative">
         <div className="relative z-10 flex flex-col items-center">
           <Mail className="h-16 w-16 mb-4 text-[#D62828]" />
-          <h1 className="text-4xl md:text-5xl font-bold font-sans mb-4 tracking-tight">Fale Conosco</h1>
+          <h1 className="text-4xl md:text-5xl font-bold font-sans mb-4 tracking-tight text-[#D62828]">Fale Conosco</h1>
           <p className="text-blue-100 max-w-2xl mx-auto px-4 text-lg">
             Estamos sempre prontos para ouvir você. Envie suas dúvidas, sugestões ou elogios através dos nossos canais de atendimento.
           </p>
@@ -84,14 +84,14 @@ export const Contato = () => {
           {/* Informações de Contato */}
           <div className="lg:col-span-2 space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 font-sans mb-6">Nossos Canais</h2>
+              <h2 className="text-2xl font-bold text-[#D62828] font-sans mb-6">Nossos Canais</h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="bg-red-50 p-3 rounded-lg text-[#D62828] shrink-0">
                     <MapPin className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Endereço Principal</h3>
+                    <h3 className="font-bold text-[#D62828]">Endereço Principal</h3>
                     <p className="text-gray-600 mt-1 whitespace-pre-wrap">{empresa.endereco}</p>
                   </div>
                 </div>
@@ -101,7 +101,7 @@ export const Contato = () => {
                     <Phone className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Telefone / Televendas</h3>
+                    <h3 className="font-bold text-[#D62828]">Telefone / Televendas</h3>
                     <p className="text-gray-600 mt-1 whitespace-pre-wrap">{empresa.telefone}</p>
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export const Contato = () => {
                     <Mail className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">E-mail</h3>
+                    <h3 className="font-bold text-[#D62828]">E-mail</h3>
                     <p className="text-gray-600 mt-1">{empresa.email}</p>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ export const Contato = () => {
                     <MessageCircle className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">WhatsApp</h3>
+                    <h3 className="font-bold text-[#D62828]">WhatsApp</h3>
                     <a 
                       href="https://wa.me/5534997283342" 
                       target="_blank" 
@@ -139,7 +139,7 @@ export const Contato = () => {
                     <Clock className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Horário de Funcionamento</h3>
+                    <h3 className="font-bold text-[#D62828]">Horário de Funcionamento</h3>
                     <p className="text-gray-600 mt-1">
                       Segunda a Sexta: 07:30 às 21:00h<br />
                       Sábados: 07:30 às 20:00h<br />
@@ -167,7 +167,7 @@ export const Contato = () => {
           {/* Formulário */}
           <div className="lg:col-span-3">
             <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100 h-full">
-              <h2 className="text-2xl font-bold text-gray-900 font-sans mb-2">Envie sua Mensagem</h2>
+              <h2 className="text-2xl font-bold text-[#D62828] font-sans mb-2">Envie sua Mensagem</h2>
               <p className="text-gray-500 mb-8">Preencha o formulário abaixo e retornaremos o mais breve possível.</p>
 
               {submitted ? (

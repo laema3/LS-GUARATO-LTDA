@@ -26,7 +26,7 @@ export const TransparenciaSalarial = () => {
           <div className="bg-white/10 p-4 rounded-full mb-4">
              <TrendingUp className="h-12 w-12 text-white" />
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold font-sans mb-4 uppercase tracking-wider">Transparência Salarial</h1>
+          <h1 className="text-3xl md:text-5xl font-bold font-sans mb-4 uppercase tracking-wider text-[#D62828]">Transparência Salarial</h1>
           <p className="text-blue-100 max-w-2xl mx-auto px-4 text-lg">
             Em conformidade com a legislação vigente, o LS Guarato disponibiliza os relatórios de transparência salarial e de critérios remuneratórios.
           </p>
@@ -48,13 +48,13 @@ export const TransparenciaSalarial = () => {
                 className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden"
               >
                 <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-2xl font-bold text-[#0B3C8C] font-sans flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-[#D62828] font-sans flex items-center gap-2">
                     Ano Referência: {year}
                   </h2>
                 </div>
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-3">
-                    <h3 className="font-semibold text-gray-700">Relatório 1º Semestre</h3>
+                    <h3 className="font-semibold text-[#D62828]">Relatório 1º Semestre</h3>
                     {firstPdf ? (
                        <div className="flex gap-2">
                           <a href={firstPdf} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white py-2 px-4 rounded transition-colors text-sm font-medium">
@@ -72,7 +72,7 @@ export const TransparenciaSalarial = () => {
                   </div>
 
                   <div className="flex flex-col gap-3">
-                    <h3 className="font-semibold text-gray-700">Relatório 2º Semestre</h3>
+                    <h3 className="font-semibold text-[#D62828]">Relatório 2º Semestre</h3>
                     {secondPdf ? (
                        <div className="flex gap-2">
                           <a href={secondPdf} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white py-2 px-4 rounded transition-colors text-sm font-medium">

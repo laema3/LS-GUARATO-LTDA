@@ -240,7 +240,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-4 font-sans uppercase tracking-wider">Contato</h4>
+            <h4 className="text-[#D62828] font-bold mb-4 font-sans uppercase tracking-wider">Contato</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-[#D62828] shrink-0 mt-0.5" />
@@ -270,7 +270,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-4 font-sans uppercase tracking-wider">Links Rápidos</h4>
+            <h4 className="text-[#D62828] font-bold mb-4 font-sans uppercase tracking-wider">Links Rápidos</h4>
             <ul className="space-y-2">
               <li><Link to="/sobre" className="hover:text-white transition-colors">Sobre Nós</Link></li>
               <li><Link to="/servicos/vagas" className="hover:text-white transition-colors">Trabalhe Conosco</Link></li>
@@ -280,7 +280,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-4 font-sans uppercase tracking-wider">Compre Online</h4>
+            <h4 className="text-[#D62828] font-bold mb-4 font-sans uppercase tracking-wider">Compre Online</h4>
             <p className="text-sm mb-4">Baixe nosso app ou acesse a loja virtual para comprar sem sair de casa.</p>
             <div className="flex flex-col gap-3">
               <a href={linkLoja} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] hover:bg-[#082a63] text-white py-2 px-4 rounded font-medium text-center transition-colors shadow-md">

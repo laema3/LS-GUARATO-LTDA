@@ -217,28 +217,28 @@ export const CandidatosList = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider border-b border-gray-200">
-                  <th className="p-4 font-semibold">Candidato</th>
-                  <th className="p-4 font-semibold whitespace-nowrap">Status</th>
-                  <th className="p-4 font-semibold">Contato</th>
-                  <th className="p-4 font-semibold">Vaga/Interesse</th>
-                  <th className="p-4 font-semibold">Data</th>
-                  <th className="p-4 font-semibold text-center">Ações</th>
+                  <th className="px-3 py-4 font-semibold">Candidato</th>
+                  <th className="px-3 py-4 font-semibold whitespace-nowrap">Status</th>
+                  <th className="px-3 py-4 font-semibold whitespace-nowrap">Contato</th>
+                  <th className="px-3 py-4 font-semibold">Vaga</th>
+                  <th className="px-3 py-4 font-semibold">Data</th>
+                  <th className="px-3 py-4 font-semibold text-center">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginatedCandidatos.length > 0 ? (
                   paginatedCandidatos.map((candidato, idx) => (
                     <tr key={candidato.id || idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-4">
+                      <td className="px-3 py-4">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 bg-blue-100 text-[#0B3C8C] rounded-full flex items-center justify-center shrink-0">
                             <User className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="font-bold text-gray-900">{candidato.nome}</p>
+                            <p className="font-bold text-gray-900 leading-tight">{candidato.nome}</p>
                             {candidato.mensagem && (
                               <div className="flex flex-col">
-                                <p className="text-xs text-gray-500 max-w-[200px] truncate">
+                                <p className="text-xs text-gray-500 max-w-[150px] truncate">
                                   {candidato.mensagem}
                                 </p>
                                 <button 
@@ -252,11 +252,11 @@ export const CandidatosList = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="px-3 py-4">
                         {candidato.status === 'CONTACTADO' ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 uppercase tracking-wider">
                             <CheckCircle className="h-3 w-3" />
-                            Contactado
+                            OK
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-wider">
@@ -265,19 +265,19 @@ export const CandidatosList = () => {
                           </span>
                         )}
                       </td>
-                      <td className="p-4 text-sm text-gray-600">
-                        <p>{candidato.email}</p>
+                      <td className="px-3 py-4 text-sm text-gray-600">
+                        <p className="truncate max-w-[150px]">{candidato.email}</p>
                         <p className="font-medium text-gray-800">{candidato.telefone}</p>
                       </td>
-                      <td className="p-4">
-                        <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full border border-gray-200">
-                          {candidato.vaga_nome || candidato.cargo_desejado || "Banco de Talentos"}
+                      <td className="px-3 py-4">
+                        <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-[10px] font-semibold rounded-full border border-gray-200 max-w-[120px] truncate">
+                          {candidato.vaga_nome || candidato.cargo_desejado || "Banco"}
                         </span>
                       </td>
-                      <td className="p-4 text-sm text-gray-500 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                         {candidato.created_at ? new Date(candidato.created_at).toLocaleDateString("pt-BR") : "Recente"}
                       </td>
-                      <td className="p-4">
+                      <td className="px-3 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <div className="flex flex-col gap-1 mr-2">
                             {candidato.status === 'CONTACTADO' ? (

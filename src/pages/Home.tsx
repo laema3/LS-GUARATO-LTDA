@@ -74,17 +74,16 @@ export const Home = () => {
   // Helper to split title for coloring
   const renderTitle = (title: string) => {
     const words = title.split(' ');
-    if (words.length <= 1) return <span className="text-white">{title}</span>;
+    if (words.length <= 1) return <span className="text-[#D62828]">{title}</span>;
     
     // For titles like "Festival de Carnes", "Hortifruti Fresquinho", etc.
-    // Try to highlight the last word/part
     const lastWord = words.pop();
     const firstPart = words.join(' ');
     
     return (
       <>
-        <span className="text-white">{firstPart} </span>
-        <span className="text-[#D62828]">{lastWord}</span>
+        <span className="text-[#D62828]">{firstPart} </span>
+        <span className="text-white">{lastWord}</span>
       </>
     );
   };
@@ -155,7 +154,7 @@ export const Home = () => {
                     {slides[currentSlide].cta && (
                       <Link 
                         to={slides[currentSlide].link || "/"}
-                        className="flex items-center justify-center gap-3 bg-[#D62828] hover:bg-[#b02222] text-white font-bold py-4 px-8 rounded-lg text-lg transition-all hover:scale-105 shadow-xl group"
+                        className="flex items-center justify-center gap-3 bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-4 px-8 rounded-lg text-lg transition-all hover:scale-105 shadow-xl group"
                       >
                         <MessageCircle className="w-5 h-5" />
                         {slides[currentSlide].cta}
@@ -201,7 +200,7 @@ export const Home = () => {
                 <feat.icon className="h-6 w-6" />
               </div>
               <div className="text-left">
-                <h3 className="font-bold text-gray-900 font-sans group-hover:text-[#0B3C8C] transition-colors">{feat.title}</h3>
+                <h3 className="font-bold text-[#D62828] font-sans group-hover:text-[#0B3C8C] transition-colors">{feat.title}</h3>
                 <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{feat.desc}</p>
               </div>
             </div>
@@ -218,8 +217,8 @@ export const Home = () => {
                 <div className="w-4 h-[1px] bg-[#0B3C8C]" />
                 Tradição e Qualidade
               </div>
-              <h2 className="text-5xl font-bold font-sans text-gray-900 leading-tight tracking-tight">
-                {sobreTitle} <span className="text-[#0B3C8C]">{sobreHighlight}</span>
+              <h2 className="text-5xl font-bold font-sans text-[#D62828] leading-tight tracking-tight">
+                {sobreTitle} <span className="text-gray-900">{sobreHighlight}</span>
               </h2>
               <div className="space-y-4">
                 {sobreDescription.split('\n').map((paragraph, index) => (
@@ -229,7 +228,7 @@ export const Home = () => {
                 ))}
               </div>
               <div className="pt-6">
-                <Link to="/sobre" className="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-lg font-bold hover:bg-[#0B3C8C] transition-all hover:translate-x-2">
+                <Link to="/sobre" className="inline-flex items-center gap-3 bg-[#0B3C8C] text-white px-8 py-4 rounded-lg font-bold hover:bg-[#082a63] transition-all hover:translate-x-2">
                   Nossa História <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
@@ -253,8 +252,8 @@ export const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div className="text-left">
-              <span className="text-[#0B3C8C] font-bold text-sm tracking-widest uppercase mb-4 block">Central de Ajuda</span>
-              <h2 className="text-4xl md:text-5xl font-bold font-sans text-gray-900 leading-tight">
+              <span className="text-[#D62828] font-bold text-sm tracking-widest uppercase mb-4 block">Central de Ajuda</span>
+              <h2 className="text-4xl md:text-5xl font-bold font-sans text-[#D62828] leading-tight">
                 TIRE SUAS <br /> <span className="text-gray-400">DÚVIDAS</span>
               </h2>
             </div>
@@ -274,14 +273,14 @@ export const Home = () => {
         <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 skew-x-12 translate-x-1/2" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <h2 className="text-4xl md:text-6xl font-bold font-sans text-white leading-tight">Ainda não tem o nosso <br /> <span className="text-red-400">aplicativo?</span></h2>
+            <h2 className="text-4xl md:text-6xl font-bold font-sans text-[#D62828] leading-tight">Ainda não tem o nosso <br /> <span className="text-white">aplicativo?</span></h2>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">Baixe agora e tenha acesso a ofertas exclusivas, clube de benefícios e faça suas compras sem sair de casa.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-6 pt-6">
-              <button className="bg-white text-black px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-2xl shadow-blue-900/40">
+              <button className="bg-[#0B3C8C] text-white px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-2xl shadow-blue-900/40">
                 <Apple className="h-6 w-6" />
                 Download App Store
               </button>
-              <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-white/20">
+              <button className="bg-[#0B3C8C]/80 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#0B3C8C]">
                 <Play className="h-6 w-6" />
                 Download Google Play
               </button>

@@ -23,12 +23,12 @@ export const JornalOfertas = () => {
           className="absolute inset-0 bg-cover bg-center" 
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&q=80&w=1600')" }}
         ></div>
-        <div className="absolute inset-0 bg-[#D62828]/60"></div>
+        <div className="absolute inset-0 bg-[#0B3C8C]/80"></div>
         {/* Pattern overlay */}
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="relative z-10 flex flex-col items-center">
           <FileText className="h-16 w-16 mb-4" />
-          <h1 className="text-3xl md:text-5xl font-bold font-sans mb-4 uppercase tracking-wider">Jornal de Ofertas</h1>
+          <h1 className="text-3xl md:text-5xl font-bold font-sans mb-4 uppercase tracking-wider text-[#D62828]">Jornal de Ofertas</h1>
           <p className="text-red-100 max-w-xl mx-auto px-4 text-lg">
             Confira nossas promoções vigentes e economia garantida para a sua família.
           </p>
@@ -39,7 +39,7 @@ export const JornalOfertas = () => {
         <div className="max-w-5xl mx-auto bg-white p-4 md:p-8 rounded-2xl shadow-lg border border-gray-100">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Encarte Semanal</h2>
+              <h2 className="text-2xl font-bold text-[#D62828]">Encarte Semanal</h2>
               <p className="text-gray-500">Válido até domingo</p>
             </div>
             {encartePdf ? (
@@ -61,7 +61,7 @@ export const JornalOfertas = () => {
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-100 p-8 text-center">
                 <FileText className="h-24 w-24 mb-4 opacity-50" />
-                <h3 className="text-xl font-bold mb-2 text-gray-500">Nenhum Encarte Disponível</h3>
+                <h3 className="text-xl font-bold mb-2 text-[#D62828]">Nenhum Encarte Disponível</h3>
                 <p>O encarte promocional da semana ainda não foi publicado.</p>
               </div>
             )}
