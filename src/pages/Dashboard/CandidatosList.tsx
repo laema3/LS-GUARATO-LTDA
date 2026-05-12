@@ -283,19 +283,19 @@ export const CandidatosList = () => {
                             {candidato.status === 'CONTACTADO' ? (
                               <button 
                                 onClick={() => handleStatusChange(candidato.id, 'PENDENTE DE CONTATO')}
-                                className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-1.5 rounded border border-amber-200 transition-colors whitespace-nowrap flex items-center gap-1"
-                                title="Marcar como Pendente"
+                                className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-1.5 rounded border border-green-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                                title="Marcar como Pendente (Desfazer)"
                               >
-                                <Clock className="h-3 w-3" />
-                                PENDENTE
+                                <CheckCircle className="h-3 w-3" />
+                                OK
                               </button>
                             ) : (
                               <button 
                                 onClick={() => handleStatusChange(candidato.id, 'CONTACTADO')}
-                                className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-1.5 rounded border border-green-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                                className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-1.5 rounded border border-amber-200 transition-colors whitespace-nowrap flex items-center gap-1"
                                 title="Marcar como Contactado"
                               >
-                                <CheckCircle className="h-3 w-3" />
+                                <Clock className="h-3 w-3" />
                                 CONTACTADO
                               </button>
                             )}
