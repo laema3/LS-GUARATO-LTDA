@@ -8,10 +8,16 @@ export const PageLoader = () => {
   const location = useLocation();
 
   useEffect(() => {
+    // Não exibe o loader no painel administrativo
+    if (location.pathname.startsWith('/admin')) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500); // Aumentado um pouco para garantir que a transição ocorra
+    }, 1000); // Alterado para 1 segundo conforme solicitado
 
     // Segurança extra: se o componente for desmontado, limpa o timer
     return () => {

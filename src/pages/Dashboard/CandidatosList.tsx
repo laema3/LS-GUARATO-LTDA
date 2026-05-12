@@ -213,9 +213,6 @@ export const CandidatosList = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-gray-500">Carregando candidatos...</div>
-        ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -366,7 +363,6 @@ export const CandidatosList = () => {
                   </div>
                 )}
           </div>
-        )}
       </div>
     </div>
   );
