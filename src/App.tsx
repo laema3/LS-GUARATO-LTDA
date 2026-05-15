@@ -4,6 +4,7 @@
  */
 
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
@@ -57,7 +58,7 @@ const ExternalRedirect = ({ url }: { url: string }) => {
 };
 
 export default function App() {
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(true);
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Se o banco não estiver configurado (URL placeholder), evita requisições e mantém em manutenção
@@ -85,6 +86,19 @@ export default function App() {
     };
     checkMaintenance();
   }, []);
+
+  if (maintenanceMode === null) {
+      return (
+        <div className="fixed inset-0 z-[100] bg-[#0B3C8C] flex flex-col items-center justify-center">
+            <div className="animate-pulse">
+                <ShoppingCart className="h-16 w-16 text-white" />
+            </div>
+            <h2 className="text-white font-sans font-bold text-2xl mt-4 tracking-wider">
+                ABASTECENDO...
+            </h2>
+        </div>
+      );
+  }
 
   return (
     <BrowserRouter>
