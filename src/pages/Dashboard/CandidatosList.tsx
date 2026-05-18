@@ -6,6 +6,7 @@ export const CandidatosList = () => {
   const [candidatos, setCandidatos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState<'curriculos' | 'banco'>('curriculos');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<{nome: string, mensagem: string} | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,11 +87,15 @@ export const CandidatosList = () => {
     }
   };
 
-  const filteredCandidatos = candidatos.filter(c => 
-    (c.nome || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (c.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.cargo_desejado || c.vaga_nome || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCandidatos = candidatos.filter(c => {
+    const isBanco = c.vaga_nome === "Banco de Talentos" || c.vaga_nome === "Banco" || (!c.vaga_nome && !!c.cargo_desejado);
+    if (activeTab === 'curriculos' && isBanco) return false;
+    if (activeTab === 'banco' && !isBanco) return false;
+
+    return (c.nome || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (c.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (c.cargo_desejado || c.vaga_nome || "").toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredCandidatos.length / itemsPerPage);
@@ -210,6 +215,21 @@ export const CandidatosList = () => {
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0B3C8C] focus:border-transparent outline-none w-full sm:w-64"
           />
         </div>
+      </div>
+
+      <div className="flex gap-4 border-b border-gray-200 pb-2">
+        <button
+          onClick={() => { setActiveTab('curriculos'); setCurrentPage(1); }}
+          className={`px-4 py-2 font-bold font-sans text-sm tracking-wider uppercase rounded-t-lg transition-colors border-b-2 ${activeTab === 'curriculos' ? 'border-[#D62828] text-[#D62828]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Currículos
+        </button>
+        <button
+          onClick={() => { setActiveTab('banco'); setCurrentPage(1); }}
+          className={`px-4 py-2 font-bold font-sans text-sm tracking-wider uppercase rounded-t-lg transition-colors border-b-2 ${activeTab === 'banco' ? 'border-[#D62828] text-[#D62828]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Banco de Talentos
+        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

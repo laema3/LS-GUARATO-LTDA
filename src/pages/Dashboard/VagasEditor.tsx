@@ -10,6 +10,7 @@ export const VagasEditor = () => {
   const [criteriosList, setCriteriosList] = useState<string[]>([]);
 
   const [vagasCadastradas, setVagasCadastradas] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'ativas' | 'desabilitadas'>('ativas');
 
   useEffect(() => {
     loadParametros();
@@ -374,13 +375,30 @@ export const VagasEditor = () => {
       )}
 
       {/* Lista de Vagas */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="flex gap-4 border-b border-gray-200 pb-2 mt-8">
+        <button
+          onClick={() => setActiveTab('ativas')}
+          className={`px-4 py-2 font-bold font-sans text-sm tracking-wider uppercase rounded-t-lg transition-colors border-b-2 ${activeTab === 'ativas' ? 'border-[#D62828] text-[#D62828]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Vagas Ativas
+        </button>
+        <button
+          onClick={() => setActiveTab('desabilitadas')}
+          className={`px-4 py-2 font-bold font-sans text-sm tracking-wider uppercase rounded-t-lg transition-colors border-b-2 ${activeTab === 'desabilitadas' ? 'border-[#D62828] text-[#D62828]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Desabilitadas
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-4">
         <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-          <h2 className="text-lg font-bold font-sans text-gray-900">Vagas Cadastradas</h2>
-          <span className="bg-[#0B3C8C]/10 text-[#0B3C8C] py-1 px-3 rounded-full text-sm font-bold">{vagasCadastradas.length} vagas</span>
+          <h2 className="text-lg font-bold font-sans text-gray-900">{activeTab === 'ativas' ? 'Vagas Habilitadas no Site' : 'Vagas Ocultas no Site'}</h2>
+          <span className="bg-[#0B3C8C]/10 text-[#0B3C8C] py-1 px-3 rounded-full text-sm font-bold">
+            {vagasCadastradas.filter(v => activeTab === 'ativas' ? v.ativa : !v.ativa).length} vagas
+          </span>
         </div>
         <div className="divide-y divide-gray-100">
-          {vagasCadastradas.map(vaga => (
+          {vagasCadastradas.filter(v => activeTab === 'ativas' ? v.ativa : !v.ativa).map(vaga => (
             <div key={vaga.id} className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-gray-50/50 transition-colors">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -416,9 +434,9 @@ export const VagasEditor = () => {
               </div>
             </div>
           ))}
-          {vagasCadastradas.length === 0 && (
+          {vagasCadastradas.filter(v => activeTab === 'ativas' ? v.ativa : !v.ativa).length === 0 && (
             <div className="p-12 text-center text-gray-500">
-              Nenhuma vaga cadastrada.
+              Nenhuma vaga encontrada nesta aba.
             </div>
           )}
         </div>
