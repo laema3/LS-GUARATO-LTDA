@@ -6,6 +6,8 @@ import { supabase } from "../lib/supabase";
 export const DetalhesVaga = () => {
   const { id } = useParams();
   const [job, setJob] = useState<any>(null);
+  const [outrasVagas, setOutrasVagas] = useState<any[]>([]);
+  const [selectedOutrasVagas, setSelectedOutrasVagas] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [fileName, setFileName] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -31,6 +33,11 @@ export const DetalhesVaga = () => {
           setJob(null);
         } else {
           setJob(data);
+          // Carregar outras vagas ativas
+          const { data: allJobs } = await supabase.from('vagas').select('id, cargo').eq('ativa', true);
+          if (allJobs) {
+            setOutrasVagas(allJobs.filter(v => v.id.toString() !== id));
+          }
         }
       } else if (error) {
         setJob(null);
@@ -85,11 +92,19 @@ export const DetalhesVaga = () => {
         }
       }
 
+      let finalMessage = formData.mensagem;
+      if (selectedOutrasVagas.length > 0) {
+        const vagasStr = selectedOutrasVagas.join(', ');
+        finalMessage = finalMessage 
+          ? `${finalMessage}\n\nTambém tenho interesse nas vagas: ${vagasStr}`
+          : `Também tenho interesse nas vagas: ${vagasStr}`;
+      }
+
       await supabase.from('candidatos').insert([{
         nome: formData.nome,
         email: formData.email,
         telefone: formData.telefone,
-        mensagem: formData.mensagem,
+        mensagem: finalMessage,
         curriculo_url: fileUrl,
         vaga_nome: job.cargo
       }]);
@@ -184,6 +199,34 @@ export const DetalhesVaga = () => {
                           </div>
                        </div>
                     </div>
+
+                    {/* Outras Vagas de Interesse */}
+                    {outrasVagas.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">TENHO INTERESSE EM OUTRAS VAGAS:</label>
+                        <div className="space-y-2 max-h-48 overflow-y-auto p-4 border border-gray-200 rounded-md bg-gray-50/50 custom-scrollbar">
+                          {outrasVagas.map(v => (
+                            <div key={v.id} className="flex items-center gap-3">
+                              <input 
+                                type="checkbox" 
+                                id={`vaga-${v.id}`} 
+                                value={v.cargo}
+                                checked={selectedOutrasVagas.includes(v.cargo)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedOutrasVagas([...selectedOutrasVagas, v.cargo]);
+                                  } else {
+                                    setSelectedOutrasVagas(selectedOutrasVagas.filter(cargo => cargo !== v.cargo));
+                                  }
+                                }}
+                                className="h-4 w-4 rounded border-gray-300 text-[#0B3C8C] focus:ring-[#0B3C8C] cursor-pointer" 
+                              />
+                              <label htmlFor={`vaga-${v.id}`} className="text-sm text-gray-700 cursor-pointer flex-1 font-medium select-none">{v.cargo}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* LGPD */}
                     <div className="flex items-start gap-3 pt-4 border-t border-gray-100 mt-6">
