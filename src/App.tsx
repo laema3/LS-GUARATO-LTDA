@@ -18,6 +18,7 @@ import { Setores } from "./pages/Setores";
 import { Eventos } from "./pages/Eventos";
 import { Contato } from "./pages/Contato";
 import { NotFound } from "./pages/NotFound";
+import { PoliticaPrivacidade } from "./pages/PoliticaPrivacidade";
 import { PageLoader } from "./components/ui/Loader";
 import Maintenance from "./pages/Maintenance";
 import { supabase, isSupabaseConfigured } from "./lib/supabase";
@@ -141,6 +142,7 @@ export default function App() {
             <Route path="area-restrita" element={<AreaRestrita />} />
             <Route path="sobre" element={<Sobre />} />
             <Route path="contato" element={<Contato />} />
+            <Route path="politica-de-privacidade" element={<PoliticaPrivacidade />} />
             
             <Route path="servicos">
               <Route path="jornal-de-ofertas" element={<JornalOfertas />} />

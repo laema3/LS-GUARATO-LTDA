@@ -3,6 +3,7 @@ import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, 
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
+import { CookieConsent } from "./CookieConsent";
 
 const Header = () => {
 
@@ -305,6 +306,7 @@ const Footer = () => {
               <li><Link to="/servicos/vagas" className="hover:text-white transition-colors">Trabalhe Conosco</Link></li>
               <li><Link to="/servicos/jornal-de-ofertas" className="hover:text-white transition-colors">Jornal de Ofertas</Link></li>
               <li><Link to="/area-restrita" className="hover:text-white transition-colors">Área Restrita (RH)</Link></li>
+              <li><Link to="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link></li>
             </ul>
           </div>
 
@@ -369,6 +371,8 @@ export const Layout = () => {
            Fale com a LS GUARATO
         </span>
       </a>
+
+      <CookieConsent />
     </div>
   );
 };
