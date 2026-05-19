@@ -91,7 +91,7 @@ export const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Banner / Slider Section */}
-      <section ref={bannerRef} className="relative h-[550px] md:h-[700px] w-full container mx-auto md:rounded-3xl overflow-hidden bg-gray-900 md:mt-8">
+      <section ref={bannerRef} className="relative h-[350px] sm:h-[450px] md:h-[600px] lg:h-[700px] w-full container mx-auto md:rounded-3xl overflow-hidden bg-gray-900 md:mt-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}

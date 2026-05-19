@@ -7,6 +7,8 @@ import { supabase } from "../../lib/supabase";
 export const ServicosEditor = () => {
   const [showToast, setShowToast] = useState(false);
   const [encartePdf, setEncartePdf] = useState("");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
   const [pdfsTransparencia, setPdfsTransparencia] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -17,6 +19,8 @@ export const ServicosEditor = () => {
     const { data } = await supabase.from('servicos_settings').select('*').eq('id', 1).single();
     if (data) {
       if (data.encarte_pdf) setEncartePdf(data.encarte_pdf);
+      if (data.data_inicio) setDataInicio(data.data_inicio);
+      if (data.data_fim) setDataFim(data.data_fim);
       if (data.transparencia_pdfs) setPdfsTransparencia(data.transparencia_pdfs);
     }
   };
@@ -25,6 +29,8 @@ export const ServicosEditor = () => {
     const { error } = await supabase.from('servicos_settings').upsert({
       id: 1,
       encarte_pdf: encartePdf,
+      data_inicio: dataInicio,
+      data_fim: dataFim,
       transparencia_pdfs: pdfsTransparencia
     });
 
@@ -52,6 +58,17 @@ export const ServicosEditor = () => {
          <div className="mb-6">
            <h2 className="text-xl font-bold font-sans text-gray-900 border-b border-gray-100 pb-3">Jornal de Ofertas</h2>
            <p className="text-gray-500 text-sm mt-3">Faça o upload do encarte promocional atual (PDF). Ele será exibido e disponibilizado para download na página "Jornal de Ofertas".</p>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Data Inicial de Exibição</label>
+              <input type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Data Final de Exibição</label>
+              <input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg" />
+            </div>
          </div>
          
          <FileUpload
