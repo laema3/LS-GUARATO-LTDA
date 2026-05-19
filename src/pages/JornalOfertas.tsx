@@ -3,18 +3,36 @@ import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 export const JornalOfertas = () => {
-  const [encartePdf, setEncartePdf] = useState("");
+  const [encarteData, setEncarteData] = useState<{url: string, inicio: string | null, fim: string | null} | null>(null);
 
   useEffect(() => {
     const loadEncarte = async () => {
       if (!isSupabaseConfigured) return;
-      const { data } = await supabase.from('servicos_settings').select('encarte_pdf').eq('id', 1).single();
-      if (data && data.encarte_pdf) {
-        setEncartePdf(data.encarte_pdf);
+      const { data } = await supabase.from('servicos_settings').select('encarte_pdf, data_inicio, data_fim').eq('id', 1).single();
+      if (data) {
+        setEncarteData({
+          url: data.encarte_pdf,
+          inicio: data.data_inicio,
+          fim: data.data_fim
+        });
       }
     };
     loadEncarte();
   }, []);
+
+  const isEncarteValid = () => {
+    if (!encarteData || !encarteData.url) return false;
+    if (!encarteData.inicio || !encarteData.fim) return true; // Se não houver datas, assume válido
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const inicio = new Date(encarteData.inicio);
+    const fim = new Date(encarteData.fim);
+    
+    return today >= inicio && today <= fim;
+  };
+
+  const showEncarte = isEncarteValid();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -42,8 +60,8 @@ export const JornalOfertas = () => {
               <h2 className="text-2xl font-bold text-[#D62828]">Encarte Semanal</h2>
               <p className="text-gray-500">Válido até domingo</p>
             </div>
-            {encartePdf ? (
-              <a href={encartePdf} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 shadow-md">
+            {showEncarte ? (
+              <a href={encarteData!.url} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 shadow-md">
                 <Download className="h-5 w-5" />
                 Baixar em PDF
               </a>
@@ -56,13 +74,13 @@ export const JornalOfertas = () => {
           </div>
 
           <div className="w-full aspect-[3/4] md:aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden border border-gray-300 relative flex items-center justify-center">
-            {encartePdf ? (
-              <iframe src={encartePdf} className="w-full h-full" title="Jornal de Ofertas"></iframe>
+            {showEncarte ? (
+              <iframe src={encarteData!.url} className="w-full h-full" title="Jornal de Ofertas"></iframe>
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-100 p-8 text-center">
                 <FileText className="h-24 w-24 mb-4 opacity-50" />
                 <h3 className="text-xl font-bold mb-2 text-[#D62828]">Nenhum Encarte Disponível</h3>
-                <p>O encarte promocional da semana ainda não foi publicado.</p>
+                <p>Nenhum encarte promocional está disponível no momento.</p>
               </div>
             )}
           </div>
