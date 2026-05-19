@@ -91,7 +91,7 @@ export const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Banner / Slider Section */}
-      <section ref={bannerRef} className="relative h-[350px] sm:h-[450px] md:h-[600px] lg:h-[700px] w-full container mx-auto md:rounded-3xl overflow-hidden bg-gray-900 md:mt-8">
+      <section ref={bannerRef} className="relative h-[245px] sm:h-[315px] md:h-[420px] lg:h-[490px] w-full container mx-auto md:rounded-3xl overflow-hidden bg-gray-900 md:mt-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -116,10 +116,10 @@ export const Home = () => {
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-black/20 backdrop-blur-sm mb-8"
+                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-black/20 backdrop-blur-sm mb-6"
                   >
                     <div className="w-2 h-2 rounded-full bg-[#D62828] animate-pulse" />
-                    <span className="text-white text-[10px] md:text-xs font-bold tracking-widest uppercase">
+                    <span className="text-white text-[9px] md:text-[10px] font-bold tracking-widest uppercase">
                       LÍDER EM QUALIDADE E TRADIÇÃO
                     </span>
                   </motion.div>
@@ -129,7 +129,7 @@ export const Home = () => {
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
-                    className="text-5xl md:text-8xl font-sans font-bold leading-[1.1] mb-6 tracking-tight"
+                    className="text-4xl md:text-6xl font-sans font-bold leading-[1.1] mb-4 tracking-tight"
                   >
                     {renderTitle(slides[currentSlide].title)}
                   </motion.h1>
@@ -139,7 +139,7 @@ export const Home = () => {
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed font-light"
+                    className="text-base md:text-lg text-white/90 mb-6 max-w-xl leading-relaxed font-light"
                   >
                     {slides[currentSlide].description}
                   </motion.p>
@@ -154,7 +154,7 @@ export const Home = () => {
                     {slides[currentSlide].cta && (
                       <Link 
                         to={slides[currentSlide].link || "/"}
-                        className="flex items-center justify-center gap-3 bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-4 px-8 rounded-lg text-lg transition-all hover:scale-105 shadow-xl group"
+                        className="flex items-center justify-center gap-3 bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-6 rounded-lg text-base transition-all hover:scale-105 shadow-xl group"
                       >
                         <MessageCircle className="w-5 h-5" />
                         {slides[currentSlide].cta}
@@ -162,7 +162,7 @@ export const Home = () => {
                     )}
                     <Link 
                       to="/servicos/jornal-de-ofertas"
-                      className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-4 px-8 rounded-lg border border-white/30 backdrop-blur-md text-lg transition-all group"
+                      className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-lg border border-white/30 backdrop-blur-md text-base transition-all group"
                     >
                       Ver Ofertas
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
