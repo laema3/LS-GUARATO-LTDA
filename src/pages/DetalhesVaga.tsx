@@ -203,7 +203,7 @@ export const DetalhesVaga = () => {
                     {/* Outras Vagas de Interesse */}
                     {outrasVagas.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">TENHO INTERESSE EM OUTRAS VAGAS:</label>
+                        <label className="block text-sm font-bold text-red-600 mb-2 animate-pulse">TENHO INTERESSE EM OUTRAS VAGAS:</label>
                         <div className="space-y-2 max-h-48 overflow-y-auto p-4 border border-gray-200 rounded-md bg-gray-50/50 custom-scrollbar">
                           {outrasVagas.map(v => (
                             <div key={v.id} className="flex items-center gap-3">
@@ -221,7 +221,7 @@ export const DetalhesVaga = () => {
                                 }}
                                 className="h-4 w-4 rounded border-gray-300 text-[#0B3C8C] focus:ring-[#0B3C8C] cursor-pointer" 
                               />
-                              <label htmlFor={`vaga-${v.id}`} className="text-sm text-gray-700 cursor-pointer flex-1 font-medium select-none">{v.cargo}</label>
+                              <label htmlFor={`vaga-${v.id}`} className="text-sm text-red-600 animate-pulse cursor-pointer flex-1 font-bold select-none">{v.cargo}</label>
                             </div>
                           ))}
                         </div>
