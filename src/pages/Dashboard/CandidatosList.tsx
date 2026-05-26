@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
-import { Download, FileText, Search, User, Trash2, X, AlertTriangle, ChevronLeft, ChevronRight, Clock, CheckCircle } from "lucide-react";
+import { Download, FileText, Search, User, Trash2, X, AlertTriangle, ChevronLeft, ChevronRight, Clock, CheckCircle, ArrowRightLeft } from "lucide-react";
 
 export const CandidatosList = () => {
   const [candidatos, setCandidatos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState<'curriculos' | 'banco'>('curriculos');
+  const [activeTab, setActiveTab] = useState<'curriculos' | 'banco' | 'reserva'>('curriculos');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<{nome: string, mensagem: string} | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,9 +88,16 @@ export const CandidatosList = () => {
   };
 
   const filteredCandidatos = candidatos.filter(c => {
-    const isBanco = c.vaga_nome === "Banco de Talentos" || c.vaga_nome === "Banco" || (!c.vaga_nome && !!c.cargo_desejado);
-    if (activeTab === 'curriculos' && isBanco) return false;
-    if (activeTab === 'banco' && !isBanco) return false;
+    const isReserva = c.status === 'RESERVA';
+    
+    if (activeTab === 'reserva') {
+      if (!isReserva) return false;
+    } else {
+      if (isReserva) return false;
+      const isBanco = c.vaga_nome === "Banco de Talentos" || c.vaga_nome === "Banco" || (!c.vaga_nome && !!c.cargo_desejado);
+      if (activeTab === 'curriculos' && isBanco) return false;
+      if (activeTab === 'banco' && !isBanco) return false;
+    }
 
     return (c.nome || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
       (c.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -230,6 +237,12 @@ export const CandidatosList = () => {
         >
           Banco de Talentos
         </button>
+        <button
+          onClick={() => { setActiveTab('reserva'); setCurrentPage(1); }}
+          className={`px-4 py-2 font-bold font-sans text-sm tracking-wider uppercase rounded-t-lg transition-colors border-b-2 ${activeTab === 'reserva' ? 'border-[#D62828] text-[#D62828]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Transferidos/Reservas
+        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -273,7 +286,12 @@ export const CandidatosList = () => {
                         </div>
                       </td>
                       <td className="px-3 py-4">
-                        {candidato.status === 'CONTACTADO' ? (
+                        {candidato.status === 'RESERVA' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200 uppercase tracking-wider font-sans">
+                            <ArrowRightLeft className="h-3 w-3 animate-pulse" />
+                            Reserva
+                          </span>
+                        ) : candidato.status === 'CONTACTADO' ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 uppercase tracking-wider">
                             <CheckCircle className="h-3 w-3" />
                             OK
@@ -299,25 +317,47 @@ export const CandidatosList = () => {
                       </td>
                       <td className="px-3 py-4">
                         <div className="flex items-center justify-center gap-2">
-                          <div className="flex flex-col gap-1 mr-2">
-                            {candidato.status === 'CONTACTADO' ? (
+                          <div className="flex flex-col sm:flex-row gap-1.5 mr-2">
+                            {candidato.status === 'RESERVA' ? (
                               <button 
                                 onClick={() => handleStatusChange(candidato.id, 'PENDENTE DE CONTATO')}
-                                className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-1.5 rounded border border-green-200 transition-colors whitespace-nowrap flex items-center gap-1"
-                                title="Marcar como Pendente (Desfazer)"
+                                className="text-[9px] font-bold bg-purple-50 text-purple-600 hover:bg-purple-100 px-2 py-1.5 rounded border border-purple-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                                title="Reativar e devolver para lista de ativos"
                               >
-                                <CheckCircle className="h-3 w-3" />
-                                OK
+                                <ArrowRightLeft className="h-3 w-3" />
+                                REATIVAR
                               </button>
                             ) : (
-                              <button 
-                                onClick={() => handleStatusChange(candidato.id, 'CONTACTADO')}
-                                className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-1.5 rounded border border-amber-200 transition-colors whitespace-nowrap flex items-center gap-1"
-                                title="Marcar como Contactado"
-                              >
-                                <Clock className="h-3 w-3" />
-                                CONTACTADO
-                              </button>
+                              <>
+                                {candidato.status === 'CONTACTADO' ? (
+                                  <button 
+                                    onClick={() => handleStatusChange(candidato.id, 'PENDENTE DE CONTATO')}
+                                    className="text-[9px] font-bold bg-green-50 text-green-600 hover:bg-green-100 px-2 py-1.5 rounded border border-green-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                                    title="Marcar como Pendente (Desfazer)"
+                                  >
+                                    <CheckCircle className="h-3 w-3" />
+                                    OK
+                                  </button>
+                                ) : (
+                                  <button 
+                                    onClick={() => handleStatusChange(candidato.id, 'CONTACTADO')}
+                                    className="text-[9px] font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 px-2 py-1.5 rounded border border-amber-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                                    title="Marcar como Contactado"
+                                  >
+                                    <Clock className="h-3 w-3" />
+                                    CONTACTADO
+                                  </button>
+                                )}
+                                
+                                <button 
+                                  onClick={() => handleStatusChange(candidato.id, 'RESERVA')}
+                                  className="text-[9px] font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-2 py-1.5 rounded border border-indigo-200 transition-colors whitespace-nowrap flex items-center gap-1"
+                                  title="Transferir para Reservas"
+                                >
+                                  <ArrowRightLeft className="h-3 w-3" />
+                                  TRANSFERIR
+                                </button>
+                              </>
                             )}
                           </div>
 
