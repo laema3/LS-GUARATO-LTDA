@@ -204,7 +204,7 @@ export const DetalhesVaga = () => {
                     {outrasVagas.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-gray-100">
                         <label className="block text-sm font-bold text-red-600 mb-2 animate-pulse">TENHO INTERESSE EM OUTRAS VAGAS:</label>
-                        <div className="space-y-2 max-h-48 overflow-y-auto p-4 border border-gray-200 rounded-md bg-gray-50/50 custom-scrollbar">
+                        <div className="space-y-2 max-h-48 overflow-y-auto p-4 border border-yellow-200 rounded-md bg-yellow-50 animate-pulse custom-scrollbar">
                           {outrasVagas.map(v => (
                             <div key={v.id} className="flex items-center gap-3">
                               <input 
