@@ -35,15 +35,16 @@ export const AreaRestrita = () => {
       link: links.link_meu_rh
     },
     {
-      title: "SALDO DE CONVÊNIO FORA DA EMPRESA",
+      title: "SALDO DE CONVÊNIO FORA DA EMPRESA\n- SUGESTÕES/MELHORIAS",
       icon: CreditCard,
       desc: "Consulte seu saldo para uso na rede credenciada externa.",
       color: "from-emerald-500 to-emerald-700",
       link: links.link_saldo_fora
     },
     {
-      title: "SALDO DE CONVÊNIO DENTRO DA EMPRESA",
+      title: "SALDO DE CONVÊNIO DENTRO DA EMPRESA\n- SUGESTÕES/MELHORIAS",
       icon: Building2,
+
       desc: "Consulte seu saldo para compras nas lojas LS Guarato.",
       color: "from-[#D62828] to-red-800",
       link: links.link_saldo_dentro

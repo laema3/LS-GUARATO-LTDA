@@ -9,15 +9,6 @@ import { supabase } from "../lib/supabase";
 export const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<any[]>(mockSlides);
-  const [sobreTitle, setSobreTitle] = useState("A sua família merece o padrão");
-  const [sobreHighlight, setSobreHighlight] = useState(" LS Guarato");
-  const [sobreDescription, setSobreDescription] = useState("Há muitos anos fazendo parte do dia a dia da família uberabense, o LS Guarato se destaca pelo atendimento humanizado, produtos sempre frescos e preços que cabem no seu bolso.\nNosso compromisso é entregar a melhor experiência de compra, seja nas nossas lojas físicas amplas e confortáveis ou através do nosso aplicativo de delivery.");
-  const [sobreImage, setSobreImage] = useState("https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&q=80&w=800");
-
-  const sobreRef = useRef(null);
-  const { scrollYProgress: sobreScrollY } = useScroll({ target: sobreRef, offset: ["start end", "end start"] });
-  const ySobre = useTransform(sobreScrollY, [0, 1], ["0%", "20%"]);
-
   const bannerRef = useRef(null);
   const { scrollYProgress: bannerScrollY } = useScroll({ target: bannerRef });
   const yBanner = useTransform(bannerScrollY, [0, 1], ["0%", "10%"]);
@@ -35,19 +26,6 @@ export const Home = () => {
           const validSlides = data.slides.filter((s:any) => s && s.image && s.title);
           if (validSlides.length > 0) setSlides(validSlides);
         }
-        if (data.sobre_title && typeof data.sobre_title === 'string') {
-          const words = data.sobre_title.split(' ');
-          if (words.length > 1) {
-            const lastTwo = words.splice(-2).join(' ');
-            setSobreTitle(words.join(' '));
-            setSobreHighlight(' ' + lastTwo);
-          } else {
-            setSobreTitle(data.sobre_title);
-            setSobreHighlight('');
-          }
-        }
-        if (data.sobre_description) setSobreDescription(data.sobre_description);
-        if (data.sobre_image) setSobreImage(data.sobre_image);
       }
     } catch (err) {
       // Silently fail to fallback to mocks
@@ -191,78 +169,22 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* Features bar */}
-      <section className="bg-white border-b border-gray-100 py-10 relative z-20 -mt-8 md:-mt-12 container mx-auto px-4 rounded-xl shadow-2xl">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {features.map((feat, idx) => (
-            <div key={idx} className="flex items-center gap-4 group cursor-default">
-              <div className="bg-[#0B3C8C] text-white p-3 rounded-xl transition-transform group-hover:scale-110">
-                <feat.icon className="h-6 w-6" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-bold text-[#D62828] font-sans group-hover:text-[#0B3C8C] transition-colors">{feat.title}</h3>
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{feat.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Sobre Nós Section */}
-      <section className="py-24 bg-white overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="lg:w-1/2 space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#0B3C8C]/5 text-[#0B3C8C] font-black text-[10px] tracking-[0.2em] rounded-md uppercase border border-[#0B3C8C]/10">
-                <div className="w-4 h-[1px] bg-[#0B3C8C]" />
-                Tradição e Qualidade
-              </div>
-              <h2 className="text-5xl font-bold font-sans text-[#D62828] leading-tight tracking-tight">
-                {sobreTitle} <span className="text-gray-900">{sobreHighlight}</span>
-              </h2>
-              <div className="space-y-4">
-                {sobreDescription.split('\n').map((paragraph, index) => (
-                  <p key={index} className="text-gray-500 text-lg leading-[1.8] font-light">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-              <div className="pt-6">
-                <Link to="/sobre" className="inline-flex items-center gap-3 bg-[#0B3C8C] text-white px-8 py-4 rounded-lg font-bold hover:bg-[#082a63] transition-all hover:translate-x-2">
-                  Nossa História <ArrowRight className="h-5 w-5" />
-                </Link>
-              </div>
-            </div>
-            <div ref={sobreRef} className="lg:w-1/2 relative overflow-hidden rounded-3xl">
-              <div className="absolute -top-10 -right-10 w-64 h-64 bg-[#0B3C8C]/5 rounded-full blur-3xl -z-10" />
-              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-red-500/5 rounded-full blur-3xl -z-10" />
-              <motion.img 
-                style={{ y: ySobre, scale: 1.2 }}
-                src={sobreImage} 
-                alt="Fachada Supermercado" 
-                className="relative z-10 w-full object-cover h-[500px]"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-            <div className="text-left">
+          <div className="flex flex-col items-center justify-center text-center mb-16 gap-4">
+            <div>
               <span className="text-[#D62828] font-bold text-sm tracking-widest uppercase mb-4 block">Central de Ajuda</span>
               <h2 className="text-4xl md:text-5xl font-bold font-sans text-[#D62828] leading-tight">
-                TIRE SUAS <br /> <span className="text-gray-400">DÚVIDAS</span>
+                TIRE SUAS <span className="text-gray-400">DÚVIDAS</span>
               </h2>
             </div>
-            <p className="text-gray-500 max-w-md text-lg font-light leading-relaxed">
+            <p className="text-gray-500 max-w-2xl text-lg font-light leading-relaxed">
               Separamos as perguntas mais frequentes dos nossos clientes para facilitar o seu dia a dia.
             </p>
           </div>
           
-          <div className="max-w-4xl">
+          <div className="max-w-4xl mx-auto">
             <Accordion items={mockFAQs} />
           </div>
         </div>
