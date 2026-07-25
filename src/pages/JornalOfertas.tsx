@@ -8,7 +8,7 @@ export const JornalOfertas = () => {
   useEffect(() => {
     const loadEncarte = async () => {
       if (!isSupabaseConfigured) return;
-      const { data } = await supabase.from('servicos_settings').select('encarte_pdf, data_inicio, data_fim').eq('id', 1).single();
+      const { data } = await supabase.from('servicos_settings').select('encarte_pdf, data_inicio, data_fim').eq('id', 1).maybeSingle();
       if (data) {
         setEncarteData({
           url: data.encarte_pdf,
@@ -20,19 +20,25 @@ export const JornalOfertas = () => {
     loadEncarte();
   }, []);
 
-  const isEncarteValid = () => {
-    if (!encarteData || !encarteData.url) return false;
-    if (!encarteData.inicio || !encarteData.fim) return true; // Se não houver datas, assume válido
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const inicio = new Date(encarteData.inicio);
-    const fim = new Date(encarteData.fim);
-    
-    return today >= inicio && today <= fim;
+  const getValiditySubtitle = () => {
+    if (!encarteData || !encarteData.inicio || !encarteData.fim) {
+      return "Confira as nossas ofertas especiais da semana";
+    }
+
+    try {
+      const [startYear, startMonth, startDay] = encarteData.inicio.split('-').map(Number);
+      const [endYear, endMonth, endDay] = encarteData.fim.split('-').map(Number);
+
+      const inicioStr = `${String(startDay).padStart(2, '0')}/${String(startMonth).padStart(2, '0')}/${startYear}`;
+      const fimStr = `${String(endDay).padStart(2, '0')}/${String(endMonth).padStart(2, '0')}/${endYear}`;
+
+      return `Válido de ${inicioStr} até ${fimStr}`;
+    } catch {
+      return "Confira as nossas ofertas especiais da semana";
+    }
   };
 
-  const showEncarte = isEncarteValid();
+  const showEncarte = !!(encarteData && encarteData.url && encarteData.url.trim() !== "");
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -58,7 +64,7 @@ export const JornalOfertas = () => {
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div>
               <h2 className="text-2xl font-bold text-[#D62828]">Encarte Semanal</h2>
-              <p className="text-gray-500">Válido até domingo</p>
+              <p className="text-gray-500">{getValiditySubtitle()}</p>
             </div>
             {showEncarte ? (
               <a href={encarteData!.url} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 shadow-md">
@@ -73,9 +79,44 @@ export const JornalOfertas = () => {
             )}
           </div>
 
-          <div className="w-full aspect-[3/4] md:aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden border border-gray-300 relative flex items-center justify-center">
+          <div className="w-full aspect-[3/4] md:aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden border border-gray-300 relative flex flex-col items-center justify-center">
             {showEncarte ? (
-              <iframe src={encarteData!.url} className="w-full h-full" title="Jornal de Ofertas"></iframe>
+              <>
+                <div className="absolute top-0 left-0 right-0 z-10 bg-yellow-50 border-b border-yellow-200 p-3 flex items-center justify-between gap-4">
+                  <p className="text-sm font-medium text-yellow-800">
+                    Se o encarte não carregar corretamente abaixo, você pode visualizá-lo diretamente.
+                  </p>
+                  <a 
+                    href={encarteData!.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="whitespace-nowrap px-4 py-1.5 bg-[#D62828] text-white text-xs font-bold rounded hover:bg-red-700 transition-colors"
+                  >
+                    ABRIR EM NOVA ABA
+                  </a>
+                </div>
+                <object 
+                  data={encarteData!.url} 
+                  type="application/pdf" 
+                  className="w-full h-full pt-[52px]" 
+                  title="Jornal de Ofertas"
+                >
+                  <iframe 
+                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(encarteData!.url)}&embedded=true`}
+                    className="w-full h-full pt-[52px]" 
+                    title="Jornal de Ofertas"
+                  >
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-gray-100">
+                      <FileText className="h-16 w-16 mb-4 text-[#D62828]" />
+                      <h3 className="text-lg font-bold mb-2">Não foi possível carregar o PDF</h3>
+                      <p className="text-gray-600 mb-6">Seu navegador pode estar bloqueando a visualização direta.</p>
+                      <a href={encarteData!.url} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] text-white font-bold py-3 px-6 rounded-lg">
+                        Clique aqui para ver o Encarte
+                      </a>
+                    </div>
+                  </iframe>
+                </object>
+              </>
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-gray-100 p-8 text-center">
                 <FileText className="h-24 w-24 mb-4 opacity-50" />

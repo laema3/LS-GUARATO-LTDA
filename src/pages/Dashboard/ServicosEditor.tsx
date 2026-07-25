@@ -1,4 +1,4 @@
-import { Save, FileText } from "lucide-react";
+import { Save, FileText, Loader2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { FileUpload } from "../../components/ui/FileUpload";
@@ -6,6 +6,8 @@ import { supabase } from "../../lib/supabase";
 
 export const ServicosEditor = () => {
   const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [encartePdf, setEncartePdf] = useState("");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
@@ -16,28 +18,80 @@ export const ServicosEditor = () => {
   }, []);
 
   const loadData = async () => {
-    const { data } = await supabase.from('servicos_settings').select('*').eq('id', 1).single();
-    if (data) {
-      if (data.encarte_pdf) setEncartePdf(data.encarte_pdf);
-      if (data.data_inicio) setDataInicio(data.data_inicio);
-      if (data.data_fim) setDataFim(data.data_fim);
-      if (data.transparencia_pdfs) setPdfsTransparencia(data.transparencia_pdfs);
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.from('servicos_settings').select('*').eq('id', 1).maybeSingle();
+      
+      if (error) throw error;
+      
+      if (data) {
+        setEncartePdf(data.encarte_pdf || "");
+        setDataInicio(data.data_inicio || "");
+        setDataFim(data.data_fim || "");
+        setPdfsTransparencia(data.transparencia_pdfs || {});
+      }
+    } catch (error: any) {
+      console.error("Erro ao carregar dados:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setSevenDaysValidity = () => {
+    const today = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+
+    const formatDate = (d: Date) => d.toISOString().split('T')[0];
+    setDataInicio(formatDate(today));
+    setDataFim(formatDate(nextWeek));
+  };
+
+  const handleEncarteChange = (url: string) => {
+    setEncartePdf(url);
+    if (url) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (!dataFim || dataFim < todayStr) {
+        setSevenDaysValidity();
+      }
     }
   };
 
   const handleSave = async () => {
-    const { error } = await supabase.from('servicos_settings').upsert({
-      id: 1,
-      encarte_pdf: encartePdf,
-      data_inicio: dataInicio,
-      data_fim: dataFim,
-      transparencia_pdfs: pdfsTransparencia
-    });
+    if (loading) return;
+    
+    try {
+      setIsSaving(true);
 
-    if (!error) {
+      let finalInicio = dataInicio;
+      let finalFim = dataFim;
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      if (encartePdf && (!finalFim || finalFim < todayStr)) {
+        const today = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(today.getDate() + 7);
+        finalInicio = today.toISOString().split('T')[0];
+        finalFim = nextWeek.toISOString().split('T')[0];
+        setDataInicio(finalInicio);
+        setDataFim(finalFim);
+      }
+
+      const { error } = await supabase.from('servicos_settings').upsert({
+        id: 1,
+        encarte_pdf: encartePdf,
+        data_inicio: finalInicio,
+        data_fim: finalFim,
+        transparencia_pdfs: pdfsTransparencia
+      });
+
+      if (error) throw error;
       setShowToast(true);
-    } else {
+    } catch (error: any) {
+      console.error("Erro ao salvar:", error);
       alert("Erro ao salvar: " + error.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -49,36 +103,59 @@ export const ServicosEditor = () => {
     <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
         <h1 className="text-2xl font-bold font-sans text-gray-900">Editar Serviços Institucionais</h1>
-        <button onClick={handleSave} className="bg-[#0B3C8C] text-white px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-[#082a63] transition-colors">
-          <Save className="h-5 w-5" /> Salvar Alterações
+        <button 
+          onClick={handleSave} 
+          disabled={loading || isSaving}
+          className={`bg-[#0B3C8C] text-white px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors ${loading || isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#082a63]'}`}
+        >
+          {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+          {isSaving ? "Salvando..." : "Salvar Alterações"}
         </button>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-         <div className="mb-6">
-           <h2 className="text-xl font-bold font-sans text-gray-900 border-b border-gray-100 pb-3">Jornal de Ofertas</h2>
-           <p className="text-gray-500 text-sm mt-3">Faça o upload do encarte promocional atual (PDF). Ele será exibido e disponibilizado para download na página "Jornal de Ofertas".</p>
-         </div>
+         {loading ? (
+           <div className="flex flex-col items-center justify-center py-12">
+             <Loader2 className="h-8 w-8 text-[#0B3C8C] animate-spin mb-2" />
+             <p className="text-gray-500 font-medium">Carregando dados...</p>
+           </div>
+         ) : (
+           <>
+             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+               <div>
+                 <h2 className="text-xl font-bold font-sans text-gray-900">Jornal de Ofertas</h2>
+                 <p className="text-gray-500 text-sm mt-1">Faça o upload do encarte promocional atual (PDF). Ele será exibido e disponibilizado para download na página "Jornal de Ofertas".</p>
+               </div>
+               <button 
+                 type="button" 
+                 onClick={setSevenDaysValidity}
+                 className="text-xs bg-blue-50 text-[#0B3C8C] hover:bg-blue-100 font-bold px-3 py-1.5 rounded border border-blue-200 transition-colors shrink-0 self-start sm:self-auto"
+               >
+                 + Renovar para +7 Dias
+               </button>
+             </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Data Inicial de Exibição</label>
-              <input type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Data Final de Exibição</label>
-              <input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg" />
-            </div>
-         </div>
-         
-         <FileUpload
-            value={encartePdf}
-            onChange={setEncartePdf}
-            title="Upload do Encarte (PDF)"
-            accept="application/pdf"
-            type="pdf"
-            folder="encartes"
-         />
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Data Inicial de Exibição</label>
+                  <input type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Data Final de Exibição</label>
+                  <input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg" />
+                </div>
+             </div>
+             
+             <FileUpload
+                value={encartePdf}
+                onChange={handleEncarteChange}
+                title="Upload do Encarte (PDF)"
+                accept="application/pdf"
+                type="pdf"
+                folder="encartes"
+             />
+           </>
+         )}
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">

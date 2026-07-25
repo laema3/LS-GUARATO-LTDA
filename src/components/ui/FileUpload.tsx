@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Upload, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, FileText, Loader2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 interface FileUploadProps {
@@ -13,6 +13,15 @@ interface FileUploadProps {
   folder?: string;
   heightClass?: string;
 }
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
 
 export const FileUpload = ({ 
   value, 
@@ -34,37 +43,45 @@ export const FileUpload = ({
 
     try {
       setIsUploading(true);
-      
-      if (!import.meta.env.VITE_SUPABASE_URL) {
-        // Fallback apenas visual local se o usuário ainda não tiver posto as chaves.
-        console.warn("Chaves do Supabase não configuradas, usando preview local.");
-        const localUrl = URL.createObjectURL(file);
-        onChange(localUrl);
-        return;
+      let uploadedUrl = "";
+
+      // Tenta upload no Supabase Storage se configurado
+      if (import.meta.env.VITE_SUPABASE_URL && !import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) {
+        try {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+          const filePath = `${folder}/${fileName}`;
+
+          const { error } = await supabase.storage
+            .from(bucket)
+            .upload(filePath, file, { upsert: true });
+
+          if (!error) {
+            const { data: publicData } = supabase.storage
+              .from(bucket)
+              .getPublicUrl(filePath);
+            
+            if (publicData?.publicUrl) {
+              uploadedUrl = publicData.publicUrl;
+            }
+          } else {
+            console.warn("Upload no Supabase Storage falhou, usando fallback Base64:", error.message);
+          }
+        } catch (storageErr) {
+          console.warn("Erro ao enviar ao Supabase Storage, usando fallback Base64:", storageErr);
+        }
       }
 
-      // Upload do arquivo pro Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-      const filePath = `${folder}/${fileName}`;
-
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file);
-
-      if (error) {
-        throw error;
+      // Se o upload no Supabase Storage não gerou URL válida, usa Base64 persistente
+      // (Base64 não expira ao atualizar a página, diferente de blob: URLs)
+      if (!uploadedUrl) {
+        uploadedUrl = await fileToBase64(file);
       }
 
-      // Pega a URL pública
-      const { data: publicData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
-      onChange(publicData.publicUrl);
+      onChange(uploadedUrl);
     } catch (error) {
-      console.error("Erro no upload:", error);
-      alert("Erro ao fazer upload. Verifique se o bucket 'assets' existe no seu Supabase.");
+      console.error("Erro no processamento do arquivo:", error);
+      alert("Não foi possível processar o arquivo. Tente novamente.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {

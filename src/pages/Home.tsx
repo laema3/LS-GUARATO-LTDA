@@ -200,11 +200,11 @@ export const Home = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-6 pt-6">
               <button className="bg-[#0B3C8C] text-white px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:scale-105 hover:shadow-2xl shadow-blue-900/40">
                 <Apple className="h-6 w-6" />
-                Download App Store
+                Download na App Store
               </button>
               <button className="bg-[#0B3C8C]/80 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#0B3C8C]">
                 <Play className="h-6 w-6" />
-                Download Google Play
+                Download na Google Play
               </button>
             </div>
           </div>
