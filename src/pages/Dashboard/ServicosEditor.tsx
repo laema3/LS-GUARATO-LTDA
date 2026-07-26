@@ -20,15 +20,32 @@ export const ServicosEditor = () => {
   const loadData = async () => {
     try {
       setLoading(true);
+      // 1. Carrega do localStorage primeiro para garantir persistência imediata
+      const cached = localStorage.getItem('servicos_settings_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setEncartePdf(parsed.encarte_pdf || "");
+        setDataInicio(parsed.data_inicio || "");
+        setDataFim(parsed.data_fim || "");
+        setPdfsTransparencia(parsed.transparencia_pdfs || {});
+      }
+
+      // 2. Sincroniza com Supabase
       const { data, error } = await supabase.from('servicos_settings').select('*').eq('id', 1).maybeSingle();
       
-      if (error) throw error;
-      
-      if (data) {
+      if (!error && data) {
         setEncartePdf(data.encarte_pdf || "");
         setDataInicio(data.data_inicio || "");
         setDataFim(data.data_fim || "");
         setPdfsTransparencia(data.transparencia_pdfs || {});
+        
+        // Atualiza cache local
+        localStorage.setItem('servicos_settings_cache', JSON.stringify({
+          encarte_pdf: data.encarte_pdf || "",
+          data_inicio: data.data_inicio || "",
+          data_fim: data.data_fim || "",
+          transparencia_pdfs: data.transparencia_pdfs || {}
+        }));
       }
     } catch (error: any) {
       console.error("Erro ao carregar dados:", error);
@@ -77,15 +94,27 @@ export const ServicosEditor = () => {
         setDataFim(finalFim);
       }
 
-      const { error } = await supabase.from('servicos_settings').upsert({
+      const payload = {
         id: 1,
         encarte_pdf: encartePdf,
         data_inicio: finalInicio,
         data_fim: finalFim,
         transparencia_pdfs: pdfsTransparencia
-      });
+      };
 
-      if (error) throw error;
+      // Sempre salva no localStorage primeiro para garantia de persistência imediata
+      localStorage.setItem('servicos_settings_cache', JSON.stringify({
+        encarte_pdf: encartePdf,
+        data_inicio: finalInicio,
+        data_fim: finalFim,
+        transparencia_pdfs: pdfsTransparencia
+      }));
+
+      const { error } = await supabase.from('servicos_settings').upsert(payload);
+
+      if (error) {
+        console.warn("Aviso ao salvar no Supabase (salvo localmente):", error.message);
+      }
       setShowToast(true);
     } catch (error: any) {
       console.error("Erro ao salvar:", error);

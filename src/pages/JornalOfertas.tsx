@@ -1,4 +1,4 @@
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, Printer } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
@@ -7,14 +7,37 @@ export const JornalOfertas = () => {
 
   useEffect(() => {
     const loadEncarte = async () => {
+      // 1. Carrega do localStorage primeiro para garantir persistência imediata
+      const cached = localStorage.getItem('servicos_settings_cache');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.encarte_pdf) {
+            setEncarteData({
+              url: parsed.encarte_pdf,
+              inicio: parsed.data_inicio,
+              fim: parsed.data_fim
+            });
+          }
+        } catch (e) {
+          console.error("Erro ao ler cache local:", e);
+        }
+      }
+
+      // 2. Sincroniza com Supabase se configurado
       if (!isSupabaseConfigured) return;
       const { data } = await supabase.from('servicos_settings').select('encarte_pdf, data_inicio, data_fim').eq('id', 1).maybeSingle();
-      if (data) {
+      if (data && data.encarte_pdf) {
         setEncarteData({
           url: data.encarte_pdf,
           inicio: data.data_inicio,
           fim: data.data_fim
         });
+        localStorage.setItem('servicos_settings_cache', JSON.stringify({
+          encarte_pdf: data.encarte_pdf,
+          data_inicio: data.data_inicio,
+          data_fim: data.data_fim
+        }));
       }
     };
     loadEncarte();
@@ -67,10 +90,26 @@ export const JornalOfertas = () => {
               <p className="text-gray-500">{getValiditySubtitle()}</p>
             </div>
             {showEncarte ? (
-              <a href={encarteData!.url} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 shadow-md">
-                <Download className="h-5 w-5" />
-                Baixar em PDF
-              </a>
+              <div className="flex flex-wrap items-center gap-3">
+                <a href={encarteData!.url} target="_blank" rel="noopener noreferrer" className="bg-[#0B3C8C] hover:bg-[#082a63] text-white font-bold py-3 px-5 rounded-lg transition-colors flex items-center gap-2 shadow-md">
+                  <Download className="h-5 w-5" />
+                  Baixar em PDF
+                </a>
+                <button 
+                  onClick={() => {
+                    const printWindow = window.open(encarteData!.url, '_blank');
+                    if (printWindow) {
+                      printWindow.addEventListener('load', () => {
+                        printWindow.print();
+                      });
+                    }
+                  }}
+                  className="bg-[#D62828] hover:bg-red-700 text-white font-bold py-3 px-5 rounded-lg transition-colors flex items-center gap-2 shadow-md"
+                >
+                  <Printer className="h-5 w-5" />
+                  Imprimir Encarte
+                </button>
+              </div>
             ) : (
               <button disabled className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg flex items-center gap-2">
                 <Download className="h-5 w-5" />
