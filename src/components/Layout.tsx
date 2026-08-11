@@ -48,7 +48,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#0B3C8C] shadow-lg text-white">
-      <div className="container mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex py-4 min-h-[5rem] items-center justify-between">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2">
@@ -156,7 +156,7 @@ const Header = () => {
       {/* Mobile Nav */}
       {isOpen && (
         <div className="md:hidden bg-[#082a63] border-t border-white/10">
-          <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
               link.isExternal ? (
                 <a 
@@ -242,7 +242,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-gray-300">
-      <div className="container mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1 border-b md:border-b-0 border-gray-800 pb-8 md:pb-0">
             <Link to="/" className="flex items-center gap-2 mb-4 text-white">

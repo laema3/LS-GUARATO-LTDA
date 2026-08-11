@@ -82,8 +82,8 @@ export const JornalOfertas = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12 flex-grow">
-        <div className="max-w-5xl mx-auto bg-white p-4 md:p-8 rounded-2xl shadow-lg border border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 py-12 flex-grow w-full">
+        <div className="max-w-7xl mx-auto bg-white p-4 md:p-8 rounded-2xl shadow-lg border border-gray-100">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div>
               <h2 className="text-2xl font-bold text-[#D62828]">Encarte Semanal</h2>

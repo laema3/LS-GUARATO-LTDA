@@ -69,7 +69,7 @@ export const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Banner / Slider Section */}
-      <section ref={bannerRef} className="relative h-[245px] sm:h-[315px] md:h-[420px] lg:h-[490px] w-full container mx-auto md:rounded-3xl overflow-hidden bg-gray-900 md:mt-8">
+      <section ref={bannerRef} className="relative h-[245px] sm:h-[315px] md:h-[420px] lg:h-[490px] w-full max-w-7xl mx-auto md:rounded-3xl overflow-hidden bg-gray-900 md:mt-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -87,7 +87,7 @@ export const Home = () => {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 z-20 flex items-center px-4 md:px-0">
-              <div className="container mx-auto">
+              <div className="max-w-7xl mx-auto w-full">
                 <div className="max-w-4xl text-left pl-8 md:pl-16">
                   {/* Badge */}
                   <motion.div
@@ -171,7 +171,7 @@ export const Home = () => {
 
       {/* FAQ Section */}
       <section className="py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col items-center justify-center text-center mb-16 gap-4">
             <div>
               <span className="text-[#D62828] font-bold text-sm tracking-widest uppercase mb-4 block">Central de Ajuda</span>
@@ -193,7 +193,7 @@ export const Home = () => {
       {/* CTA Section */}
       <section className="bg-[#0B3C8C] py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 skew-x-12 translate-x-1/2" />
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h2 className="text-4xl md:text-6xl font-bold font-sans text-[#D62828] leading-tight">Ainda não tem o nosso <br /> <span className="text-white">aplicativo?</span></h2>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">Baixe agora e tenha acesso a ofertas exclusivas, clube de benefícios e faça suas compras sem sair de casa.</p>

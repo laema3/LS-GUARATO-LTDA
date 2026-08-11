@@ -33,8 +33,8 @@ export const TransparenciaSalarial = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 flex-grow">
-        <div className="max-w-4xl mx-auto grid gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-16 flex-grow">
+        <div className="max-w-7xl mx-auto grid gap-8">
           {years.map((year, idx) => {
             const firstPdf = pdfsTransparencia[`${year}-1`];
             const secondPdf = pdfsTransparencia[`${year}-2`];
@@ -94,7 +94,7 @@ export const TransparenciaSalarial = () => {
           })}
         </div>
         
-        <div className="max-w-4xl mx-auto mt-12 bg-blue-50 p-6 rounded-lg border border-blue-100 text-sm text-blue-900">
+        <div className="max-w-7xl mx-auto mt-12 bg-blue-50 p-6 rounded-lg border border-blue-100 text-sm text-blue-900">
           <p>
             <strong>Nota de Esclarecimento:</strong> Os relatórios acima cumprem a obrigatoriedade da Lei nº 14.611, de 3 de julho de 2023, que dispõe sobre a igualdade salarial e de critérios remuneratórios entre mulheres e homens. Os dados são anonimizados e garantem a proteção de dados pessoais de acordo com a LGPD.
           </p>

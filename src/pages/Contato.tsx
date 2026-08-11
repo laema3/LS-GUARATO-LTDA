@@ -78,8 +78,8 @@ export const Contato = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-12">
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-12">
           
           {/* Informações de Contato */}
           <div className="lg:col-span-2 space-y-8">

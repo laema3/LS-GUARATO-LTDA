@@ -120,8 +120,8 @@ export const DetalhesVaga = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <Link to="/servicos/vagas" className="inline-flex items-center gap-2 text-gray-500 hover:text-[#0B3C8C] transition-colors mb-6">

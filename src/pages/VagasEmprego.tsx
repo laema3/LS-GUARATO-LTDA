@@ -84,9 +84,9 @@ export const VagasEmprego = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12 flex-grow">
+      <div className="max-w-7xl mx-auto px-4 py-12 flex-grow">
         {/* Search / Filter */}
-        <div className="max-w-6xl mx-auto bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-8 flex flex-col sm:flex-row gap-4">
+        <div className="max-w-7xl mx-auto bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-8 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input 
@@ -102,7 +102,7 @@ export const VagasEmprego = () => {
           </button>
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl font-bold text-[#D62828] mb-6 font-sans">
             Vagas Abertas ({filteredJobs.length})
           </h2>
