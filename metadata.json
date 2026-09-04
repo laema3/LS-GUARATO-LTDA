@@ -2,5 +2,5 @@
   "name": "LS GUARATO OFICIAL",
   "description": "Website e painel administrativo para a LS Guarato.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

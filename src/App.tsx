@@ -16,6 +16,7 @@ import { VagasEmprego } from "./pages/VagasEmprego";
 import { DetalhesVaga } from "./pages/DetalhesVaga";
 import { Setores } from "./pages/Setores";
 import { Eventos } from "./pages/Eventos";
+import { DetalhesEvento } from "./pages/DetalhesEvento";
 import { Contato } from "./pages/Contato";
 import { NotFound } from "./pages/NotFound";
 import { PoliticaPrivacidade } from "./pages/PoliticaPrivacidade";
@@ -144,11 +145,16 @@ export default function App() {
             <Route path="contato" element={<Contato />} />
             <Route path="politica-de-privacidade" element={<PoliticaPrivacidade />} />
             
+            {/* Rotas de Eventos Diretas */}
+            <Route path="eventos" element={<Eventos />} />
+            <Route path="eventos/:id" element={<DetalhesEvento />} />
+            
             <Route path="servicos">
               <Route path="jornal-de-ofertas" element={<JornalOfertas />} />
               <Route path="transparencia-salarial" element={<TransparenciaSalarial />} />
               <Route path="setores" element={<Setores />} />
               <Route path="eventos" element={<Eventos />} />
+              <Route path="eventos/:id" element={<DetalhesEvento />} />
               <Route path="vagas" element={<VagasEmprego />} />
               <Route path="vagas/:id" element={<DetalhesVaga />} />
             </Route>

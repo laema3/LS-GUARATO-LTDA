@@ -1,20 +1,25 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid, Clock, MessageCircle, Calendar } from "lucide-react";
+import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid, Clock, MessageCircle, Calendar, Gift, Trophy, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import { CookieConsent } from "./CookieConsent";
+import { getEventos } from "../services/eventosService";
+import { EventoItem } from "../types/evento";
 
 const Header = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isEventosOpen, setIsEventosOpen] = useState(false);
+  const [eventos, setEventos] = useState<EventoItem[]>([]);
   const [logo, setLogo] = useState("");
   const location = useLocation();
 
   useEffect(() => {
     setIsOpen(false);
     setIsServicesOpen(false);
+    setIsEventosOpen(false);
   }, [location]);
 
   useEffect(() => {
@@ -25,6 +30,20 @@ const Header = () => {
       }
     };
     loadHeader();
+
+    const loadEventosList = async () => {
+      try {
+        const list = await getEventos();
+        setEventos(list);
+      } catch (err) {
+        console.error("Erro ao carregar lista de eventos:", err);
+      }
+    };
+    loadEventosList();
+
+    // Atualiza automaticamente quando eventos forem criados/editados no painel
+    window.addEventListener('eventos_updated', loadEventosList);
+    return () => window.removeEventListener('eventos_updated', loadEventosList);
   }, []);
 
   const navLinks = [
@@ -103,12 +122,72 @@ const Header = () => {
               )
             ))}
 
-            {/* Dropdown Menu */}
+            {/* Menu Eventos com Submenu Dinâmico de Eventos Criados */}
             <div className="relative group">
               <button 
                 className={cn(
                   "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
-                  location.pathname.startsWith('/servicos') && "text-[#D62828]"
+                  (location.pathname.startsWith('/eventos') || location.pathname.startsWith('/servicos/eventos')) && "text-[#D62828]"
+                )}
+              >
+                <Calendar className="h-5 w-5 text-[#D62828]" />
+                Eventos <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
+              </button>
+              
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden text-gray-800 border border-gray-100 z-50">
+                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#0B3C8C] uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#D62828]" />
+                    Eventos & Sorteios
+                  </span>
+                  <span className="text-[10px] bg-[#D62828] text-white px-2 py-0.5 rounded-full font-black">
+                    {eventos.length}
+                  </span>
+                </div>
+
+                <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                  {eventos.length > 0 ? (
+                    eventos.map((evento) => (
+                      <Link 
+                        key={evento.id} 
+                        to={`/eventos/${evento.id}`}
+                        className="flex flex-col px-4 py-3 hover:bg-blue-50/70 hover:text-[#0B3C8C] transition-colors group/item"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-bold text-sm text-gray-900 group-hover/item:text-[#0B3C8C] leading-snug line-clamp-1">
+                            {evento.titulo}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mt-1">
+                          <Trophy className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                          <span className="font-medium">
+                            {(evento.ganhadores || []).length} de {evento.total_premios || 42} prêmios sorteados
+                          </span>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="px-4 py-4 text-xs text-gray-500 text-center">
+                      Nenhum evento no momento
+                    </div>
+                  )}
+                </div>
+
+                <Link 
+                  to="/servicos/eventos"
+                  className="block px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-xs font-bold text-[#0B3C8C] border-t border-gray-100 text-center transition-colors"
+                >
+                  Ver Todos os Eventos &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Dropdown Menu Serviços */}
+            <div className="relative group">
+              <button 
+                className={cn(
+                  "flex items-center gap-2 hover:text-[#D62828] transition-colors text-white",
+                  location.pathname.startsWith('/servicos') && !location.pathname.startsWith('/servicos/eventos') && "text-[#D62828]"
                 )}
               >
                 <Store className="h-5 w-5 text-[#D62828]" />
@@ -162,7 +241,7 @@ const Header = () => {
                 <a 
                   key={link.path} 
                   href={link.path} 
-                  target="_blank"
+                  target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-lg font-medium py-2 text-white hover:text-[#D62828]"
                   onClick={() => setIsOpen(false)}
@@ -177,7 +256,48 @@ const Header = () => {
                 </Link>
               )
             ))}
+
+            {/* Mobile Eventos com Submenu */}
+            <div className="flex flex-col gap-2">
+              <button 
+                onClick={() => setIsEventosOpen(!isEventosOpen)}
+                className="flex items-center justify-between text-lg font-medium py-2 text-[#D62828]"
+              >
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-[#D62828]" /> Eventos & Sorteios
+                </span>
+                <ChevronDown className={cn("h-5 w-5 transition-transform", isEventosOpen && "rotate-180")} />
+              </button>
+              {isEventosOpen && (
+                <div className="pl-4 flex flex-col gap-2 py-2 border-l-2 border-[#D62828]">
+                  {eventos.map((evento) => (
+                    <Link 
+                      key={evento.id} 
+                      to={`/eventos/${evento.id}`} 
+                      className="flex flex-col text-white/90 hover:text-white py-1.5"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span className="font-bold text-sm flex items-center gap-1.5 text-white">
+                        <Gift className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                        {evento.titulo}
+                      </span>
+                      <span className="text-xs text-blue-200 pl-5">
+                        {(evento.ganhadores || []).length} de {evento.total_premios || 42} prêmios sorteados
+                      </span>
+                    </Link>
+                  ))}
+                  <Link 
+                    to="/servicos/eventos" 
+                    className="text-xs font-bold text-amber-300 pt-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Ver Todos os Eventos &rarr;
+                  </Link>
+                </div>
+              )}
+            </div>
             
+            {/* Mobile Serviços */}
             <div className="flex flex-col gap-2">
               <button 
                 onClick={() => setIsServicesOpen(!isServicesOpen)}

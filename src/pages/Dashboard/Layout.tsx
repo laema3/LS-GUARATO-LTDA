@@ -105,7 +105,7 @@ export const DashboardLayout = () => {
     { name: "SAC / Mensagens", path: "/admin/sac", icon: MessageSquare },
     { name: "Serviços (PDFs)", path: "/admin/servicos", icon: FileText, adminOnly: true },
     { name: "Setores da Loja", path: "/admin/setores", icon: LayoutGrid },
-    { name: "Eventos da Loja", path: "/admin/eventos", icon: Calendar },
+    { name: "Eventos", path: "/admin/eventos", icon: Calendar },
     { name: "Vagas: Cadastrar", path: "/admin/vagas/cadastrar", icon: Briefcase },
     { name: "Vagas: Parâmetros", path: "/admin/vagas/parametros", icon: Settings2 },
     { name: "Usuários do Sistema", path: "/admin/usuarios", icon: Users, adminOnly: true },
