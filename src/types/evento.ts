@@ -1,3 +1,12 @@
+export const PREMIOS_FIXOS = [
+  "Tablet Samsung",
+  "TV LG 50 polegadas",
+  "Smartphone Xiaomi Note 14",
+  "Fritadeira a Ar MONDIAL"
+] as const;
+
+export type PremioFixo = typeof PREMIOS_FIXOS[number];
+
 export interface GanhadorPremio {
   id: string;
   numero: number;

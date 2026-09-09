@@ -17,7 +17,7 @@ export const DEFAULT_EVENTO_42_ANOS: EventoItem = {
       id: "premio-1",
       numero: 1,
       nome_ganhador: "Maria de Lourdes Ferreira",
-      nome_premio: "Smart TV 50\" 4K UHD",
+      nome_premio: "TV LG 50 polegadas",
       foto_ganhador: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=800",
       data_sorteio: new Date().toISOString().split("T")[0],
       observacoes: "1º Prêmio sorteado"
@@ -26,7 +26,7 @@ export const DEFAULT_EVENTO_42_ANOS: EventoItem = {
       id: "premio-2",
       numero: 2,
       nome_ganhador: "Carlos Eduardo Santos",
-      nome_premio: "Fritadeira Elétrica Air Fryer 4.5L",
+      nome_premio: "Fritadeira a Ar MONDIAL",
       foto_ganhador: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800",
       data_sorteio: new Date().toISOString().split("T")[0],
       observacoes: "2º Prêmio sorteado"
@@ -35,10 +35,19 @@ export const DEFAULT_EVENTO_42_ANOS: EventoItem = {
       id: "premio-3",
       numero: 3,
       nome_ganhador: "Juliana Andrade Lima",
-      nome_premio: "Micro-ondas 32 Litros Inox",
+      nome_premio: "Smartphone Xiaomi Note 14",
       foto_ganhador: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
       data_sorteio: new Date().toISOString().split("T")[0],
       observacoes: "3º Prêmio sorteado"
+    },
+    {
+      id: "premio-4",
+      numero: 4,
+      nome_ganhador: "Roberto Silva Mendes",
+      nome_premio: "Tablet Samsung",
+      foto_ganhador: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
+      data_sorteio: new Date().toISOString().split("T")[0],
+      observacoes: "4º Prêmio sorteado"
     }
   ]
 };

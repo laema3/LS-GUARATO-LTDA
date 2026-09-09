@@ -20,7 +20,7 @@ import { SaveToast } from "../../components/ui/SaveToast";
 import { FileUpload } from "../../components/ui/FileUpload";
 import { generateEventDescription } from "../../services/geminiService";
 import { getEventos, saveEvento, deleteEvento } from "../../services/eventosService";
-import { EventoItem, GanhadorPremio } from "../../types/evento";
+import { EventoItem, GanhadorPremio, PREMIOS_FIXOS } from "../../types/evento";
 
 export const EventosEditor = () => {
   const [showToast, setShowToast] = useState(false);
@@ -94,11 +94,14 @@ export const EventosEditor = () => {
   const handleAddGanhador = (eventoIndex: number) => {
     const evento = eventos[eventoIndex];
     const nextNum = (evento.ganhadores || []).length + 1;
+    // Traz ciclicamente um dos 4 prêmios fixos como sugestão padrão
+    const defaultPremio = PREMIOS_FIXOS[(nextNum - 1) % PREMIOS_FIXOS.length];
+
     const novoGanhador: GanhadorPremio = {
       id: `ganhador-${Date.now()}`,
       numero: nextNum,
       nome_ganhador: "",
-      nome_premio: "",
+      nome_premio: defaultPremio,
       foto_ganhador: "",
       data_sorteio: new Date().toISOString().split("T")[0],
       observacoes: ""
@@ -114,14 +117,14 @@ export const EventosEditor = () => {
     const totalSlots = evento.total_premios || 42;
     const existing = [...(evento.ganhadores || [])];
     
-    // Cria os slots que faltam até atingir totalSlots
+    // Cria os slots que faltam até atingir totalSlots distribuindo os 4 prêmios fixos
     const currentCount = existing.length;
     for (let i = currentCount + 1; i <= totalSlots; i++) {
       existing.push({
         id: `slot-${i}-${Date.now()}`,
         numero: i,
         nome_ganhador: "",
-        nome_premio: `Prêmio #${i}`,
+        nome_premio: PREMIOS_FIXOS[(i - 1) % PREMIOS_FIXOS.length],
         foto_ganhador: "",
         data_sorteio: new Date().toISOString().split("T")[0],
         observacoes: ""
@@ -130,7 +133,7 @@ export const EventosEditor = () => {
 
     handleChangeEvento(eventoIndex, "ganhadores", existing);
     setExpandedGanhadores({ ...expandedGanhadores, [evento.id]: true });
-    setToastMessage(`Estrutura de ${totalSlots} prêmios preparada com sucesso!`);
+    setToastMessage(`Estrutura de ${totalSlots} prêmios preparada com os 4 prêmios fixos!`);
     setShowToast(true);
   };
 
@@ -536,19 +539,72 @@ export const EventosEditor = () => {
                                     />
                                   </div>
 
-                                  {/* Nome do Prêmio */}
-                                  <div>
-                                    <label className="block text-xs font-bold text-gray-600 mb-1 flex items-center gap-1.5">
-                                      <Gift className="w-3.5 h-3.5 text-amber-500" />
-                                      Nome do Prêmio *
-                                    </label>
-                                    <input 
-                                      type="text"
-                                      value={ganhador.nome_premio}
-                                      onChange={(e) => handleChangeGanhador(index, gIndex, "nome_premio", e.target.value)}
-                                      placeholder="Ex: Smart TV 50 polegadas"
-                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#0B3C8C] outline-none"
-                                    />
+                                  {/* Nome do Prêmio com 4 Prêmios Fixos */}
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center justify-between">
+                                      <label className="block text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                        <Gift className="w-3.5 h-3.5 text-amber-500" />
+                                        Nome do Prêmio *
+                                      </label>
+                                      <span className="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded">
+                                        4 Prêmios Oficiais
+                                      </span>
+                                    </div>
+
+                                    {/* 4 Botões Rápidos dos Prêmios Fixos */}
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                      {PREMIOS_FIXOS.map((premio) => {
+                                        const isSelected = (ganhador.nome_premio || "").trim().toLowerCase() === premio.toLowerCase();
+                                        return (
+                                          <button
+                                            key={premio}
+                                            type="button"
+                                            onClick={() => handleChangeGanhador(index, gIndex, "nome_premio", premio)}
+                                            className={`text-left px-2 py-1.5 rounded-lg text-xs font-medium border transition-all flex items-center gap-1.5 ${
+                                              isSelected 
+                                                ? "bg-[#0B3C8C] text-white border-[#0B3C8C] shadow-sm font-bold ring-2 ring-[#0B3C8C]/20" 
+                                                : "bg-white hover:bg-blue-50/80 text-gray-700 border-gray-200 hover:border-blue-300"
+                                            }`}
+                                            title={`Selecionar ${premio}`}
+                                          >
+                                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSelected ? "bg-amber-400" : "bg-gray-300"}`} />
+                                            <span className="truncate text-[11px] leading-tight">{premio}</span>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+
+                                    {/* Campo de Seleção / Digitação */}
+                                    <div className="flex gap-1.5">
+                                      <select
+                                        value={
+                                          PREMIOS_FIXOS.some(p => p.toLowerCase() === (ganhador.nome_premio || "").toLowerCase())
+                                            ? PREMIOS_FIXOS.find(p => p.toLowerCase() === (ganhador.nome_premio || "").toLowerCase())
+                                            : (ganhador.nome_premio ? "outro" : "")
+                                        }
+                                        onChange={(e) => {
+                                          if (e.target.value && e.target.value !== "outro") {
+                                            handleChangeGanhador(index, gIndex, "nome_premio", e.target.value);
+                                          }
+                                        }}
+                                        className="w-1/2 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                                      >
+                                        <option value="">Escolher Prêmio Fixo...</option>
+                                        {PREMIOS_FIXOS.map((p) => (
+                                          <option key={p} value={p}>{p}</option>
+                                        ))}
+                                        <option value="outro">Personalizado...</option>
+                                      </select>
+
+                                      <input 
+                                        type="text"
+                                        list="premios-fixos-list"
+                                        value={ganhador.nome_premio}
+                                        onChange={(e) => handleChangeGanhador(index, gIndex, "nome_premio", e.target.value)}
+                                        placeholder="Digite ou ajuste..."
+                                        className="w-1/2 px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                                      />
+                                    </div>
                                   </div>
                                 </div>
 
