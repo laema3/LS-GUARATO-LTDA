@@ -3,6 +3,30 @@ import { EventoItem, GanhadorPremio } from "../types/evento";
 
 const STORAGE_KEY = "lsguarato_eventos_cache";
 
+function safeSetLocalStorage(key: string, data: any) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn("localStorage quota exceeded, caching light version:", e);
+    try {
+      const lightData = (Array.isArray(data) ? data : [data]).map((ev: any) => ({
+        ...ev,
+        ganhadores: (ev.ganhadores || []).map((g: any) => ({
+          ...g,
+          foto_ganhador: g.foto_ganhador?.startsWith("data:") ? "[BASE64]" : g.foto_ganhador
+        }))
+      }));
+      localStorage.setItem(key, JSON.stringify(Array.isArray(data) ? lightData : lightData[0]));
+    } catch {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
+
 // Exemplo inicial caso não haja nenhum evento cadastrado ainda
 export const DEFAULT_EVENTO_42_ANOS: EventoItem = {
   id: "42-anos-confraternizacao",
@@ -151,7 +175,7 @@ export async function getEventos(): Promise<EventoItem[]> {
         return parsed;
       });
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsedList));
+      safeSetLocalStorage(STORAGE_KEY, parsedList);
       return parsedList;
     }
   } catch (err) {
@@ -161,7 +185,7 @@ export async function getEventos(): Promise<EventoItem[]> {
   // 3. Se não houver nada no banco nem no cache, inicializa com o evento de 42 Anos
   if (cachedList.length === 0) {
     cachedList = [DEFAULT_EVENTO_42_ANOS];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedList));
+    safeSetLocalStorage(STORAGE_KEY, cachedList);
   }
 
   return cachedList;
@@ -231,7 +255,7 @@ export async function saveEvento(evento: EventoItem): Promise<EventoItem> {
     updatedList = [updatedEvento, ...all];
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+  safeSetLocalStorage(STORAGE_KEY, updatedList);
 
   // Notifica componentes em tempo real (como o Menu/Header)
   window.dispatchEvent(new Event("eventos_updated"));
