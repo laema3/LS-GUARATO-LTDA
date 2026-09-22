@@ -14,12 +14,14 @@ import {
   Award,
   ChevronDown,
   ChevronUp,
-  Image as ImageIcon
+  Image as ImageIcon,
+  CalendarDays,
+  ArrowUpDown
 } from "lucide-react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { FileUpload } from "../../components/ui/FileUpload";
 import { generateEventDescription } from "../../services/geminiService";
-import { getEventos, saveEvento, deleteEvento } from "../../services/eventosService";
+import { getEventos, saveEvento, deleteEvento, sortGanhadoresByDate } from "../../services/eventosService";
 import { EventoItem, GanhadorPremio, PREMIOS_FIXOS } from "../../types/evento";
 
 export const EventosEditor = () => {
@@ -43,10 +45,15 @@ export const EventosEditor = () => {
     setLoadError(null);
     try {
       const data = await getEventos();
-      setEventos(data);
+      // Organiza automaticamente os ganhadores por data do sorteio
+      const sortedData = data.map(ev => ({
+        ...ev,
+        ganhadores: sortGanhadoresByDate(ev.ganhadores || [], "asc", false)
+      }));
+      setEventos(sortedData);
       // Abre a seção de ganhadores para o primeiro evento por padrão
-      if (data.length > 0) {
-        setExpandedGanhadores({ [data[0].id]: true });
+      if (sortedData.length > 0) {
+        setExpandedGanhadores({ [sortedData[0].id]: true });
       }
     } catch (err: any) {
       console.error("Erro ao carregar eventos:", err);
@@ -156,6 +163,24 @@ export const EventosEditor = () => {
     ganhadores.splice(ganhadorIndex, 1);
     updated[eventoIndex].ganhadores = ganhadores;
     setEventos(updated);
+  };
+
+  const handleSortGanhadoresByDate = (eventoIndex: number, order: "asc" | "desc" = "asc") => {
+    const updated = [...eventos];
+    const rawGanhadores = updated[eventoIndex].ganhadores || [];
+    if (rawGanhadores.length === 0) return;
+
+    // Ordena por data e renumera para manter a sequência perfeita dos prêmios
+    const sorted = sortGanhadoresByDate(rawGanhadores, order, true);
+    updated[eventoIndex].ganhadores = sorted;
+    setEventos(updated);
+    setExpandedGanhadores({ ...expandedGanhadores, [updated[eventoIndex].id]: true });
+    setToastMessage(
+      order === "asc"
+        ? "Fotos e prêmios ordenados cronologicamente por data (do 1º sorteio ao mais recente)!"
+        : "Fotos e prêmios ordenados por data (mais recentes primeiro)!"
+    );
+    setShowToast(true);
   };
 
   const handleGenerateAI = async (index: number, title: string, id: string) => {
@@ -445,7 +470,27 @@ export const EventosEditor = () => {
                         </div>
 
                         {/* Placar e Botões de Ação */}
-                        <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          {ganhadores.length > 1 && (
+                            <div className="inline-flex rounded-xl shadow-sm border border-amber-300 overflow-hidden bg-amber-50">
+                              <button
+                                onClick={() => handleSortGanhadoresByDate(index, "asc")}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-amber-950 hover:bg-amber-100 transition-colors"
+                                title="Organizar todas as fotos e ganhadores em ordem cronológica por data (do 1º ao mais recente) e corrigir numeração sequencial (#1, #2, #3...)"
+                              >
+                                <CalendarDays className="w-3.5 h-3.5 text-amber-700" />
+                                <span>Ordenar Fotos por Data</span>
+                              </button>
+                              <button
+                                onClick={() => handleSortGanhadoresByDate(index, "desc")}
+                                className="px-2.5 py-2 text-[10px] font-bold text-amber-900 hover:bg-amber-100 border-l border-amber-300 transition-colors"
+                                title="Ordenar da data mais recente para a mais antiga"
+                              >
+                                <ArrowUpDown className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
+
                           <button
                             onClick={() => handleAddGanhador(index)}
                             className="inline-flex items-center gap-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-sm"
@@ -505,13 +550,19 @@ export const EventosEditor = () => {
                               >
                                 {/* Header do Card do Ganhador */}
                                 <div className="flex items-center justify-between gap-2 border-b border-gray-200 pb-3">
-                                  <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-[#D62828] text-white flex items-center justify-center font-black text-xs">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="w-7 h-7 rounded-lg bg-[#D62828] text-white flex items-center justify-center font-black text-xs shadow-xs">
                                       #{ganhador.numero || gIndex + 1}
                                     </span>
                                     <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                                       Prêmio #{ganhador.numero || gIndex + 1} de {totalPremios}
                                     </span>
+                                    {ganhador.data_sorteio && (
+                                      <span className="text-[11px] bg-blue-50 text-[#0B3C8C] border border-blue-200 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <CalendarDays className="w-3 h-3 text-[#0B3C8C]" />
+                                        {new Date(ganhador.data_sorteio).toLocaleDateString('pt-BR')}
+                                      </span>
+                                    )}
                                   </div>
 
                                   <button

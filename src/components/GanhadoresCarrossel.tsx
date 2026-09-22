@@ -32,8 +32,15 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
 
-  // Ordena os ganhadores pelo número do prêmio
-  const sortedGanhadores = [...ganhadores].sort((a, b) => (a.numero || 0) - (b.numero || 0));
+  // Ordena os ganhadores e fotos cronologicamente pela data do sorteio
+  const sortedGanhadores = [...ganhadores].sort((a, b) => {
+    const timeA = a.data_sorteio ? new Date(a.data_sorteio).getTime() : 0;
+    const timeB = b.data_sorteio ? new Date(b.data_sorteio).getTime() : 0;
+    if (timeA && timeB && timeA !== timeB) return timeA - timeB;
+    if (timeA && !timeB) return -1;
+    if (!timeA && timeB) return 1;
+    return (a.numero || 0) - (b.numero || 0);
+  });
   const currentWinner = sortedGanhadores[currentIndex];
 
   // Autoplay do carrossel
@@ -162,10 +169,18 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
                   </button>
                 )}
 
-                {/* Badge do Número do Prêmio sobre a foto */}
-                <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-[#D62828] text-white px-3.5 py-1.5 rounded-full shadow-lg font-bold text-sm">
-                  <Award className="w-4 h-4 text-amber-300" />
-                  <span>Prêmio #{currentWinner?.numero || currentIndex + 1} de {totalPremios}</span>
+                {/* Badge do Número do Prêmio e Data sobre a foto */}
+                <div className="absolute top-4 left-4 z-10 flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
+                  <div className="flex items-center gap-2 bg-[#D62828] text-white px-3.5 py-1.5 rounded-full shadow-lg font-bold text-xs sm:text-sm">
+                    <Award className="w-4 h-4 text-amber-300" />
+                    <span>Prêmio #{currentWinner?.numero || currentIndex + 1} de {totalPremios}</span>
+                  </div>
+                  {currentWinner?.data_sorteio && (
+                    <div className="flex items-center gap-1.5 bg-black/75 backdrop-blur-md text-amber-300 px-3 py-1 rounded-full shadow-md font-bold text-xs border border-white/10">
+                      <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{new Date(currentWinner.data_sorteio).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </AnimatePresence>

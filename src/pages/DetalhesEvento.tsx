@@ -12,7 +12,8 @@ import {
   Award, 
   Share2, 
   CheckCircle2,
-  CalendarDays
+  CalendarDays,
+  ArrowUpDown
 } from "lucide-react";
 import { getEventoById, getEventos } from "../services/eventosService";
 import { EventoItem, GanhadorPremio } from "../types/evento";
@@ -24,6 +25,7 @@ export const DetalhesEvento: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"date-asc" | "date-desc" | "number">("date-asc");
 
   useEffect(() => {
     const load = async () => {
@@ -87,8 +89,23 @@ export const DetalhesEvento: React.FC = () => {
   const ganhadores = evento.ganhadores || [];
   const totalPremios = evento.total_premios || 42;
 
+  // Ordenação dos ganhadores (por data cronológica por padrão)
+  const sortedGanhadores = [...ganhadores].sort((a, b) => {
+    if (sortOrder === "number") {
+      return (a.numero || 0) - (b.numero || 0);
+    }
+    const timeA = a.data_sorteio ? new Date(a.data_sorteio).getTime() : 0;
+    const timeB = b.data_sorteio ? new Date(b.data_sorteio).getTime() : 0;
+    if (timeA && timeB && timeA !== timeB) {
+      return sortOrder === "date-asc" ? timeA - timeB : timeB - timeA;
+    }
+    if (timeA && !timeB) return -1;
+    if (!timeA && timeB) return 1;
+    return (a.numero || 0) - (b.numero || 0);
+  });
+
   // Filtragem de busca
-  const filteredGanhadores = ganhadores.filter(g => {
+  const filteredGanhadores = sortedGanhadores.filter(g => {
     const term = searchTerm.toLowerCase();
     return (
       (g.nome_ganhador || "").toLowerCase().includes(term) ||
@@ -177,7 +194,7 @@ export const DetalhesEvento: React.FC = () => {
           </div>
 
           <GanhadoresCarrossel 
-            ganhadores={ganhadores}
+            ganhadores={sortedGanhadores}
             totalPremios={totalPremios}
             tituloEvento={evento.titulo}
           />
@@ -186,14 +203,14 @@ export const DetalhesEvento: React.FC = () => {
         {/* Seção 2: Grade Completa com Busca de Ganhadores */}
         {ganhadores.length > 0 && (
           <section className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 font-sans flex items-center gap-2">
                   <Gift className="w-6 h-6 text-[#D62828]" />
                   Lista de Todos os {ganhadores.length} Ganhadores Contemplados
                 </h3>
                 <p className="text-sm text-gray-500">
-                  Consulte abaixo os prêmios já sorteados até o momento
+                  Consulte abaixo os prêmios organizados por data dos sorteios
                 </p>
               </div>
 
@@ -210,6 +227,54 @@ export const DetalhesEvento: React.FC = () => {
               </div>
             </div>
 
+            {/* Barra de Ordenação por Data / Número */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-6 mb-6 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-500 flex items-center gap-1">
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenação:
+                </span>
+                <div className="inline-flex p-1 bg-gray-100 rounded-xl gap-1">
+                  <button
+                    onClick={() => setSortOrder("date-asc")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      sortOrder === "date-asc"
+                        ? "bg-[#0B3C8C] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <CalendarDays className="w-3.5 h-3.5" />
+                    Por Data (1º ao mais recente)
+                  </button>
+                  <button
+                    onClick={() => setSortOrder("date-desc")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      sortOrder === "date-desc"
+                        ? "bg-[#0B3C8C] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <CalendarDays className="w-3.5 h-3.5" />
+                    Mais Recentes
+                  </button>
+                  <button
+                    onClick={() => setSortOrder("number")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      sortOrder === "number"
+                        ? "bg-[#0B3C8C] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <Award className="w-3.5 h-3.5" />
+                    Nº do Prêmio
+                  </button>
+                </div>
+              </div>
+
+              <span className="text-xs font-medium text-gray-500">
+                Mostrando <strong>{filteredGanhadores.length}</strong> fotos e prêmios
+              </span>
+            </div>
+
             {/* Grade de Cards */}
             {filteredGanhadores.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -222,7 +287,7 @@ export const DetalhesEvento: React.FC = () => {
                     transition={{ delay: (idx % 8) * 0.05 }}
                     className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all overflow-hidden flex flex-col"
                   >
-                    {/* Foto com Badge de Número */}
+                    {/* Foto com Badges de Número e Data */}
                     <div className="relative h-48 bg-gray-900 overflow-hidden">
                       {g.foto_ganhador ? (
                         <img
@@ -236,9 +301,18 @@ export const DetalhesEvento: React.FC = () => {
                           <span className="text-xs">Sem foto</span>
                         </div>
                       )}
-                      <div className="absolute top-3 left-3 bg-[#D62828] text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5 text-amber-300" />
-                        Prêmio #{g.numero || idx + 1}
+                      
+                      <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
+                        <div className="bg-[#D62828] text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+                          <Award className="w-3.5 h-3.5 text-amber-300" />
+                          Prêmio #{g.numero || idx + 1}
+                        </div>
+                        {g.data_sorteio && (
+                          <div className="bg-black/75 text-amber-300 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-bold shadow flex items-center gap-1 border border-white/10">
+                            <CalendarDays className="w-3 h-3 text-amber-400" />
+                            {new Date(g.data_sorteio).toLocaleDateString('pt-BR')}
+                          </div>
+                        )}
                       </div>
                     </div>
 

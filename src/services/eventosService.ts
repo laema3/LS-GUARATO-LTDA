@@ -27,6 +27,33 @@ function safeSetLocalStorage(key: string, data: any) {
   }
 }
 
+// Função utilitária para ordenar ganhadores e fotos por data do sorteio
+export function sortGanhadoresByDate(
+  ganhadores: GanhadorPremio[], 
+  order: "asc" | "desc" = "asc",
+  renumber: boolean = false
+): GanhadorPremio[] {
+  const sorted = [...ganhadores].sort((a, b) => {
+    const timeA = a.data_sorteio ? new Date(a.data_sorteio).getTime() : 0;
+    const timeB = b.data_sorteio ? new Date(b.data_sorteio).getTime() : 0;
+    
+    if (timeA && timeB && timeA !== timeB) {
+      return order === "asc" ? timeA - timeB : timeB - timeA;
+    }
+    if (timeA && !timeB) return -1;
+    if (!timeA && timeB) return 1;
+    return (a.numero || 0) - (b.numero || 0);
+  });
+
+  if (renumber) {
+    sorted.forEach((g, idx) => {
+      g.numero = idx + 1;
+    });
+  }
+
+  return sorted;
+}
+
 // Exemplo inicial caso não haja nenhum evento cadastrado ainda
 export const DEFAULT_EVENTO_42_ANOS: EventoItem = {
   id: "42-anos-confraternizacao",
@@ -121,6 +148,9 @@ export function parseEventoData(rawEvento: any): EventoItem {
     total_premios = 42;
   }
 
+  // Ordena os ganhadores e fotos por data do sorteio
+  const sortedGanhadores = Array.isArray(ganhadores) ? sortGanhadoresByDate(ganhadores, "asc") : [];
+
   return {
     id: String(rawEvento.id),
     titulo: rawEvento.titulo || "Evento",
@@ -129,7 +159,7 @@ export function parseEventoData(rawEvento: any): EventoItem {
     imagens: Array.isArray(rawEvento.imagens) ? rawEvento.imagens : [],
     data_evento: rawEvento.data_evento || "",
     total_premios: total_premios || 42,
-    ganhadores: Array.isArray(ganhadores) ? ganhadores : [],
+    ganhadores: sortedGanhadores,
     created_at: rawEvento.created_at
   };
 }
@@ -153,7 +183,11 @@ export async function getEventos(): Promise<EventoItem[]> {
   const cachedRaw = localStorage.getItem(STORAGE_KEY);
   if (cachedRaw) {
     try {
-      cachedList = JSON.parse(cachedRaw);
+      const parsed = JSON.parse(cachedRaw);
+      cachedList = (Array.isArray(parsed) ? parsed : [parsed]).map((item: any) => ({
+        ...item,
+        ganhadores: Array.isArray(item.ganhadores) ? sortGanhadoresByDate(item.ganhadores, "asc") : []
+      }));
     } catch {
       // ignore
     }
@@ -169,7 +203,7 @@ export async function getEventos(): Promise<EventoItem[]> {
         // Se no Supabase não tiver ganhadores mas tiver no cache local com o mesmo ID, mescla
         const localCached = cachedList.find(c => String(c.id) === String(parsed.id));
         if (localCached && localCached.ganhadores && localCached.ganhadores.length > parsed.ganhadores.length) {
-          parsed.ganhadores = localCached.ganhadores;
+          parsed.ganhadores = sortGanhadoresByDate(localCached.ganhadores, "asc");
           if (localCached.total_premios) parsed.total_premios = localCached.total_premios;
         }
         return parsed;
