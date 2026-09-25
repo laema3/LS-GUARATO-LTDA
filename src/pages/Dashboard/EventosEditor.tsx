@@ -34,6 +34,7 @@ export const EventosEditor = () => {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [expandedGanhadores, setExpandedGanhadores] = useState<Record<string, boolean>>({});
+  const [ganhadoresPages, setGanhadoresPages] = useState<Record<string, number>>({});
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -100,7 +101,8 @@ export const EventosEditor = () => {
   // Funções para gerenciamento de ganhadores de cada evento
   const handleAddGanhador = (eventoIndex: number) => {
     const evento = eventos[eventoIndex];
-    const nextNum = (evento.ganhadores || []).length + 1;
+    const currentGanhadores = evento.ganhadores || [];
+    const nextNum = currentGanhadores.length + 1;
     // Traz ciclicamente um dos 4 prêmios fixos como sugestão padrão
     const defaultPremio = PREMIOS_FIXOS[(nextNum - 1) % PREMIOS_FIXOS.length];
 
@@ -114,9 +116,23 @@ export const EventosEditor = () => {
       observacoes: ""
     };
 
-    const updatedGanhadores = [...(evento.ganhadores || []), novoGanhador];
+    const updatedGanhadores = [...currentGanhadores, novoGanhador];
     handleChangeEvento(eventoIndex, "ganhadores", updatedGanhadores);
     setExpandedGanhadores({ ...expandedGanhadores, [evento.id]: true });
+
+    // Exibe de 4 em 4: calcula a página do novo ganhador
+    const targetPage = Math.ceil(updatedGanhadores.length / 4);
+    setGanhadoresPages({ ...ganhadoresPages, [evento.id]: targetPage });
+
+    // Rola a página até o campo criado
+    setTimeout(() => {
+      const el = document.getElementById(`ganhador-${novoGanhador.id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        const inputEl = el.querySelector("input[type='text']") as HTMLInputElement;
+        if (inputEl) inputEl.focus();
+      }
+    }, 100);
   };
 
   const handleGenerate42Slots = (eventoIndex: number) => {
@@ -140,6 +156,7 @@ export const EventosEditor = () => {
 
     handleChangeEvento(eventoIndex, "ganhadores", existing);
     setExpandedGanhadores({ ...expandedGanhadores, [evento.id]: true });
+    setGanhadoresPages({ ...ganhadoresPages, [evento.id]: 1 });
     setToastMessage(`Estrutura de ${totalSlots} prêmios preparada com os 4 prêmios fixos!`);
     setShowToast(true);
   };
@@ -538,173 +555,260 @@ export const EventosEditor = () => {
                       </div>
                     </div>
 
-                    {/* Lista de Ganhadores Cadastrados */}
+                    {/* Lista de Ganhadores Cadastrados (Exibidos de 4 em 4) */}
                     {isExpanded && (
                       <div className="space-y-4">
                         {ganhadores.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {ganhadores.map((ganhador, gIndex) => (
-                              <div 
-                                key={ganhador.id || gIndex}
-                                className="bg-gray-50/80 hover:bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all space-y-4 relative group/item"
-                              >
-                                {/* Header do Card do Ganhador */}
-                                <div className="flex items-center justify-between gap-2 border-b border-gray-200 pb-3">
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-[#D62828] text-white flex items-center justify-center font-black text-xs shadow-xs">
-                                      #{ganhador.numero || gIndex + 1}
-                                    </span>
-                                    <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                      Prêmio #{ganhador.numero || gIndex + 1} de {totalPremios}
-                                    </span>
-                                    {ganhador.data_sorteio && (
-                                      <span className="text-[11px] bg-blue-50 text-[#0B3C8C] border border-blue-200 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                        <CalendarDays className="w-3 h-3 text-[#0B3C8C]" />
-                                        {new Date(ganhador.data_sorteio).toLocaleDateString('pt-BR')}
-                                      </span>
+                          <>
+                            {(() => {
+                              const itemsPerPage = 4;
+                              const totalPages = Math.ceil(ganhadores.length / itemsPerPage) || 1;
+                              const currentPage = Math.min(ganhadoresPages[evento.id] || 1, totalPages);
+                              const startIndex = (currentPage - 1) * itemsPerPage;
+                              const currentGanhadores = ganhadores.slice(startIndex, startIndex + itemsPerPage);
+
+                              return (
+                                <div className="space-y-4">
+                                  {/* Controles de Paginação & Informação */}
+                                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs">
+                                    <div className="text-xs font-bold text-gray-700">
+                                      Exibindo prêmios <span className="text-[#0B3C8C]">{startIndex + 1}</span> a <span className="text-[#0B3C8C]">{Math.min(ganhadores.length, startIndex + itemsPerPage)}</span> de <span className="text-[#0B3C8C]">{ganhadores.length}</span> (Página {currentPage} de {totalPages})
+                                    </div>
+
+                                    {/* Paginação Navegação */}
+                                    {totalPages > 1 && (
+                                      <div className="flex items-center gap-1.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => setGanhadoresPages({ ...ganhadoresPages, [evento.id]: Math.max(1, currentPage - 1) })}
+                                          disabled={currentPage === 1}
+                                          className="px-3 py-1.5 text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg disabled:opacity-40 transition-colors"
+                                        >
+                                          Anterior
+                                        </button>
+                                        <div className="flex items-center gap-1">
+                                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                            <button
+                                              key={page}
+                                              type="button"
+                                              onClick={() => setGanhadoresPages({ ...ganhadoresPages, [evento.id]: page })}
+                                              className={`w-7 h-7 text-xs font-bold rounded-lg transition-all ${
+                                                currentPage === page
+                                                  ? "bg-[#0B3C8C] text-white shadow-xs"
+                                                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                              }`}
+                                            >
+                                              {page}
+                                            </button>
+                                          ))}
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => setGanhadoresPages({ ...ganhadoresPages, [evento.id]: Math.min(totalPages, currentPage + 1) })}
+                                          disabled={currentPage === totalPages}
+                                          className="px-3 py-1.5 text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg disabled:opacity-40 transition-colors"
+                                        >
+                                          Próxima
+                                        </button>
+                                      </div>
                                     )}
                                   </div>
 
-                                  <button
-                                    onClick={() => handleRemoveGanhador(index, gIndex)}
-                                    className="text-gray-400 hover:text-red-600 p-1 rounded-md transition-colors"
-                                    title="Remover ganhador"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
+                                  {/* Grid dos Ganhadores (4 por página) */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    {currentGanhadores.map((ganhador, localIdx) => {
+                                      const gIndex = startIndex + localIdx;
+                                      return (
+                                        <div 
+                                          key={ganhador.id || gIndex}
+                                          id={`ganhador-${ganhador.id}`}
+                                          data-ganhador-id={ganhador.id}
+                                          className="bg-gray-50/80 hover:bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all space-y-4 relative group/item"
+                                        >
+                                          {/* Header do Card do Ganhador */}
+                                          <div className="flex items-center justify-between gap-2 border-b border-gray-200 pb-3">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                              <span className="w-7 h-7 rounded-lg bg-[#D62828] text-white flex items-center justify-center font-black text-xs shadow-xs">
+                                                #{ganhador.numero || gIndex + 1}
+                                              </span>
+                                              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                                Prêmio #{ganhador.numero || gIndex + 1} de {totalPremios}
+                                              </span>
+                                              {ganhador.data_sorteio && (
+                                                <span className="text-[11px] bg-blue-50 text-[#0B3C8C] border border-blue-200 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                  <CalendarDays className="w-3 h-3 text-[#0B3C8C]" />
+                                                  {new Date(ganhador.data_sorteio).toLocaleDateString('pt-BR')}
+                                                </span>
+                                              )}
+                                            </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                  {/* Nome do Ganhador */}
-                                  <div>
-                                    <label className="block text-xs font-bold text-gray-600 mb-1 flex items-center gap-1.5">
-                                      <User className="w-3.5 h-3.5 text-[#0B3C8C]" />
-                                      Nome do Ganhador *
-                                    </label>
-                                    <input 
-                                      type="text"
-                                      value={ganhador.nome_ganhador}
-                                      onChange={(e) => handleChangeGanhador(index, gIndex, "nome_ganhador", e.target.value)}
-                                      placeholder="Ex: Carlos Eduardo"
-                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#0B3C8C] outline-none"
-                                    />
+                                            <button
+                                              onClick={() => handleRemoveGanhador(index, gIndex)}
+                                              className="text-gray-400 hover:text-red-600 p-1 rounded-md transition-colors"
+                                              title="Remover ganhador"
+                                            >
+                                              <Trash2 className="w-4 h-4" />
+                                            </button>
+                                          </div>
+
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {/* Nome do Ganhador */}
+                                            <div>
+                                              <label className="block text-xs font-bold text-gray-600 mb-1 flex items-center gap-1.5">
+                                                <User className="w-3.5 h-3.5 text-[#0B3C8C]" />
+                                                Nome do Ganhador *
+                                              </label>
+                                              <input 
+                                                type="text"
+                                                value={ganhador.nome_ganhador}
+                                                onChange={(e) => handleChangeGanhador(index, gIndex, "nome_ganhador", e.target.value)}
+                                                placeholder="Ex: Carlos Eduardo"
+                                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                                              />
+                                            </div>
+
+                                            {/* Nome do Prêmio com 4 Prêmios Fixos */}
+                                            <div className="space-y-1.5">
+                                              <div className="flex items-center justify-between">
+                                                <label className="block text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                                                  <Gift className="w-3.5 h-3.5 text-amber-500" />
+                                                  Nome do Prêmio *
+                                                </label>
+                                                <span className="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded">
+                                                  4 Prêmios Oficiais
+                                                </span>
+                                              </div>
+
+                                              {/* 4 Botões Rápidos dos Prêmios Fixos */}
+                                              <div className="grid grid-cols-2 gap-1.5">
+                                                {PREMIOS_FIXOS.map((premio) => {
+                                                  const isSelected = (ganhador.nome_premio || "").trim().toLowerCase() === premio.toLowerCase();
+                                                  return (
+                                                    <button
+                                                      key={premio}
+                                                      type="button"
+                                                      onClick={() => handleChangeGanhador(index, gIndex, "nome_premio", premio)}
+                                                      className={`text-left px-2 py-1.5 rounded-lg text-xs font-medium border transition-all flex items-center gap-1.5 ${
+                                                        isSelected 
+                                                          ? "bg-[#0B3C8C] text-white border-[#0B3C8C] shadow-sm font-bold ring-2 ring-[#0B3C8C]/20" 
+                                                          : "bg-white hover:bg-blue-50/80 text-gray-700 border-gray-200 hover:border-blue-300"
+                                                      }`}
+                                                      title={`Selecionar ${premio}`}
+                                                    >
+                                                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSelected ? "bg-amber-400" : "bg-gray-300"}`} />
+                                                      <span className="truncate text-[11px] leading-tight">{premio}</span>
+                                                    </button>
+                                                  );
+                                                })}
+                                              </div>
+
+                                              {/* Campo de Seleção / Digitação */}
+                                              <div className="flex gap-1.5">
+                                                <select
+                                                  value={
+                                                    PREMIOS_FIXOS.some(p => p.toLowerCase() === (ganhador.nome_premio || "").toLowerCase())
+                                                      ? PREMIOS_FIXOS.find(p => p.toLowerCase() === (ganhador.nome_premio || "").toLowerCase())
+                                                      : (ganhador.nome_premio ? "outro" : "")
+                                                  }
+                                                  onChange={(e) => {
+                                                    if (e.target.value && e.target.value !== "outro") {
+                                                      handleChangeGanhador(index, gIndex, "nome_premio", e.target.value);
+                                                    }
+                                                  }}
+                                                  className="w-1/2 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                                                >
+                                                  <option value="">Escolher Prêmio Fixo...</option>
+                                                  {PREMIOS_FIXOS.map((p) => (
+                                                    <option key={p} value={p}>{p}</option>
+                                                  ))}
+                                                  <option value="outro">Personalizado...</option>
+                                                </select>
+
+                                                <input 
+                                                  type="text"
+                                                  list="premios-fixos-list"
+                                                  value={ganhador.nome_premio}
+                                                  onChange={(e) => handleChangeGanhador(index, gIndex, "nome_premio", e.target.value)}
+                                                  placeholder="Digite ou ajuste..."
+                                                  className="w-1/2 px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-[#0B3C8C] outline-none"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* Upload da Foto do Ganhador com o Prêmio */}
+                                          <div>
+                                            <label className="block text-xs font-bold text-gray-600 mb-1.5 flex items-center gap-1.5">
+                                              <ImageIcon className="w-3.5 h-3.5 text-[#D62828]" />
+                                              Foto do Ganhador com o Prêmio
+                                            </label>
+                                            <FileUpload 
+                                              value={ganhador.foto_ganhador}
+                                              onChange={(url) => handleChangeGanhador(index, gIndex, "foto_ganhador", url)}
+                                              title={`Foto do Ganhador #${ganhador.numero || gIndex + 1}`}
+                                              folder="ganhadores"
+                                              heightClass="h-36"
+                                            />
+                                          </div>
+
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                            <div>
+                                              <label className="block text-[11px] font-bold text-gray-500 mb-1">Data do Sorteio</label>
+                                              <input 
+                                                type="date"
+                                                value={ganhador.data_sorteio || ""}
+                                                onChange={(e) => handleChangeGanhador(index, gIndex, "data_sorteio", e.target.value)}
+                                                className="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none"
+                                              />
+                                            </div>
+                                            <div>
+                                              <label className="block text-[11px] font-bold text-gray-500 mb-1">Observações (opcional)</label>
+                                              <input 
+                                                type="text"
+                                                value={ganhador.observacoes || ""}
+                                                onChange={(e) => handleChangeGanhador(index, gIndex, "observacoes", e.target.value)}
+                                                placeholder="Ex: Loja Centro"
+                                                className="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none"
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
                                   </div>
 
-                                  {/* Nome do Prêmio com 4 Prêmios Fixos */}
-                                  <div className="space-y-1.5">
-                                    <div className="flex items-center justify-between">
-                                      <label className="block text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                                        <Gift className="w-3.5 h-3.5 text-amber-500" />
-                                        Nome do Prêmio *
-                                      </label>
-                                      <span className="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded">
-                                        4 Prêmios Oficiais
-                                      </span>
+                                  {/* Botão "Adicionar Ganhador" sempre à frente da última criada / no rodapé da página atual */}
+                                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 pb-2 border-t border-gray-200">
+                                    <div className="text-xs text-gray-500 font-medium">
+                                      ✨ O botão de adicionar novo ganhador acompanha sempre a última posição criada.
                                     </div>
-
-                                    {/* 4 Botões Rápidos dos Prêmios Fixos */}
-                                    <div className="grid grid-cols-2 gap-1.5">
-                                      {PREMIOS_FIXOS.map((premio) => {
-                                        const isSelected = (ganhador.nome_premio || "").trim().toLowerCase() === premio.toLowerCase();
-                                        return (
-                                          <button
-                                            key={premio}
-                                            type="button"
-                                            onClick={() => handleChangeGanhador(index, gIndex, "nome_premio", premio)}
-                                            className={`text-left px-2 py-1.5 rounded-lg text-xs font-medium border transition-all flex items-center gap-1.5 ${
-                                              isSelected 
-                                                ? "bg-[#0B3C8C] text-white border-[#0B3C8C] shadow-sm font-bold ring-2 ring-[#0B3C8C]/20" 
-                                                : "bg-white hover:bg-blue-50/80 text-gray-700 border-gray-200 hover:border-blue-300"
-                                            }`}
-                                            title={`Selecionar ${premio}`}
-                                          >
-                                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSelected ? "bg-amber-400" : "bg-gray-300"}`} />
-                                            <span className="truncate text-[11px] leading-tight">{premio}</span>
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-
-                                    {/* Campo de Seleção / Digitação */}
-                                    <div className="flex gap-1.5">
-                                      <select
-                                        value={
-                                          PREMIOS_FIXOS.some(p => p.toLowerCase() === (ganhador.nome_premio || "").toLowerCase())
-                                            ? PREMIOS_FIXOS.find(p => p.toLowerCase() === (ganhador.nome_premio || "").toLowerCase())
-                                            : (ganhador.nome_premio ? "outro" : "")
-                                        }
-                                        onChange={(e) => {
-                                          if (e.target.value && e.target.value !== "outro") {
-                                            handleChangeGanhador(index, gIndex, "nome_premio", e.target.value);
-                                          }
-                                        }}
-                                        className="w-1/2 px-2 py-1.5 bg-gray-50 border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:ring-2 focus:ring-[#0B3C8C] outline-none"
-                                      >
-                                        <option value="">Escolher Prêmio Fixo...</option>
-                                        {PREMIOS_FIXOS.map((p) => (
-                                          <option key={p} value={p}>{p}</option>
-                                        ))}
-                                        <option value="outro">Personalizado...</option>
-                                      </select>
-
-                                      <input 
-                                        type="text"
-                                        list="premios-fixos-list"
-                                        value={ganhador.nome_premio}
-                                        onChange={(e) => handleChangeGanhador(index, gIndex, "nome_premio", e.target.value)}
-                                        placeholder="Digite ou ajuste..."
-                                        className="w-1/2 px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-[#0B3C8C] outline-none"
-                                      />
-                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAddGanhador(index)}
+                                      className="inline-flex items-center gap-2 bg-[#0B3C8C] hover:bg-[#082a63] text-white px-5 py-3 rounded-xl font-bold text-xs transition-colors shadow-md w-full sm:w-auto justify-center"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                      Adicionar Ganhador (Próximo)
+                                    </button>
                                   </div>
                                 </div>
-
-                                {/* Upload da Foto do Ganhador com o Prêmio */}
-                                <div>
-                                  <label className="block text-xs font-bold text-gray-600 mb-1.5 flex items-center gap-1.5">
-                                    <ImageIcon className="w-3.5 h-3.5 text-[#D62828]" />
-                                    Foto do Ganhador com o Prêmio
-                                  </label>
-                                  <FileUpload 
-                                    value={ganhador.foto_ganhador}
-                                    onChange={(url) => handleChangeGanhador(index, gIndex, "foto_ganhador", url)}
-                                    title={`Foto do Ganhador #${ganhador.numero || gIndex + 1}`}
-                                    folder="ganhadores"
-                                    heightClass="h-36"
-                                  />
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                                  <div>
-                                    <label className="block text-[11px] font-bold text-gray-500 mb-1">Data do Sorteio</label>
-                                    <input 
-                                      type="date"
-                                      value={ganhador.data_sorteio || ""}
-                                      onChange={(e) => handleChangeGanhador(index, gIndex, "data_sorteio", e.target.value)}
-                                      className="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="block text-[11px] font-bold text-gray-500 mb-1">Observações (opcional)</label>
-                                    <input 
-                                      type="text"
-                                      value={ganhador.observacoes || ""}
-                                      onChange={(e) => handleChangeGanhador(index, gIndex, "observacoes", e.target.value)}
-                                      placeholder="Ex: Loja Centro"
-                                      className="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                              );
+                            })()}
+                          </>
                         ) : (
                           <div className="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
                             <Gift className="w-10 h-10 text-gray-400 mx-auto mb-2" />
                             <p className="text-gray-600 font-bold text-sm">Nenhum ganhador cadastrado neste evento ainda.</p>
                             <p className="text-gray-400 text-xs mt-1">
-                              Clique no botão "+ Adicionar Ganhador" acima para cadastrar a cada sorteio realizado!
+                              Clique no botão "+ Adicionar Ganhador" acima ou abaixo para cadastrar a cada sorteio realizado!
                             </p>
+                            <button
+                              type="button"
+                              onClick={() => handleAddGanhador(index)}
+                              className="mt-4 inline-flex items-center gap-2 bg-[#0B3C8C] text-white px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-[#082a63] transition-colors"
+                            >
+                              <Plus className="w-4 h-4" /> Adicionar Primeiro Ganhador
+                            </button>
                           </div>
                         )}
                       </div>
