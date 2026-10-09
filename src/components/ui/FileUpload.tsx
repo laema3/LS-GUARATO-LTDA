@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Upload, X, FileText, Loader2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { compressImageFile } from "../../lib/imageCompress";
 
 interface FileUploadProps {
   value?: string;
@@ -35,7 +36,18 @@ export const FileUpload = ({
   heightClass = "h-40"
 }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const hasValidValue = !!(
+    value && 
+    typeof value === "string" && 
+    value.trim() !== "" && 
+    value !== "[BASE64]" && 
+    value !== "undefined" && 
+    value !== "null" &&
+    !imgError
+  );
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,6 +55,7 @@ export const FileUpload = ({
 
     try {
       setIsUploading(true);
+      setImgError(false);
       let uploadedUrl = "";
 
       // Tenta upload no Supabase Storage se configurado
@@ -65,17 +78,25 @@ export const FileUpload = ({
               uploadedUrl = publicData.publicUrl;
             }
           } else {
-            console.warn("Upload no Supabase Storage falhou, usando fallback Base64:", error.message);
+            console.warn("Upload no Supabase Storage falhou, usando fallback otimizado Base64:", error.message);
           }
         } catch (storageErr) {
-          console.warn("Erro ao enviar ao Supabase Storage, usando fallback Base64:", storageErr);
+          console.warn("Erro ao enviar ao Supabase Storage, usando fallback otimizado Base64:", storageErr);
         }
       }
 
-      // Se o upload no Supabase Storage não gerou URL válida, usa Base64 persistente
-      // (Base64 não expira ao atualizar a página, diferente de blob: URLs)
+      // Se o upload no Supabase Storage não gerou URL válida, usa Base64 comprimido
+      // Comprime a imagem para manter o tamanho leve (~80-120KB) sem estourar quotas
       if (!uploadedUrl) {
-        uploadedUrl = await fileToBase64(file);
+        if (type === "image") {
+          try {
+            uploadedUrl = await compressImageFile(file, 1280, 1280, 0.82);
+          } catch {
+            uploadedUrl = await fileToBase64(file);
+          }
+        } else {
+          uploadedUrl = await fileToBase64(file);
+        }
       }
 
       onChange(uploadedUrl);
@@ -92,6 +113,7 @@ export const FileUpload = ({
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setImgError(false);
     onChange("");
   };
 
@@ -105,7 +127,7 @@ export const FileUpload = ({
         onChange={handleFileChange}
       />
       
-      {!value ? (
+      {!hasValidValue ? (
         <div 
           onClick={() => !isUploading && fileInputRef.current?.click()}
           className={`border-2 border-dashed border-gray-300 rounded-xl ${heightClass} flex flex-col items-center justify-center text-gray-500 hover:bg-white hover:border-[#0B3C8C] cursor-pointer transition-all bg-gray-100/50 group relative overflow-hidden`}
@@ -113,7 +135,7 @@ export const FileUpload = ({
           {isUploading ? (
             <div className="flex flex-col items-center justify-center">
               <Loader2 className="h-8 w-8 text-[#0B3C8C] animate-spin mb-2" />
-              <span className="text-sm font-medium">Enviando...</span>
+              <span className="text-sm font-medium">Otimizando e enviando...</span>
             </div>
           ) : (
             <>
@@ -128,7 +150,12 @@ export const FileUpload = ({
       ) : (
         <div className={`relative ${heightClass} border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex items-center justify-center`}>
           {type === "image" ? (
-            <img src={value} alt="Preview" className="w-full h-full object-cover" />
+            <img 
+              src={value} 
+              alt="Preview" 
+              className="w-full h-full object-cover" 
+              onError={() => setImgError(true)}
+            />
           ) : (
             <div className="flex flex-col items-center">
               <FileText className="h-10 w-10 text-red-500 mb-2" />
@@ -138,8 +165,8 @@ export const FileUpload = ({
           
           <button 
             onClick={handleClear}
-            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 shadow-sm transition-colors"
-            title="Remover"
+            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 shadow-sm transition-colors z-10"
+            title="Remover imagem"
           >
             <X className="h-4 w-4" />
           </button>

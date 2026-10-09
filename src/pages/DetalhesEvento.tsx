@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { 
   Calendar, 
   ArrowLeft, 
@@ -13,9 +13,12 @@ import {
   Share2, 
   CheckCircle2,
   CalendarDays,
-  ArrowUpDown
+  ArrowUpDown,
+  Image as ImageIcon,
+  X,
+  Maximize2
 } from "lucide-react";
-import { getEventoById, getEventos } from "../services/eventosService";
+import { getEventoById, getEventos, isValidImageUrl } from "../services/eventosService";
 import { EventoItem, GanhadorPremio } from "../types/evento";
 import { GanhadoresCarrossel } from "../components/GanhadoresCarrossel";
 
@@ -26,6 +29,8 @@ export const DetalhesEvento: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [sortOrder, setSortOrder] = useState<"date-asc" | "date-desc" | "number">("date-asc");
+  const [failedCardImages, setFailedCardImages] = useState<Record<string, boolean>>({});
+  const [activeGalleryZoom, setActiveGalleryZoom] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -289,11 +294,12 @@ export const DetalhesEvento: React.FC = () => {
                   >
                     {/* Foto com Badges de Número e Data */}
                     <div className="relative h-48 bg-gray-900 overflow-hidden">
-                      {g.foto_ganhador ? (
+                      {isValidImageUrl(g.foto_ganhador) && !failedCardImages[g.id || idx] ? (
                         <img
                           src={g.foto_ganhador}
                           alt={`${g.nome_ganhador} - ${g.nome_premio}`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={() => setFailedCardImages(prev => ({ ...prev, [g.id || idx]: true }))}
                         />
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
@@ -360,7 +366,74 @@ export const DetalhesEvento: React.FC = () => {
           </section>
         )}
 
+        {/* Seção 3: Galeria de Fotos Gerais do Evento */}
+        {evento.imagens && evento.imagens.filter(img => isValidImageUrl(img)).length > 0 && (
+          <section className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100">
+            <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <span className="text-[#D62828] font-black text-xs uppercase tracking-widest block mb-1">
+                  Momentos Especiais
+                </span>
+                <h3 className="text-xl md:text-2xl font-bold font-sans text-gray-900 flex items-center gap-2">
+                  <ImageIcon className="w-6 h-6 text-[#0B3C8C]" />
+                  Galeria de Fotos do Evento
+                </h3>
+              </div>
+              <p className="text-sm text-gray-500 max-w-md">
+                Registros e lembranças da nossa comemoração especial de aniversário.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {evento.imagens.filter(img => isValidImageUrl(img)).map((foto, fIdx) => (
+                <div
+                  key={fIdx}
+                  onClick={() => setActiveGalleryZoom(foto)}
+                  className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-900 cursor-pointer shadow-sm hover:shadow-xl transition-all border border-gray-100"
+                >
+                  <img
+                    src={foto}
+                    alt={`Foto ${fIdx + 1} do evento`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                    <Maximize2 className="w-6 h-6" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
       </div>
+
+      {/* Modal Zoom para Galeria de Fotos */}
+      <AnimatePresence>
+        {activeGalleryZoom && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+            onClick={() => setActiveGalleryZoom(null)}
+          >
+            <button
+              onClick={() => setActiveGalleryZoom(null)}
+              className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/30 text-white rounded-full transition-colors z-20"
+              title="Fechar"
+            >
+              <X className="w-7 h-7" />
+            </button>
+            <div className="max-w-5xl max-h-[90vh] flex items-center justify-center p-2" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={activeGalleryZoom}
+                alt="Foto do Evento"
+                className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/20"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

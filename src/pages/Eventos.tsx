@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Calendar, ChevronRight, X, ChevronLeft, CalendarDays, Trophy, Gift, Sparkles, Award } from "lucide-react";
-import { getEventos } from "../services/eventosService";
+import { getEventos, isValidImageUrl } from "../services/eventosService";
 import { EventoItem } from "../types/evento";
 
 export const Eventos = () => {
@@ -79,7 +79,7 @@ export const Eventos = () => {
                   >
                     <div className="relative h-64 overflow-hidden bg-gray-900">
                       <img 
-                        src={evento.imagem_capa || "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"} 
+                        src={isValidImageUrl(evento.imagem_capa) ? evento.imagem_capa : "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"} 
                         alt={evento.titulo}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />

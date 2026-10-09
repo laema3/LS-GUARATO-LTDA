@@ -15,6 +15,7 @@ import {
   Award
 } from "lucide-react";
 import { GanhadorPremio } from "../types/evento";
+import { isValidImageUrl } from "../services/eventosService";
 
 interface GanhadoresCarrosselProps {
   ganhadores: GanhadorPremio[];
@@ -30,6 +31,7 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const thumbnailsRef = useRef<HTMLDivElement>(null);
 
   // Ordena os ganhadores e fotos cronologicamente pela data do sorteio
@@ -140,12 +142,13 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
                 transition={{ duration: 0.4 }}
                 className="w-full h-full flex items-center justify-center relative group"
               >
-                {currentWinner?.foto_ganhador ? (
+                {isValidImageUrl(currentWinner?.foto_ganhador) && !failedImages[currentWinner.id || currentIndex] ? (
                   <img
                     src={currentWinner.foto_ganhador}
                     alt={`${currentWinner.nome_ganhador} - ${currentWinner.nome_premio}`}
                     className="w-full h-full object-contain max-h-[560px] cursor-pointer transition-transform duration-300 group-hover:scale-105"
                     onClick={() => setIsZoomOpen(true)}
+                    onError={() => setFailedImages(prev => ({ ...prev, [currentWinner.id || currentIndex]: true }))}
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-8 text-center bg-gray-950">
@@ -159,7 +162,7 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
                 {/* Botão de Zoom / Ampliar */}
-                {currentWinner?.foto_ganhador && (
+                {isValidImageUrl(currentWinner?.foto_ganhador) && !failedImages[currentWinner.id || currentIndex] && (
                   <button
                     onClick={() => setIsZoomOpen(true)}
                     className="absolute top-4 right-4 z-10 p-2.5 bg-black/50 hover:bg-black/80 text-white rounded-xl backdrop-blur-md transition-all opacity-80 hover:opacity-100 hover:scale-110"
@@ -334,8 +337,13 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
                 >
                   {/* Foto miniatura */}
                   <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 border border-white/20">
-                    {item.foto_ganhador ? (
-                      <img src={item.foto_ganhador} alt="" className="w-full h-full object-cover" />
+                    {isValidImageUrl(item.foto_ganhador) && !failedImages[item.id || idx] ? (
+                      <img 
+                        src={item.foto_ganhador} 
+                        alt="" 
+                        className="w-full h-full object-cover" 
+                        onError={() => setFailedImages(prev => ({ ...prev, [item.id || idx]: true }))}
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">
                         <Gift className="w-5 h-5" />

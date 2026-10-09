@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { SaveToast } from "../../components/ui/SaveToast";
 import { FileUpload } from "../../components/ui/FileUpload";
+import { MultiFileUpload } from "../../components/ui/MultiFileUpload";
 import { generateEventDescription } from "../../services/geminiService";
 import { getEventos, saveEvento, deleteEvento, sortGanhadoresByDate } from "../../services/eventosService";
 import { EventoItem, GanhadorPremio, PREMIOS_FIXOS } from "../../types/evento";
@@ -464,6 +465,25 @@ export const EventosEditor = () => {
                           folder="eventos"
                           heightClass="h-40"
                         />
+                      </div>
+
+                      <div className="md:col-span-12">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                            Galeria de Fotos do Evento (Imagens da Comemoração)
+                          </label>
+                          <span className="text-[11px] text-gray-400">
+                            {(evento.imagens || []).length} fotos adicionadas
+                          </span>
+                        </div>
+                        <MultiFileUpload 
+                          value={evento.imagens || []}
+                          onChange={(urls) => handleChangeEvento(index, "imagens", urls)}
+                          folder="eventos/galeria"
+                        />
+                        <p className="text-[11px] text-gray-400 mt-1">
+                          Fotos e registros gerais da festa ou cerimônia que serão exibidas na galeria do evento.
+                        </p>
                       </div>
                     </div>
                   </div>
