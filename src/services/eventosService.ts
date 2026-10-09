@@ -1,45 +1,31 @@
 import { supabase } from "../lib/supabase";
 import { EventoItem, GanhadorPremio } from "../types/evento";
-import { getIdbItem, setIdbItem } from "../lib/idbStorage";
 
 const STORAGE_KEY = "lsguarato_eventos_cache";
-let inMemoryEventosCache: EventoItem[] | null = null;
 
-// Verifica se uma string de imagem é uma URL ou dataURL válida e não um placeholder quebrado
-export function isValidImageUrl(url?: string | null): boolean {
-  if (!url || typeof url !== "string") return false;
-  const trimmed = url.trim();
-  if (
-    trimmed === "" ||
-    trimmed === "[BASE64]" ||
-    trimmed === "undefined" ||
-    trimmed === "null" ||
-    trimmed === "[object Object]"
-  ) {
-    return false;
-  }
-  return (
-    trimmed.startsWith("data:image/") ||
-    trimmed.startsWith("http://") ||
-    trimmed.startsWith("https://") ||
-    trimmed.startsWith("/")
-  );
-}
-
-// Limpa qualquer cache corrompido do localStorage antigo que possa ter salvo a string literal "[BASE64]"
-function cleanCorruptedLocalStorage() {
+function safeSetLocalStorage(key: string, data: any) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw && (raw.includes("[BASE64]") || raw.includes('"foto_ganhador":"[BASE64]"'))) {
-      console.warn("Removendo cache legado corrompido com '[BASE64]'...");
-      localStorage.removeItem(STORAGE_KEY);
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn("localStorage quota exceeded, caching light version:", e);
+    try {
+      const lightData = (Array.isArray(data) ? data : [data]).map((ev: any) => ({
+        ...ev,
+        ganhadores: (ev.ganhadores || []).map((g: any) => ({
+          ...g,
+          foto_ganhador: g.foto_ganhador?.startsWith("data:") ? "[BASE64]" : g.foto_ganhador
+        }))
+      }));
+      localStorage.setItem(key, JSON.stringify(Array.isArray(data) ? lightData : lightData[0]));
+    } catch {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // ignore
+      }
     }
-  } catch {
-    // ignore
   }
 }
-
-cleanCorruptedLocalStorage();
 
 // Função utilitária para ordenar ganhadores e fotos por data do sorteio
 export function sortGanhadoresByDate(
@@ -121,7 +107,6 @@ export const DEFAULT_EVENTO_42_ANOS: EventoItem = {
 export function parseEventoData(rawEvento: any): EventoItem {
   let descricao = rawEvento.descricao || "";
   let ganhadores: GanhadorPremio[] = [];
-  let imagens: string[] = [];
   let total_premios = 42;
 
   // 1. Verifica se já veio como coluna json/array
@@ -149,23 +134,7 @@ export function parseEventoData(rawEvento: any): EventoItem {
     descricao = descricao.replace(/<!--GANHADORES:[\s\S]*?-->/g, "").trim();
   }
 
-  // 3. Extrai galeria de imagens de <!--IMAGENS:...--> se existir
-  const imagensMatch = descricao.match(/<!--IMAGENS:([\s\S]*?)-->/);
-  if (imagensMatch && imagensMatch[1]) {
-    try {
-      const parsedImagens = JSON.parse(imagensMatch[1]);
-      if (Array.isArray(parsedImagens)) {
-        imagens = parsedImagens.filter(url => isValidImageUrl(url));
-      }
-    } catch {
-      // ignore
-    }
-    descricao = descricao.replace(/<!--IMAGENS:[\s\S]*?-->/g, "").trim();
-  } else if (Array.isArray(rawEvento.imagens)) {
-    imagens = rawEvento.imagens.filter(url => isValidImageUrl(url));
-  }
-
-  // 4. Extrai total_premios de <!--TOTAL_PREMIOS:...-->
+  // 3. Extrai total_premios de <!--TOTAL_PREMIOS:...-->
   const totalMatch = descricao.match(/<!--TOTAL_PREMIOS:(\d+)-->/);
   if (totalMatch && totalMatch[1]) {
     total_premios = parseInt(totalMatch[1], 10) || 42;
@@ -179,27 +148,15 @@ export function parseEventoData(rawEvento: any): EventoItem {
     total_premios = 42;
   }
 
-  // Sanitiza fotos dos ganhadores: remove strings corrompidas literais "[BASE64]"
-  const sanitizedGanhadores = (Array.isArray(ganhadores) ? ganhadores : []).map(g => {
-    let foto = g.foto_ganhador || "";
-    if (foto === "[BASE64]" || !isValidImageUrl(foto)) {
-      foto = "";
-    }
-    return {
-      ...g,
-      foto_ganhador: foto
-    };
-  });
-
   // Ordena os ganhadores e fotos por data do sorteio
-  const sortedGanhadores = sortGanhadoresByDate(sanitizedGanhadores, "asc");
+  const sortedGanhadores = Array.isArray(ganhadores) ? sortGanhadoresByDate(ganhadores, "asc") : [];
 
   return {
     id: String(rawEvento.id),
     titulo: rawEvento.titulo || "Evento",
     descricao,
-    imagem_capa: isValidImageUrl(rawEvento.imagem_capa) ? rawEvento.imagem_capa : "",
-    imagens,
+    imagem_capa: rawEvento.imagem_capa || "",
+    imagens: Array.isArray(rawEvento.imagens) ? rawEvento.imagens : [],
     data_evento: rawEvento.data_evento || "",
     total_premios: total_premios || 42,
     ganhadores: sortedGanhadores,
@@ -208,134 +165,72 @@ export function parseEventoData(rawEvento: any): EventoItem {
 }
 
 // Codifica os metadados dentro da descricao para compatibilidade com o Supabase sem requerer migrations
-export function serializeDescricao(
-  descricao: string, 
-  ganhadores: GanhadorPremio[], 
-  totalPremios: number = 42,
-  imagens: string[] = []
-): string {
+export function serializeDescricao(descricao: string, ganhadores: GanhadorPremio[], totalPremios: number = 42): string {
   let cleanDesc = (descricao || "")
     .replace(/<!--GANHADORES:[\s\S]*?-->/g, "")
     .replace(/<!--TOTAL_PREMIOS:\d+-->/g, "")
-    .replace(/<!--IMAGENS:[\s\S]*?-->/g, "")
     .trim();
 
-  // Limpa qualquer string corrompida antes de serializar
-  const cleanGanhadores = (ganhadores || []).map(g => ({
-    ...g,
-    foto_ganhador: isValidImageUrl(g.foto_ganhador) ? g.foto_ganhador : ""
-  }));
-
-  const cleanImagens = (imagens || []).filter(img => isValidImageUrl(img));
-
   const totalTag = `<!--TOTAL_PREMIOS:${totalPremios || 42}-->`;
-  const ganhadoresTag = `<!--GANHADORES:${JSON.stringify(cleanGanhadores)}-->`;
-  const imagensTag = cleanImagens.length > 0 ? `\n<!--IMAGENS:${JSON.stringify(cleanImagens)}-->` : "";
+  const ganhadoresTag = `<!--GANHADORES:${JSON.stringify(ganhadores || [])}-->`;
 
-  return `${cleanDesc}\n\n${totalTag}\n${ganhadoresTag}${imagensTag}`.trim();
+  return `${cleanDesc}\n\n${totalTag}\n${ganhadoresTag}`.trim();
 }
 
 export async function getEventos(): Promise<EventoItem[]> {
-  // 1. Se já carregamos em memória nesta sessão, retorna para velocidade instantânea
-  if (inMemoryEventosCache && inMemoryEventosCache.length > 0) {
-    // Continua para sincronizar em segundo plano se necessário
-  }
-
-  // 2. Carrega do IndexedDB (suporta gigabytes, sem limite de 5MB)
+  // 1. Carrega do localStorage primeiro (cache offline/rápido)
   let cachedList: EventoItem[] = [];
-  try {
-    const idbData = await getIdbItem<EventoItem[]>(STORAGE_KEY);
-    if (Array.isArray(idbData) && idbData.length > 0) {
-      cachedList = idbData.map(ev => ({
-        ...ev,
-        ganhadores: sortGanhadoresByDate(ev.ganhadores || [], "asc")
-      }));
-      inMemoryEventosCache = cachedList;
-    }
-  } catch (err) {
-    console.warn("Aviso ao ler cache IndexedDB:", err);
-  }
-
-  // Se não encontrou no IndexedDB, tenta localStorage mas sem placeholders
-  if (cachedList.length === 0) {
+  const cachedRaw = localStorage.getItem(STORAGE_KEY);
+  if (cachedRaw) {
     try {
-      const cachedRaw = localStorage.getItem(STORAGE_KEY);
-      if (cachedRaw && !cachedRaw.includes("[BASE64]")) {
-        const parsed = JSON.parse(cachedRaw);
-        cachedList = (Array.isArray(parsed) ? parsed : [parsed]).map((item: any) => ({
-          ...item,
-          ganhadores: Array.isArray(item.ganhadores) ? sortGanhadoresByDate(item.ganhadores, "asc") : []
-        }));
-      }
+      const parsed = JSON.parse(cachedRaw);
+      cachedList = (Array.isArray(parsed) ? parsed : [parsed]).map((item: any) => ({
+        ...item,
+        ganhadores: Array.isArray(item.ganhadores) ? sortGanhadoresByDate(item.ganhadores, "asc") : []
+      }));
     } catch {
       // ignore
     }
   }
 
-  // 3. Sincroniza com o Supabase (fonte definitiva)
+  // 2. Tenta sincronizar com o Supabase
   try {
     const { data, error } = await supabase.from("eventos").select("*").order("created_at", { ascending: false });
     
     if (!error && data && data.length > 0) {
       const parsedList = data.map(item => {
         const parsed = parseEventoData(item);
-        
-        // Se o cache local possuir slots extras criados localmente ainda não salvos, mescla apenas os excedentes
+        // Se no Supabase não tiver ganhadores mas tiver no cache local com o mesmo ID, mescla
         const localCached = cachedList.find(c => String(c.id) === String(parsed.id));
         if (localCached && localCached.ganhadores && localCached.ganhadores.length > parsed.ganhadores.length) {
-          const extraSlots = localCached.ganhadores.slice(parsed.ganhadores.length);
-          parsed.ganhadores = sortGanhadoresByDate([...parsed.ganhadores, ...extraSlots], "asc");
+          parsed.ganhadores = sortGanhadoresByDate(localCached.ganhadores, "asc");
+          if (localCached.total_premios) parsed.total_premios = localCached.total_premios;
         }
-
         return parsed;
       });
 
-      inMemoryEventosCache = parsedList;
-
-      // Salva no IndexedDB de forma assíncrona e segura
-      setIdbItem(STORAGE_KEY, parsedList).catch(() => {});
-
-      // Salva versão leve no localStorage apenas se couber sem estourar cota
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsedList));
-      } catch {
-        // Se estourar a cota de 5MB do localStorage, remove do localStorage para não corromper
-        // e deixa o IndexedDB como cache principal
-        try { localStorage.removeItem(STORAGE_KEY); } catch {}
-      }
-
+      safeSetLocalStorage(STORAGE_KEY, parsedList);
       return parsedList;
     }
   } catch (err) {
-    console.warn("Aviso ao buscar eventos do Supabase, usando cache persistente:", err);
+    console.warn("Aviso ao buscar eventos do Supabase, usando cache local:", err);
   }
 
-  // 4. Se o Supabase falhou (ou offline), usa o cache existente
-  if (cachedList.length > 0) {
-    inMemoryEventosCache = cachedList;
-    return cachedList;
+  // 3. Se não houver nada no banco nem no cache, inicializa com o evento de 42 Anos
+  if (cachedList.length === 0) {
+    cachedList = [DEFAULT_EVENTO_42_ANOS];
+    safeSetLocalStorage(STORAGE_KEY, cachedList);
   }
 
-  // 5. Se não houver nada no banco nem no cache, inicializa com o evento de 42 Anos
-  inMemoryEventosCache = [DEFAULT_EVENTO_42_ANOS];
-  setIdbItem(STORAGE_KEY, inMemoryEventosCache).catch(() => {});
-  return inMemoryEventosCache;
+  return cachedList;
 }
 
 export async function getEventoById(id: string): Promise<EventoItem | null> {
   const all = await getEventos();
-  
-  // 1. Busca exata por ID
-  let found = all.find(e => String(e.id) === String(id));
+  const found = all.find(e => String(e.id) === String(id));
   if (found) return found;
 
-  // 2. Se o ID for o alias padrão de 42 anos, mapeia para o evento oficial de 42 Anos
-  if (id === "42-anos-confraternizacao") {
-    found = all.find(e => e.titulo.toLowerCase().includes("42"));
-    if (found) return found;
-  }
-
-  // 3. Busca específica no Supabase caso não esteja na listagem
+  // Busca específica no Supabase
   try {
     const { data, error } = await supabase.from("eventos").select("*").eq("id", id).maybeSingle();
     if (!error && data) {
@@ -349,18 +244,14 @@ export async function getEventoById(id: string): Promise<EventoItem | null> {
 }
 
 export async function saveEvento(evento: EventoItem): Promise<EventoItem> {
-  const serializedDescricao = serializeDescricao(
-    evento.descricao, 
-    evento.ganhadores, 
-    evento.total_premios || 42,
-    evento.imagens || []
-  );
+  const all = await getEventos();
+  const serializedDescricao = serializeDescricao(evento.descricao, evento.ganhadores, evento.total_premios || 42);
 
   const payload: any = {
     titulo: evento.titulo,
     descricao: serializedDescricao,
-    imagem_capa: isValidImageUrl(evento.imagem_capa) ? evento.imagem_capa : "",
-    imagens: (evento.imagens || []).filter(img => isValidImageUrl(img)),
+    imagem_capa: evento.imagem_capa || "",
+    imagens: evento.imagens || [],
     data_evento: evento.data_evento || null
   };
 
@@ -371,16 +262,12 @@ export async function saveEvento(evento: EventoItem): Promise<EventoItem> {
       const { data, error } = await supabase.from("eventos").update(payload).eq("id", evento.id).select().maybeSingle();
       if (!error && data) {
         savedId = String(data.id);
-      } else if (error) {
-        console.warn("Aviso ao atualizar evento no Supabase:", error.message);
       }
     } else {
       // Inserção de novo evento
       const { data, error } = await supabase.from("eventos").insert([payload]).select().maybeSingle();
       if (!error && data) {
         savedId = String(data.id);
-      } else if (error) {
-        console.warn("Aviso ao inserir evento no Supabase:", error.message);
       }
     }
   } catch (err) {
@@ -389,13 +276,11 @@ export async function saveEvento(evento: EventoItem): Promise<EventoItem> {
 
   const updatedEvento: EventoItem = {
     ...evento,
-    id: savedId,
-    ganhadores: sortGanhadoresByDate(evento.ganhadores || [], "asc")
+    id: savedId
   };
 
-  // Atualiza cache em memória
-  const all = inMemoryEventosCache || (await getEventos());
-  const index = all.findIndex(e => String(e.id) === String(evento.id) || String(e.id) === String(savedId));
+  // Atualiza cache local
+  const index = all.findIndex(e => String(e.id) === String(evento.id));
   let updatedList: EventoItem[];
   if (index >= 0) {
     updatedList = [...all];
@@ -404,17 +289,7 @@ export async function saveEvento(evento: EventoItem): Promise<EventoItem> {
     updatedList = [updatedEvento, ...all];
   }
 
-  inMemoryEventosCache = updatedList;
-
-  // Atualiza IndexedDB (sem limite de 5MB)
-  await setIdbItem(STORAGE_KEY, updatedList);
-
-  // Tenta salvar no localStorage de forma segura
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
-  } catch {
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
-  }
+  safeSetLocalStorage(STORAGE_KEY, updatedList);
 
   // Notifica componentes em tempo real (como o Menu/Header)
   window.dispatchEvent(new Event("eventos_updated"));
@@ -431,16 +306,9 @@ export async function deleteEvento(id: string): Promise<void> {
     console.warn("Erro ao deletar do Supabase:", err);
   }
 
-  const all = inMemoryEventosCache || (await getEventos());
+  const all = await getEventos();
   const filtered = all.filter(e => String(e.id) !== String(id));
-  inMemoryEventosCache = filtered;
-
-  await setIdbItem(STORAGE_KEY, filtered);
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-  } catch {
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
-  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
 
   window.dispatchEvent(new Event("eventos_updated"));
 }

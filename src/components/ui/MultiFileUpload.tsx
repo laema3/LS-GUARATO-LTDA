@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Upload, X, Loader2, Plus } from "lucide-react";
 import { supabase } from "../../lib/supabase";
-import { compressImageFile } from "../../lib/imageCompress";
 
 interface MultiFileUploadProps {
   value?: string[];
@@ -14,7 +13,7 @@ export const MultiFileUpload = ({
   value = [], 
   onChange, 
   bucket = "assets",
-  folder = "uploads"
+  folder = "setores"
 }: MultiFileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,53 +24,32 @@ export const MultiFileUpload = ({
 
     try {
       setIsUploading(true);
-      const newUrls = [...(value || []).filter(url => url && url !== "[BASE64]")];
+      const newUrls = [...value];
       
       for (let i = 0; i < files.length; i++) {
-        if (newUrls.length >= 20) break;
+        if (newUrls.length >= 10) break;
         const file = files[i];
-        let uploadedUrl = "";
         
-        if (import.meta.env.VITE_SUPABASE_URL && !import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) {
-          try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-            const filePath = `${folder}/${fileName}`;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        const filePath = `${folder}/${fileName}`;
 
-            const { error } = await supabase.storage
-              .from(bucket)
-              .upload(filePath, file);
+        const { error } = await supabase.storage
+          .from(bucket)
+          .upload(filePath, file);
 
-            if (!error) {
-              const { data: publicData } = supabase.storage
-                .from(bucket)
-                .getPublicUrl(filePath);
+        if (error) throw error;
 
-              if (publicData?.publicUrl) {
-                uploadedUrl = publicData.publicUrl;
-              }
-            }
-          } catch {
-            // fallback
-          }
-        }
+        const { data: publicData } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(filePath);
 
-        if (!uploadedUrl) {
-          try {
-            uploadedUrl = await compressImageFile(file, 1280, 1280, 0.82);
-          } catch (err) {
-            console.warn("Erro ao comprimir imagem:", err);
-          }
-        }
-
-        if (uploadedUrl) {
-          newUrls.push(uploadedUrl);
-        }
+        newUrls.push(publicData.publicUrl);
       }
       onChange(newUrls);
     } catch (error) {
       console.error("Erro no upload:", error);
-      alert("Erro ao processar as fotos.");
+      alert("Erro ao fazer upload.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
