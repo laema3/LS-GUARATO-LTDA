@@ -335,7 +335,13 @@ export const GanhadoresCarrossel: React.FC<GanhadoresCarrosselProps> = ({
                   {/* Foto miniatura */}
                   <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 border border-white/20">
                     {item.foto_ganhador ? (
-                      <img src={item.foto_ganhador} alt="" className="w-full h-full object-cover" />
+                      <img 
+                        src={item.foto_ganhador} 
+                        alt="" 
+                        loading="lazy" 
+                        decoding="async" 
+                        className="w-full h-full object-cover" 
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">
                         <Gift className="w-5 h-5" />

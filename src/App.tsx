@@ -5,42 +5,44 @@
 
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { Layout } from "./components/Layout";
 import { Home } from "./pages/Home";
-import { Sobre } from "./pages/Sobre";
-import { AreaRestrita } from "./pages/AreaRestrita";
-import { JornalOfertas } from "./pages/JornalOfertas";
-import { TransparenciaSalarial } from "./pages/TransparenciaSalarial";
-import { VagasEmprego } from "./pages/VagasEmprego";
-import { DetalhesVaga } from "./pages/DetalhesVaga";
-import { Setores } from "./pages/Setores";
-import { Eventos } from "./pages/Eventos";
-import { DetalhesEvento } from "./pages/DetalhesEvento";
-import { Contato } from "./pages/Contato";
-import { NotFound } from "./pages/NotFound";
-import { PoliticaPrivacidade } from "./pages/PoliticaPrivacidade";
 import { PageLoader } from "./components/ui/Loader";
 import Maintenance from "./pages/Maintenance";
 import { supabase, isSupabaseConfigured } from "./lib/supabase";
 
-// Import Admin Routes
-import { DashboardLayout } from "./pages/Dashboard/Layout";
-import { Dashboard } from "./pages/Dashboard/Dashboard";
-import { HomeEditor } from "./pages/Dashboard/HomeEditor";
-import { SobreEditor } from "./pages/Dashboard/SobreEditor";
-import { FooterEditor } from "./pages/Dashboard/FooterEditor";
-import { CabecalhoEditor } from "./pages/Dashboard/CabecalhoEditor";
-import { ServicosEditor } from "./pages/Dashboard/ServicosEditor";
-import { SetoresEditor } from "./pages/Dashboard/SetoresEditor";
-import { EventosEditor } from "./pages/Dashboard/EventosEditor";
-import { VagasParametrosEditor } from "./pages/Dashboard/VagasParametrosEditor";
-import { VagasEditor } from "./pages/Dashboard/VagasEditor";
-import { CandidatosList } from "./pages/Dashboard/CandidatosList";
-import { ConfiguracoesEditor } from "./pages/Dashboard/ConfiguracoesEditor";
-import { MensagensSacList } from "./pages/Dashboard/MensagensSacList";
-import { UsuariosEditor } from "./pages/Dashboard/UsuariosEditor";
-import { Login } from "./pages/Dashboard/Login";
+// Lazy loading das páginas públicas secundárias (só baixa quando o visitante clica no menu)
+const Sobre = lazy(() => import("./pages/Sobre").then(m => ({ default: m.Sobre })));
+const AreaRestrita = lazy(() => import("./pages/AreaRestrita").then(m => ({ default: m.AreaRestrita })));
+const JornalOfertas = lazy(() => import("./pages/JornalOfertas").then(m => ({ default: m.JornalOfertas })));
+const TransparenciaSalarial = lazy(() => import("./pages/TransparenciaSalarial").then(m => ({ default: m.TransparenciaSalarial })));
+const VagasEmprego = lazy(() => import("./pages/VagasEmprego").then(m => ({ default: m.VagasEmprego })));
+const DetalhesVaga = lazy(() => import("./pages/DetalhesVaga").then(m => ({ default: m.DetalhesVaga })));
+const Setores = lazy(() => import("./pages/Setores").then(m => ({ default: m.Setores })));
+const Eventos = lazy(() => import("./pages/Eventos").then(m => ({ default: m.Eventos })));
+const DetalhesEvento = lazy(() => import("./pages/DetalhesEvento").then(m => ({ default: m.DetalhesEvento })));
+const Contato = lazy(() => import("./pages/Contato").then(m => ({ default: m.Contato })));
+const NotFound = lazy(() => import("./pages/NotFound").then(m => ({ default: m.NotFound })));
+const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade").then(m => ({ default: m.PoliticaPrivacidade })));
+
+// Lazy loading das rotas do painel administrativo (não afeta o carregamento dos visitantes)
+const DashboardLayout = lazy(() => import("./pages/Dashboard/Layout").then(m => ({ default: m.DashboardLayout })));
+const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard").then(m => ({ default: m.Dashboard })));
+const HomeEditor = lazy(() => import("./pages/Dashboard/HomeEditor").then(m => ({ default: m.HomeEditor })));
+const SobreEditor = lazy(() => import("./pages/Dashboard/SobreEditor").then(m => ({ default: m.SobreEditor })));
+const FooterEditor = lazy(() => import("./pages/Dashboard/FooterEditor").then(m => ({ default: m.FooterEditor })));
+const CabecalhoEditor = lazy(() => import("./pages/Dashboard/CabecalhoEditor").then(m => ({ default: m.CabecalhoEditor })));
+const ServicosEditor = lazy(() => import("./pages/Dashboard/ServicosEditor").then(m => ({ default: m.ServicosEditor })));
+const SetoresEditor = lazy(() => import("./pages/Dashboard/SetoresEditor").then(m => ({ default: m.SetoresEditor })));
+const EventosEditor = lazy(() => import("./pages/Dashboard/EventosEditor").then(m => ({ default: m.EventosEditor })));
+const VagasParametrosEditor = lazy(() => import("./pages/Dashboard/VagasParametrosEditor").then(m => ({ default: m.VagasParametrosEditor })));
+const VagasEditor = lazy(() => import("./pages/Dashboard/VagasEditor").then(m => ({ default: m.VagasEditor })));
+const CandidatosList = lazy(() => import("./pages/Dashboard/CandidatosList").then(m => ({ default: m.CandidatosList })));
+const ConfiguracoesEditor = lazy(() => import("./pages/Dashboard/ConfiguracoesEditor").then(m => ({ default: m.ConfiguracoesEditor })));
+const MensagensSacList = lazy(() => import("./pages/Dashboard/MensagensSacList").then(m => ({ default: m.MensagensSacList })));
+const UsuariosEditor = lazy(() => import("./pages/Dashboard/UsuariosEditor").then(m => ({ default: m.UsuariosEditor })));
+const Login = lazy(() => import("./pages/Dashboard/Login").then(m => ({ default: m.Login })));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -115,23 +117,37 @@ export default function App() {
           element={<ExternalRedirect url="https://www.guarato.com.br/servicos/vagas" />} 
         />
 
-        {/* Rotas administrativas sempre disponíveis */}
-        <Route path="/admin/login" element={<Login />} />
-        <Route path="/admin" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="home" element={<HomeEditor />} />
-          <Route path="cabecalho" element={<CabecalhoEditor />} />
-          <Route path="ajustes" element={<ConfiguracoesEditor />} />
-          <Route path="sobre" element={<SobreEditor />} />
-          <Route path="rodape" element={<FooterEditor />} />
-          <Route path="servicos" element={<ServicosEditor />} />
-          <Route path="setores" element={<SetoresEditor />} />
-          <Route path="eventos" element={<EventosEditor />} />
-          <Route path="candidatos" element={<CandidatosList />} />
-          <Route path="sac" element={<MensagensSacList />} />
-          <Route path="vagas/cadastrar" element={<VagasEditor />} />
-          <Route path="vagas/parametros" element={<VagasParametrosEditor />} />
-          <Route path="usuarios" element={<UsuariosEditor />} />
+        {/* Rotas administrativas sob demanda com Suspense */}
+        <Route 
+          path="/admin/login" 
+          element={
+            <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">Carregando painel...</div>}>
+              <Login />
+            </Suspense>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <Suspense fallback={<div className="min-h-screen bg-gray-100 flex items-center justify-center text-gray-600">Carregando painel administrativo...</div>}>
+              <DashboardLayout />
+            </Suspense>
+          }
+        >
+          <Route index element={<Suspense fallback={null}><Dashboard /></Suspense>} />
+          <Route path="home" element={<Suspense fallback={null}><HomeEditor /></Suspense>} />
+          <Route path="cabecalho" element={<Suspense fallback={null}><CabecalhoEditor /></Suspense>} />
+          <Route path="ajustes" element={<Suspense fallback={null}><ConfiguracoesEditor /></Suspense>} />
+          <Route path="sobre" element={<Suspense fallback={null}><SobreEditor /></Suspense>} />
+          <Route path="rodape" element={<Suspense fallback={null}><FooterEditor /></Suspense>} />
+          <Route path="servicos" element={<Suspense fallback={null}><ServicosEditor /></Suspense>} />
+          <Route path="setores" element={<Suspense fallback={null}><SetoresEditor /></Suspense>} />
+          <Route path="eventos" element={<Suspense fallback={null}><EventosEditor /></Suspense>} />
+          <Route path="candidatos" element={<Suspense fallback={null}><CandidatosList /></Suspense>} />
+          <Route path="sac" element={<Suspense fallback={null}><MensagensSacList /></Suspense>} />
+          <Route path="vagas/cadastrar" element={<Suspense fallback={null}><VagasEditor /></Suspense>} />
+          <Route path="vagas/parametros" element={<Suspense fallback={null}><VagasParametrosEditor /></Suspense>} />
+          <Route path="usuarios" element={<Suspense fallback={null}><UsuariosEditor /></Suspense>} />
         </Route>
 
         {/* Parte Pública do Site */}

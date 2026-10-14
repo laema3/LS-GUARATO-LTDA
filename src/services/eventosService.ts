@@ -177,6 +177,54 @@ export function serializeDescricao(descricao: string, ganhadores: GanhadorPremio
   return `${cleanDesc}\n\n${totalTag}\n${ganhadoresTag}`.trim();
 }
 
+export interface EventoSummary {
+  id: string;
+  titulo: string;
+  data_evento?: string;
+}
+
+// Busca ultra-leve apenas com título e ID (menos de 1KB) para o menu e cabeçalho,
+// sem trafegar fotos pesadas a cada carregamento de página
+export async function getEventosSummary(): Promise<EventoSummary[]> {
+  try {
+    const { data, error } = await supabase
+      .from("eventos")
+      .select("id, titulo, data_evento")
+      .order("created_at", { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      return data.map(item => ({
+        id: String(item.id),
+        titulo: item.titulo || "Evento",
+        data_evento: item.data_evento || ""
+      }));
+    }
+  } catch (err) {
+    console.warn("Aviso ao buscar resumo de eventos:", err);
+  }
+
+  // Fallback para cache local se disponível
+  const cachedRaw = localStorage.getItem(STORAGE_KEY);
+  if (cachedRaw) {
+    try {
+      const parsed = JSON.parse(cachedRaw);
+      return (Array.isArray(parsed) ? parsed : [parsed]).map((item: any) => ({
+        id: String(item.id),
+        titulo: item.titulo || "Evento",
+        data_evento: item.data_evento || ""
+      }));
+    } catch {
+      // ignore
+    }
+  }
+
+  return [{
+    id: DEFAULT_EVENTO_42_ANOS.id,
+    titulo: DEFAULT_EVENTO_42_ANOS.titulo,
+    data_evento: DEFAULT_EVENTO_42_ANOS.data_evento
+  }];
+}
+
 export async function getEventos(): Promise<EventoItem[]> {
   // 1. Carrega do localStorage primeiro (cache offline/rápido)
   let cachedList: EventoItem[] = [];

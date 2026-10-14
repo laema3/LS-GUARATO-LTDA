@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { Upload, X, Loader2, Plus } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
+import { compressImage } from "../../lib/imageOptimizer";
+
 interface MultiFileUploadProps {
   value?: string[];
   onChange: (urls: string[]) => void;
@@ -28,23 +30,42 @@ export const MultiFileUpload = ({
       
       for (let i = 0; i < files.length; i++) {
         if (newUrls.length >= 10) break;
-        const file = files[i];
+        const rawFile = files[i];
         
-        const fileExt = file.name.split('.').pop();
+        // Comprime para evitar uploads pesados e estouro de consumo
+        const { file, base64 } = await compressImage(rawFile, {
+          maxWidth: 1400,
+          maxHeight: 1400,
+          quality: 0.82
+        });
+
+        const fileExt = file.name.split('.').pop() || "jpg";
         const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
         const filePath = `${folder}/${fileName}`;
 
-        const { error } = await supabase.storage
-          .from(bucket)
-          .upload(filePath, file);
+        try {
+          const { error } = await supabase.storage
+            .from(bucket)
+            .upload(filePath, file, { upsert: true, contentType: file.type });
 
-        if (error) throw error;
+          if (!error) {
+            const { data: publicData } = supabase.storage
+              .from(bucket)
+              .getPublicUrl(filePath);
 
-        const { data: publicData } = supabase.storage
-          .from(bucket)
-          .getPublicUrl(filePath);
+            if (publicData?.publicUrl) {
+              newUrls.push(publicData.publicUrl);
+              continue;
+            }
+          }
+        } catch (storageErr) {
+          console.warn("Storage upload falhou, usando Base64 otimizado:", storageErr);
+        }
 
-        newUrls.push(publicData.publicUrl);
+        // Se o storage falhar, usa o Base64 comprimido
+        if (base64) {
+          newUrls.push(base64);
+        }
       }
       onChange(newUrls);
     } catch (error) {

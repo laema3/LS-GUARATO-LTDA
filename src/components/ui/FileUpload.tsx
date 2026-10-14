@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { Upload, X, FileText, Loader2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
+import { compressImage } from "../../lib/imageOptimizer";
+
 interface FileUploadProps {
   value?: string;
   onChange: (url: string) => void;
@@ -13,15 +15,6 @@ interface FileUploadProps {
   folder?: string;
   heightClass?: string;
 }
-
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
-  });
-};
 
 export const FileUpload = ({ 
   value, 
@@ -38,23 +31,31 @@ export const FileUpload = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
 
     try {
       setIsUploading(true);
       let uploadedUrl = "";
 
+      // Otimiza e comprime a foto (reduz fotos de 5MB-15MB para ~100KB-200KB)
+      // para economizar banda (Egress) e espaço no Supabase
+      const { file, base64 } = await compressImage(rawFile, {
+        maxWidth: 1400,
+        maxHeight: 1400,
+        quality: 0.82
+      });
+
       // Tenta upload no Supabase Storage se configurado
       if (import.meta.env.VITE_SUPABASE_URL && !import.meta.env.VITE_SUPABASE_URL.includes('placeholder')) {
         try {
-          const fileExt = file.name.split('.').pop();
+          const fileExt = file.name.split('.').pop() || "jpg";
           const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
           const filePath = `${folder}/${fileName}`;
 
           const { error } = await supabase.storage
             .from(bucket)
-            .upload(filePath, file, { upsert: true });
+            .upload(filePath, file, { upsert: true, contentType: file.type });
 
           if (!error) {
             const { data: publicData } = supabase.storage
@@ -65,17 +66,16 @@ export const FileUpload = ({
               uploadedUrl = publicData.publicUrl;
             }
           } else {
-            console.warn("Upload no Supabase Storage falhou, usando fallback Base64:", error.message);
+            console.warn("Upload no Supabase Storage falhou, usando fallback Base64 otimizado:", error.message);
           }
         } catch (storageErr) {
-          console.warn("Erro ao enviar ao Supabase Storage, usando fallback Base64:", storageErr);
+          console.warn("Erro ao enviar ao Supabase Storage, usando fallback Base64 otimizado:", storageErr);
         }
       }
 
-      // Se o upload no Supabase Storage não gerou URL válida, usa Base64 persistente
-      // (Base64 não expira ao atualizar a página, diferente de blob: URLs)
+      // Se o upload no Supabase Storage falhar, usa o Base64 comprimido
       if (!uploadedUrl) {
-        uploadedUrl = await fileToBase64(file);
+        uploadedUrl = base64;
       }
 
       onChange(uploadedUrl);

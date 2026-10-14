@@ -1,18 +1,17 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, Store, MapPin, Phone, Mail, Instagram, Facebook, Settings, FileText, Briefcase, ShieldCheck, TrendingUp, Apple, Play, LayoutGrid, Clock, MessageCircle, Calendar, Gift, Trophy, Sparkles } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import { CookieConsent } from "./CookieConsent";
-import { getEventos } from "../services/eventosService";
-import { EventoItem } from "../types/evento";
+import { getEventosSummary, EventoSummary } from "../services/eventosService";
 
 const Header = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isEventosOpen, setIsEventosOpen] = useState(false);
-  const [eventos, setEventos] = useState<EventoItem[]>([]);
+  const [eventos, setEventos] = useState<EventoSummary[]>([]);
   const [logo, setLogo] = useState("");
   const location = useLocation();
 
@@ -33,7 +32,7 @@ const Header = () => {
 
     const loadEventosList = async () => {
       try {
-        const list = await getEventos();
+        const list = await getEventosSummary();
         setEventos(list);
       } catch (err) {
         console.error("Erro ao carregar lista de eventos:", err);
@@ -474,7 +473,13 @@ export const Layout = () => {
     <div className="min-h-screen flex flex-col relative">
       <Header />
       <main className="flex-grow">
-        <Outlet />
+        <Suspense fallback={
+          <div className="min-h-[50vh] flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-3 border-gray-200 border-t-[#0B3C8C]" />
+          </div>
+        }>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
       
